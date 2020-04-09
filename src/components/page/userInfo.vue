@@ -8,42 +8,26 @@
         <span>基本信息</span>
     </div>
     <el-form class="userInfo">
-      <el-form-item label="姓名" class="userList">
+      <el-form-item label="名称" class="userList">
         <el-form-item>
-          <span>kyumin</span>
+          <span>{{userNames}}</span>
+          <span class="tips">设置名称后能给您提供更好的服务哦~</span>
+          <span class="editBtn edit1" @click="editHandel"><i class="el-icon-edit"></i>修改</span>
         </el-form-item>
       </el-form-item>
       <el-form-item label="QQ" class="userList">
         <el-form-item>
           <span>{{userQQ}}</span>
-          <span class="editBtn edit2" @click="editPwdHandel"><i class="el-icon-edit"></i>修改</span>
+          <span class="editBtn edit2" @click="editQqHandel"><i class="el-icon-edit"></i>修改</span>
         </el-form-item>
       </el-form-item>
       <el-form-item label="微信" class="userList">
         <el-form-item>
-          <span>{{userWX}}</span>
-          <span class="editBtn edit3" @click="editWxHandel"><i class="el-icon-edit"></i>修改</span>
+          <span>{{WeChat}}</span>
+          <span class="editBtn edit3" @click="editWeChatHandel"><i class="el-icon-edit"></i>修改</span>
         </el-form-item>
       </el-form-item>
     </el-form>
-<!--    <div class="userInfo">-->
-<!--      <div class="infoItem">-->
-<!--        <span class="names">名称</span>-->
-<!--        <span>{{userNames}}</span>-->
-<!--        <span class="tips">设置名称后能给您提供更好的服务哦~</span>-->
-<!--        <span class="editBtn edit1" @click="editHandel"><i class="el-icon-edit"></i>修改</span>-->
-<!--      </div>-->
-<!--      <div class="infoItem">-->
-<!--        <span class="names">QQ</span>-->
-<!--        <span>796544354</span>-->
-<!--        <span class="editBtn edit2" @click="editPwdHandel"><i class="el-icon-edit"></i>修改</span>-->
-<!--      </div>-->
-<!--      <div class="infoItem">-->
-<!--        <span class="names">微信</span>-->
-<!--        <span>kyumin</span>-->
-<!--        <span class="editBtn edit3" @click="editWxHandel"><i class="el-icon-edit"></i>修改</span>-->
-<!--      </div>-->
-<!--    </div>-->
 <!--  修改QQ-->
     <el-dialog title="修改信息" :visible.sync="editQqModel" width="30%" center :close-on-click-modal="false">
       <el-form :model="formQq" ref="formQq" label-width='50px' :rules='rules' class="demo-ruleForm">
@@ -57,36 +41,53 @@
         </span>
     </el-dialog>
     <!--修改微信-->
-    <el-dialog title="修改信息" :visible.sync="editWxModel" width="30%" center :close-on-click-modal="false">
-      <el-form :model="formWx" ref="formWx" :rules='rules' class="demo-ruleForm" label-width='50px'>
+    <el-dialog title="修改信息" :visible.sync="editWeChatModel" width="30%" center :close-on-click-modal="false">
+      <el-form :model="formWeChat" ref="formWeChat" :rules='rules' class="demo-ruleForm" label-width='50px'>
         <el-form-item prop="wx" label='微信'>
-          <el-input v-model="formWx.wx" placeholder='请输入新微信'></el-input>
+          <el-input v-model="formWeChat.WeChat" placeholder='请输入新微信'></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="editWX('formWx')">确定</el-button>
-          <el-button @click="editWxModel=false">取消</el-button>
+          <el-button type="primary" @click="editWeChat('formWeChat')">确定</el-button>
+          <el-button @click="editWeChatModel=false">取消</el-button>
+        </span>
+    </el-dialog>
+    <!-- 修改名称 -->
+    <el-dialog title="修改信息" :visible.sync="editNameModel" width="30%" center :close-on-click-modal="false">
+      <el-form :model="formName" ref="formName" :rules='rules' class="demo-ruleForm" label-width='50px'>
+        <el-form-item prop="userName" label='姓名'>
+          <el-input v-model="formName.userName" placeholder='请输入姓名'></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="editName('formName')">确定</el-button>
+          <el-button @click="editNameModel=false">取消</el-button>
         </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
+  import {updateName,updateQQ,updateWeCatch} from '@/request/api'
 export default {
   name: 'userInfo',
   data () {
     return {
       editQqModel: false,
-      editWxModel: false,
+      editWeChatModel: false,
+      editNameModel:false,
       userNames: 'kyumin',
       pwds: '123434',
       userQQ:'未填写',
-      userWX:'未填写',
+      WeChat:'未填写',
       formQq: {
         qq: ''
       },
-      formWx: {
-        wx: ''
+      formWeChat: {
+        WeChat: ''
+      },
+      formName:{
+        userName:''
       },
       rules:{
       	qq:[{
@@ -97,6 +98,10 @@ export default {
       	wx:[{
       		required: true,
 					message: '请输入微信',
+					trigger: 'blur'}],
+      	userName:[{
+      		required: true,
+					message: '请输入姓名',
 					trigger: 'blur'}],
 }
 }
@@ -129,77 +134,102 @@ created() {
 					}
 			})
 		},//  修改QQ弹窗
-    editPwdHandel () {
+    editQqHandel () {
       let _this = this
       _this.editQqModel = true
     },
     //  修改微信
-    editWxHandel () {
+    editWeChatHandel () {
       let _this = this
-      _this.editWxModel = true
+      _this.editWeChatModel = true
+    },
+    // 修改名称弹窗
+    editHandel(){
+      let _this = this
+      _this.editNameModel = true
     },
     //修改QQ确定
     editQQ(formName){
     	let _this = this
     	let param = {
-    		SessionId:sessionStorage.getItem('sessionid'),
-    		userId:sessionStorage.getItem('userId'),
-    		KeyName:'QQ',
-    		KeyValue:_this.formQq.qq
+    		Id:sessionStorage.getItem('userId'),
+    		QQ:_this.formQq.qq
     	}
     	_this.$refs[formName].validate((valid)=>{
     		if(valid){
-    			_this.axios.post(this.GLOBAL.BASE_URL + '/api/frontUserUpdate', param).then((res)=>{
-    				if(res.status=='200'){
-    					_this.userQQ = res.data.data.QQ
-    					_this.$message({
-    						type:'success',
-    						message:res.data.message
-    					})
-    					_this.editQqModel = false
-    				}if(res.data.status==400){
-						_this.$message({
-							type:'error',
-							message:'登录过期，请重新登录'
-						})
-						sessionStorage.clear()
-						_this.$router.push({name:'index',params:{indexShow: false}})
-					}
-    			})
+          updateQQ(param).then((res=>{
+            if(res.data.Code === 'ok'){
+            	// _this.userQQ = res.data.data.QQ
+            	_this.$message({
+            		type:'success',
+            		message:res.data.Msg
+            	})
+            	_this.editQqModel = false
+            }else{
+              _this.$message({
+                type:'error',
+                message:res.data.Msg
+              })
+            }
+          }).catch((err)=>{
+            console.log(err)
+          }))
     		}
     	})
     },
     //修改微信
-        editWX(formName){
+      editWeChat(formName){
     	let _this = this
     	let param = {
-    		SessionId:sessionStorage.getItem('sessionid'),
-    		userId:sessionStorage.getItem('userId'),
-    		KeyName:'wechat',
-    		KeyValue:_this.formWx.wx
+    		Id:sessionStorage.getItem('userId'),
+    		WeChat:_this.formWeChat.WeChat
     	}
     	_this.$refs[formName].validate((valid)=>{
     		if(valid){
-    			_this.axios.post(this.GLOBAL.BASE_URL + '/api/frontUserUpdate', param).then((res)=>{
-    				if(res.status=='200'){
-    					_this.userWX=res.data.data.wechat
-    					_this.$message({
-    						type:'success',
-    						message:res.data.message
-    					})
-    					_this.editWxModel = false
-    				}if(res.data.status==400){
-						_this.$message({
-							type:'error',
-							message:'登录过期，请重新登录'
-						})
-						sessionStorage.clear()
-						_this.$router.push({name:'index',params:{indexShow: false}})
-					}
-    			})
+          updateWeCatch(param).then((res)=>{
+            if(res.data.Code==='ok'){
+            	_this.WeChat=res.data.data.wechat
+            	_this.$message({
+            		type:'success',
+            		message:res.data.Msg
+            	})
+            	_this.editWeChatModel = false
+            }else{
+              _this.$message({
+                type:'error',
+                message:res.data.Msg
+              })
+            }
+          })
     		}
     	})
-    }
+    },
+    // 修改名称
+    editName(formName){
+      let _this = this
+      let param = {
+        Id:sessionStorage.getItem('userId'),
+        Name:_this.formName.userName
+      }
+      _this.$refs[formName].validate((valid)=>{
+        if(valid){
+          updateName(param).then((res)=>{
+            if(res.data.Code === 'ok'){
+              _this.$message({
+                type:'success',
+                message:res.data.Msg
+              })
+              _this.editNameModel = false
+            }else{
+              _this.$message({
+                type:'error',
+                message:res.data.Msg
+              })
+            }
+          })
+        }
+      })
+    },
   }
 }
 </script>

@@ -10,7 +10,12 @@ body {
 img {
 	border: none;
 }
-
+.tableBg{
+	border: 1px solid #eee;
+	padding: 20px;
+	border-radius: 8px;
+	box-sizing: border-box;
+}
 .mb0 {
 	margin-bottom: 0;
 }
@@ -129,7 +134,7 @@ img {
 
 .wid,
 .minWid {
-	width: 70%;
+	width: 80%;
 }
 
 .wid100 {
@@ -202,7 +207,8 @@ img {
 
 .el-dialog>.el-dialog__footer {
 	background: #eee;
-	padding: 10px 20px;
+	padding: 20px;
+  text-align: center;
 }
 
 
@@ -213,14 +219,14 @@ img {
 	width: calc(100% - 50px);
 }
 
-.fixed-dialog>.el-dialog__body {
+/* .fixed-dialog>.el-dialog__body {
 	margin-bottom: 120px;
-}
+} */
 
 .fixed-dialog>.el-dialog__footer {
 	width: 100%;
-	position: absolute;
-	bottom: 0;
+/* 	position: absolute;
+	bottom: 0; */
 }
 
 
@@ -539,7 +545,7 @@ footer {
 
 .taskBoxIndex {
 	width: 100%;
-	border: #eee solid 1px;
+	/*border: #eee solid 1px;*/
 	padding: 50px 0 20px 0;
 	box-sizing: border-box;
 }
@@ -550,7 +556,7 @@ footer {
 	display: -webkit-box;
 	-webkit-line-clamp: 4;
 	-webkit-box-orient: vertical;
-	width: 60%;
+	/*width: 60%;*/
 	margin: 0 auto;
 	color: #74788d;
 	height: 105px;
@@ -559,8 +565,8 @@ footer {
 .taskTypes {
 	height: 50px;
 	line-height: 50px;
-	border: #ebedf2 solid 1px;
-	border-bottom: none;
+	border-bottom: #ebedf2 solid 1px;
+	/*border-bottom: none;*/
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -606,7 +612,7 @@ footer {
 	flex-direction: column;
 	align-content: space-between;
 	margin-bottom: 20px;
-	border-right: #ebedf2 solid 1px;
+	/*border-right: #ebedf2 solid 1px;*/
 }
 
 .brnone {
@@ -1544,6 +1550,12 @@ footer {
 		width: auto;
 		overflow-x: auto;
 	}
+	 .fz120{
+  	font-size: 80px;
+  }
+  .taskPrice{
+  	font-size: 20px;
+  }
 }
 
 @media screen and (max-width: 580px) {

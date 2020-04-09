@@ -8,13 +8,13 @@
 			<span>安全设置</span>
 		</div>
 		<el-form class="userInfo">
-			<el-form-item label="邮箱" class="userList">
+			<!--<el-form-item label="邮箱" class="userList">
 				<el-form-item>
 					<span>79434334@qq.com</span>
 					<span class="tips">绑定密保邮箱后可用于找回密码~</span>
 					<span class="editBtn edit1" @click="editEmailHandel"><i class="el-icon-edit"></i>修改</span>
 				</el-form-item>
-			</el-form-item>
+			</el-form-item>-->
 			<el-form-item label="手机" class="userList">
 				<el-form-item>
 					<span>{{userPhone}}</span>
@@ -149,7 +149,7 @@
 				}
 			}
 			return {
-				disabled: true,
+				disabled: false,
 				codedisabled: false,
 				count: '',
 				count2: '',
@@ -349,19 +349,18 @@
 			newPhoneComfir() {
 				let _this = this
 				let param = {
-					SessionId: sessionStorage.getItem('sessionid'),
-					userId: sessionStorage.getItem('userId'),
-					KeyName: 'phonenumber',
-					KeyValue: _this.formNewPhone.phone,
-					OldValue: _this.userPhone,
-					veriCode: _this.formNewPhone.code
+					// SessionId: sessionStorage.getItem('sessionid'),
+					id: sessionStorage.getItem('userId'),
+					Phone: _this.formNewPhone.phone,
+					// OldValue: _this.userPhone,
+					// veriCode: _this.formNewPhone.code
 				}
-				_this.axios.post(_this.GLOBAL.BASE_URL + '/api/frontUserUpdate', param).then(res => {
-					if(res.data.status == 200) {
+				_this.axios.post(_this.GLOBAL.BASE_URL + '/api/CustomerUser/ChangePhone', param).then(res => {
+					if(res.data.Code === 'ok') {
 						_this.userPhone = res.data.data.phoneNumber
 						_this.$message({
 							type: 'success',
-							message: res.data.message
+							message: res.data.Msg
 						})
 						_this.editNewPhoneModel = false
 					}

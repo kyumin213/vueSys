@@ -8,21 +8,22 @@ import vuex from 'vuex'
 import 'babel-polyfill'
 import ElementUI from 'element-ui'
 import VueResource from 'vue-resource'
+import 'default-passive-events'
 import global_ from '@/components/global'
 import 'element-ui/lib/theme-chalk/index.css'
 import './assets/css/mystyle.css'
 import vali from '@/components/common/validate'
 Vue.config.productionTip = false
-Vue.use(ElementUI, VueResource, vuex, vali)
-//axios.defaults.headers.post['Content-Type'] = 'application/json'
+Vue.use(ElementUI,{size: 'medium'}, VueResource, vuex, vali)
+axios.defaults.headers.post['Content-Type'] = 'application/json'
 //axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-axios.defaults.headers.common['token'] = sessionStorage.getItem('sessionid')
+// axios.defaults.headers.common['SID'] = sessionStorage.getItem('sessionid')
 //axios.defaults.headers.common['SessionId'] = sessionStorage.getItem('sessionid')
 //axios.defaults.headers.common['fileext'] = sessionStorage.getItem('fileext')
 Vue.prototype.axios = axios
 Vue.prototype.GLOBAL = global_
 if (process.env.NODE_ENV === 'production') {
-  Vue.prototype.GLOBAL.BASE_URL = 'http://119.23.78.0' // 测试接口
+  Vue.prototype.GLOBAL.BASE_URL = 'http://47.115.37.202:8090/' // 测试接口
   // Vue.prototype.GLOBAL.BASE_URL = 'http://www.handyfitness.com.cn:8094' // 正式接口
 } else {
   // Vue.prototype.GLOBAL.BASE_URL = '开发测试地址'
@@ -31,7 +32,7 @@ if (process.env.NODE_ENV === 'production') {
 /* eslint-disable no-new */
 // 使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
-  const role = sessionStorage.getItem('token')
+  const role = sessionStorage.getItem('userId')
   if (!role && to.path !== '/index') {
    next({
         path: '/index',

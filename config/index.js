@@ -13,7 +13,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api': {
-        target: 'http://119.23.78.0',//设置你调用的接口域名和端口号 别忘了加http
+        target: 'http://47.115.37.202:8090/',//设置你调用的接口域名和端口号 别忘了加http
 //      target: 'https://jsonplaceholder.typicode.com/posts/',//设置你调用的接口域名和端口号 别忘了加http
         changeOrigin: true,
         pathRewrite: {
@@ -66,7 +66,7 @@ module.exports = {
      * Source Maps
      */
 
-    productionSourceMap: true,
+    productionSourceMap: false,
     // https://webpack.js.org/configuration/devtool/#production
     devtool: '#source-map',
 

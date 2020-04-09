@@ -31,6 +31,7 @@
 </template>
 
 <script>
+  import {updatePwd} from '@/request/api'
 	export default {
 		name: 'updatePwd',
 		data() {
@@ -101,53 +102,36 @@
 		methods: {
 			//确定
 			updatePwd(formName) {
-
 				let _this = this
 				_this.$refs[formName].validate((valid) => {
 					if(valid) {
 						let param = {
-							SessionId: sessionStorage.getItem('sessionid'),
-							userId: sessionStorage.getItem('userId'),
-							KeyName: 'Password',
-							KeyValue: _this.updatePwdForm.newPwd,
-							OldValue: _this.updatePwdForm.oldPwd
+							Id: sessionStorage.getItem('userId'),
+							OldPassWord: _this.updatePwdForm.oldPwd,
+							NowPassWord: _this.updatePwdForm.newPwd,
+              ConfirmPassWord:_this.updatePwdForm.comfirePwd
 						}
-						_this.axios.post(_this.GLOBAL.BASE_URL + 'api/frontUserUpdate', param).then(res => {
-							if(res.data.status == 200) {
-								_this.$message({
-									type: 'success',
-									message: res.data.message
-								})
-								sessionStorage.clear()
-								_this.$router.push({
-									name: 'index',
-									params: {
-										indexShow: false
-									}
-								})
-							}
-							if(res.data.status == 400) {
-								_this.$message({
-									type: 'error',
-									message: '登录过期，请重新登录'
-								})
-								sessionStorage.clear()
-								_this.$router.push({
-									name: 'index',
-									params: {
-										indexShow: false
-									}
-								})
-							}
-							if(res.data.status == 500) {
-								_this.$message({
-									type: 'success',
-									message: res.data.message
-								})
-							}
-						})
-					}else{
-						return false;
+            updatePwd(param).then((res)=>{
+              if(res.data.Code === 'ok') {
+              	_this.$message({
+              		type: 'success',
+              		message: res.data.Msg
+              	})
+              	sessionStorage.clear()
+              	_this.$router.push({
+              		name: 'index',
+              		params: {
+              			indexShow: false
+              		}
+              	})
+              }else{
+                _this.$message({
+                  type:'error',
+                  message:res.data.Msg
+                })
+              }
+            })
+
 					}
 				})
 

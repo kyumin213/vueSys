@@ -7,19 +7,16 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     user: {},
-    token: null,
     title: '',
-    SessionId:""
+    userId:""
   },
   mutations: {
     [types.LOGIN]: (state, data) => {
-      localStorage.token = data
-      state.token = data
-      state.SessionId = data
+      state.userId = data
     },
     [types.LOGOUT]: (state) => {
-      localStorage.removeItem('token')
-      state.token = null
+      localStorage.removeItem('userId')
+      state.userId = null
     },
     [types.TITLE]: (state, data) => {
       state.title = data

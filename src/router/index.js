@@ -1,7 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-// import HelloWorld from '@/components/HelloWorld'
-// import index from '@/components/index'
 Vue.use(Router)
 
 export default new Router({
@@ -28,6 +26,14 @@ export default new Router({
 					path: '/taskManage',
 					name: 'taskManage',
 					component: resolve => require(['../components/page/taskManage.vue'], resolve),
+					meta: {
+						title: '订单管理'
+					}
+				},
+				{
+					path: '/orderManage',
+					name: 'orderManage',
+					component: resolve => require(['../components/page/orderManage.vue'], resolve),
 					meta: {
 						title: '任务管理'
 					}
@@ -129,16 +135,6 @@ export default new Router({
 					}
 				}
 			]
-		},
-		{
-			path: '/register',
-			name: 'register',
-			component: resolve => require(['../components/page/register.vue'], resolve)
-		},
-		{
-			path: '/login',
-			name: 'login',
-			component: resolve => require(['../components/page/login.vue'], resolve)
 		},
 		{
 			path: '/forgetPassword',

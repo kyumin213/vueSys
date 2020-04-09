@@ -7,13 +7,12 @@
 			</div>
 			<div class="bg-purple panRight">
 				<div class="userMsg">
-					<span>您好</span>
-					<span>{{homeData.userName}}</span>
-					<span class="level">普通会员lve1</span>
+					<span>您好，</span>
+					<span>{{homeData[0].name}}</span>
 				</div>
 				<div>
-					<span>账户余额:￥<span class="money">{{homeData.balance}}</span></span>
-					<el-button class="el-button ml30" type="primary" size="medium" @click='recharge'>充值</el-button>
+					<span>账户余额:￥<span class="money">{{homeData[0].accountbalance}}</span></span>
+					<el-button class="el-button ml30" type="primary" size="medium" @click='viewAccount'>查看明细</el-button>
 					<el-button class="el-button cashWish" type="success" @click="cashMoney" size="medium">提现</el-button>
 				</div>
 			</div>
@@ -66,88 +65,20 @@
 						</div>
 						<div style="width: 60%;">
 							<div class="count">{{userSmmary.weirdTasks}}</div>
-							<div class="col fz">异常任务</div>
+							<div class="col fz">已取消任务</div>
 						</div>
 					</div>
 				</div>
 			</el-col>
 		</el-row>
-		<el-carousel :interval="5000" arrow="always" :autoplay="false">
-			<el-carousel-item>
-				<div class="taskTypes">
-					<h3 class="fz16 typeName">亚马逊任务</h3>
-					<span class="fz16 moreTxt" @click="moreTask">更多任务</span>
-				</div>
-				<div class="taskBoxIndex">
-					<el-row>
-						<el-col :span='6' :xs="24" v-for="(item,index) in homeData.tasksItems" :key="index" v-if="item.platformId==1">
-							<div class="taskItem">
-								<div class="flex2 mt50">
-									<i class="el-icon-magic-stick fz120 icon1" v-show='item.taskId==1&& item.platformId==1'></i>
-									<i class="el-icon-shopping-cart-full fz120 icon2" v-show='item.taskId==2&& item.platformId==1'></i>
-									<i class="el-icon-star-off fz120 icon3" v-show='item.taskId==3&& item.platformId==1'></i>
-									<i class="el-icon-apple fz120 icon4" v-show='item.taskId==4&& item.platformId==1'></i>
-								</div>
-								<div class="flex2">
-									<div class="mb5"><span class="mr5 taskPrice">亚马逊{{item.TaskName}}任务</span></div>
-									<div class="mb20">
-										<span class="fw titleNames mr5">￥{{item.minprice}}</span><span>起</span>
-									</div>
-									<div class="indexTaskDes">
-										{{item.descriptoin}}
-									</div>
-								</div>
-								<div class="flex1 mt50">
-									<div>
-										<el-button type="primary" round @click="fbaTask(index)" v-show='item.taskId==1&& item.platformId==1'>立即购买</el-button>
-										<el-button type="success" round @click="buyCarTask(index)" v-show='item.taskId==2&& item.platformId==1'>立即购买</el-button>
-										<el-button type="danger" round @click="wishTask(index)" v-show='item.taskId==3&& item.platformId==1'>立即购买</el-button>
-										<el-button type="warning" round @click="likesTask(index)" v-show='item.taskId==4&& item.platformId==1'>立即购买</el-button>
-									</div>
-								</div>
-							</div>
-						</el-col>
-					</el-row>
-				</div>
-			</el-carousel-item>
-			<el-carousel-item>
-				<div class="taskTypes">
-					<h3 class="fz16 typeName">速卖通任务</h3>
-					<span class="fz16 moreTxt" @click="moreTask">更多任务</span>
-				</div>
-				<div class="taskBoxIndex">
-					<el-row>
-						<el-col :span='6' :xs="24" v-for="(item,index) in homeData.tasksItems" :key="item.index" v-if="item.platformId==2">
-							<div class="taskItem">
-								<div class="flex2 mt50">
-									<i class="el-icon-magic-stick fz120 icon1" v-show='item.taskId==1&& item.platformId==2'></i>
-									<i class="el-icon-shopping-cart-full fz120 icon2" v-show='item.taskId==2&& item.platformId==2'></i>
-									<i class="el-icon-star-off fz120 icon3" v-show='item.taskId==3&& item.platformId==2'></i>
-									<i class="el-icon-apple fz120 icon4" v-show='item.taskId==4&& item.platformId==2'></i>
-								</div>
-								<div class="flex2">
-									<div class="mb5"><span class="mr5 taskPrice">亚马逊{{item.TaskName}}任务</span></div>
-									<div class="mb20">
-										<span class="fw titleNames mr5">￥{{item.minprice}}</span><span>起</span>
-									</div>
-									<div class="indexTaskDes">
-										{{item.descriptoin}}
-									</div>
-								</div>
-								<div class="flex1 mt50">
-									<div>
-										<el-button type="primary" round @click="fbaTask" v-show='item.taskId==1&& item.platformId==2'>立即购买</el-button>
-										<el-button type="success" round @click="buyCarTask" v-show='item.taskId==2&& item.platformId==2'>立即购买</el-button>
-										<el-button type="danger" round @click="wishTask" v-show='item.taskId==3&& item.platformId==2'>立即购买</el-button>
-										<el-button type="warning" round @click="likesTask" v-show='item.taskId==4&& item.platformId==2'>立即购买</el-button>
-									</div>
-								</div>
-							</div>
-						</el-col>
-					</el-row>
-				</div>
-			</el-carousel-item>
-		</el-carousel>
+    <el-card class="box-card">
+      <div slot="header" class="clearfix">
+        <span>公告</span>
+      </div>
+      <div class="text item">
+        <p v-for="(item,index) in Notice">{{item.Notice}}</p>
+      </div>
+    </el-card>
 		<!--提示-->
 		<div class="errTip">
 			<el-dialog title="提示" :visible.sync="errorModel" width="30%" center>
@@ -157,44 +88,7 @@
                 </span>
 			</el-dialog>
 		</div>
-		<!--充值-->
-		<el-dialog title='充值' :visible.sync='RechargeModal' :close-on-click-modal='false'>
-			<el-form :model='rechargeForm' ref='rechargeForm' class="form-item" :rules='rechargeRules' :inline="true" label-width="80px" status-icon>
-				<el-row>
-					<el-col>
-						<el-form-item label='充值金额'>
-							<el-radio-group v-model="rechargeForm.money">
-								<el-radio-button label="100"></el-radio-button>
-								<el-radio-button label="300"></el-radio-button>
-								<el-radio-button label="500"></el-radio-button>
-								<el-radio-button label="800"></el-radio-button>
-								<el-radio-button label="1000"></el-radio-button>
-							</el-radio-group>
-						</el-form-item>
-					</el-col>
-				</el-row>
-				<el-row>
-					<el-col>
-						<el-form-item label='自定义' prop='money'>
-							<el-input v-model='rechargeForm.money'>
-								<template slot="append">元</template>
-							</el-input>
-						</el-form-item>
-					</el-col>
-				</el-row>
-				<el-form-item label='付款方式'>
-					<el-radio-group v-model="rechargeForm.payType">
-						<el-radio label="1">支付宝</el-radio>
-						<!--<el-radio label="2">微信</el-radio>-->
-						<el-radio label="3">银行卡</el-radio>
-					</el-radio-group>
-				</el-form-item>
-			</el-form>
-			<div slot='footer' class="dialog-footer">
-				<el-button type='primary' @click="comfirPay('rechargeForm')">确认</el-button>
-				<el-button @click='RechargeModal=false'>取消</el-button>
-			</div>
-		</el-dialog>
+
 		<!--支付宝付款-->
 		<el-dialog title="支付宝" :visible.sync="AlipayPaymentModal">
 			<div class="txtCenter">
@@ -234,13 +128,14 @@
 <script>
 	import bus from '../common/bus'
 	import vali from '../common/validate'
+  import {getIndex} from '@/request/api'
 	export default {
 		name: 'loginHome',
 		data() {
 			return {
+        Notice:[], //公告内容
 				platformId:0,
 				item: '1',
-				RechargeModal: false, //充值
 				errorModel: false,
 				collapse: false,
 				AlipayPaymentModal: false, //支付宝支付
@@ -252,27 +147,12 @@
 				homeData: [],
 				userSmmary: [],
 				tasksItems: [],
-				rechargeForm: {
-					money: '',
-					payType: '1'
-				},
 				//银行卡信息
 				bankPayForm: {
 					accountName: '',
 					openBank: '',
 					accountNumber: '',
 					IdentificationCode: ''
-				},
-				rechargeRules: {
-					money: [{
-							validator: vali.proPrice,
-							trigger: 'change'
-						},
-						{
-							required: false,
-							trigger: 'change'
-						}
-					]
 				},
 				postJson: {}
 
@@ -284,6 +164,7 @@
 			})
 			// this.getSrc()
 			this.isError()
+      this.getNoticeData()
 			this.getHome()
 		},
 		computed: {
@@ -293,39 +174,32 @@
 
 		},
 		methods: {
+      // 公告内容
+      getNoticeData(){
+        let _this = this
+        _this.axios.get(_this.GLOBAL.BASE_URL +'/api/HomePage/GetHomePage').then((res)=>{
+            _this.Notice = res.data
+        })
+      },
 			//首页数据加载
 			getHome() {
 				let _this = this
 				let param = {
-					SessionId: sessionStorage.getItem('sessionid')
+					Id: sessionStorage.getItem('userId')
 				}
-				_this.axios.post(this.GLOBAL.BASE_URL + '/api/frontConsoleHome', param).then((res) => {
-					if(res.data.status == 200) {
-						_this.homeData = res.data.data
-						_this.userSmmary = res.data.data.userSmmary
-						_this.tasksItems = res.data.data.tasksItems
-						sessionStorage.setItem('userId', res.data.data.userid)
-						sessionStorage.setItem('balance', res.data.data.balance)
-					}
-					if(res.data.status == 400) {
-						_this.$message({
-							type: 'error',
-							message: '登录过期，请重新登录'
-						})
-						_this.$router.push({
-							name: 'index',
-							params: {
-								indexShow: false
-							}
-						})
-						sessionStorage.clear()
-					}
-				})
+         getIndex(param).then((res=>{
+           _this.homeData = res.data
+           if(_this.homeData[0].accountbalance == null){
+             _this.homeData[0].accountbalance = 0
+           }
+           sessionStorage.setItem('userName', _this.homeData[0].name)
+           sessionStorage.setItem('balance', _this.homeData[0].accountbalance)
+         }))
 			},
 			//充值
-			recharge() {
+			viewAccount() {
 				let _this = this
-				_this.RechargeModal = true
+				_this.$router.push('/accountManage')
 			},
 			isError() {
 				let _this = this
@@ -334,53 +208,7 @@
 					_this.errorModel = true
 				}
 			},
-			//充值确定
-			comfirPay(formName) {
-				let _this = this
-				let types = _this.rechargeForm.payType
-				let param = {
-					SessionId: sessionStorage.getItem('sessionid'),
-					Amount: _this.rechargeForm.money,
-					paymethod: _this.rechargeForm.payType
-				}
-				_this.$refs[formName].validate((valid) => {
-					if(valid) {
-						_this.axios.post(_this.GLOBAL.BASE_URL + '/api/doTopUp', param).then((res) => {
-							if(res.data.status == '200') {
-								let rechargeForm = {
-									money: '',
-									payType: '1'
-								}
-								if(types === '1') {
-									_this.AlipayPaymentModal = true
-									_this.RechargeModal = false
-								} else if(types === '3') {
-									_this.bankPayModal = true
-									_this.RechargeModal = false
-								}
-							}
-							if(res.data.status == 400) {
-								_this.$message({
-									type: 'error',
-									message: '登录过期，请重新登录'
-								})
-								_this.$router.push({
-									name: 'index',
-									params: {
-										indexShow: false
-									}
-								})
-								sessionStorage.clear()
-							} else {
-								_this.$message({
-									type: 'error',
-									message: res.data.message
-								})
-							}
-						})
-					}
-				})
-			},
+
 			//关闭银行卡充值弹窗
 			closeModel() {
 				let _this = this
@@ -468,36 +296,42 @@
 		box-sizing: border-box;
 		background: #eee;
 	}
-	
+
 	.accountCon p {
 		line-height: 40px;
 	}
-	
+
 	.alipayImg {
 		width: 350px;
 	}
-	
+
 	.colred {
 		color: #f00;
 	}
-	
+
 	.el-row {
 		margin-bottom: 20px;
 	}
-	
+
 	.todo-item {
 		font-size: 14px;
 	}
-	
+
 	.todo-item-del {
 		text-decoration: line-through;
 		color: #999;
 	}
-	
+
 	.isRed {
 		display: inline-block;
 		height: 100px;
 		width: 100%;
 		color: red;
+	}
+	.carItem{
+		border-right: #ebedf2 solid 1px;
+	}
+	.carItem:nth-child(4),.carItem:nth-child(5){
+		border-right: none;
 	}
 </style>

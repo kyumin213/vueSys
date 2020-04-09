@@ -26,42 +26,8 @@
 						</el-tab-pane>
 						<el-tab-pane label="找回密码" name="second">
 							<div v-show='switchTab!=3'>
-								<el-button :class="active === 1?'activeThis':''" size='small' @click="useEmail">通过邮箱找回</el-button>
 								<el-button size='small' :class="active === 2?'activeThis':''" @click='usePhone'>通过手机找回</el-button>
 							</div>
-							<el-form :model="forgetEmail" ref="forgetEmail" :rules='rules' class='mt20' status-icon v-show='active==1'>
-								<el-form-item class="loginItem">
-									<el-input placeholder="请输入邮箱" v-model="forgetEmail.email">
-										<template slot="prepend">邮箱</template>
-									</el-input>
-								</el-form-item>
-								<el-row>
-									<el-col :span='8' :xs='24'>
-										<el-form-item class="loginItem" prop='imgsCode' :error='errorMsg'>
-											<el-input v-model="forgetEmail.imgsCode" placeholder='请输入图形码' @blur="imgCodeVali(forgetEmail.imgsCode)">
-												<template slot="prepend">图形码</template>
-											</el-input>
-										</el-form-item>
-									</el-col>
-									<el-col :span='7' :xs='24' class='txtLeft'>
-										<div class="identifybox">
-											<div>
-												<img :src="codeImg" alt="" class="avatar">
-											</div>
-											<el-button type='text' class="textbtn" @click="getImgCode">看不清，换一张</el-button>
-										</div>
-									</el-col>
-								</el-row>
-								<el-form-item class="loginItem">
-									<el-input placeholder="请输入验证码" v-model="forgetEmail.VerificationCode">
-										<template slot="prepend">验证码</template>
-									</el-input>
-									<el-button type='primary' size='medium' :disabled='getEmailPwd'>获取验证码</el-button>
-								</el-form-item>
-								<el-form-item>
-									<el-button type='primary' @click='resetPwdEmail'>确定</el-button>
-								</el-form-item>
-							</el-form>
 							<el-form :model="forgetPhone" ref="forgetPhone" :rules='rules' class='mt20' status-icon v-show='active==2'>
 
 								<el-form-item class="loginItem" prop='PhoneNumber'>
@@ -69,7 +35,7 @@
 										<template slot="prepend">手机号</template>
 									</el-input>
 								</el-form-item>
-								<el-row>
+<!-- 								<el-row>
 									<el-col :span='8' :xs='24'>
 										<el-form-item class="loginItem" prop='imgsCode' :error='errorMsg'>
 											<el-input v-model="forgetPhone.imgsCode" placeholder='请输入图形码' @blur="imgCodeVali(forgetPhone.imgsCode)">
@@ -85,7 +51,7 @@
 											<el-button type='text' class="textbtn" @click="getImgCode">看不清，换一张</el-button>
 										</div>
 									</el-col>
-								</el-row>
+								</el-row> -->
 								<el-form-item class="loginItem" prop='VerificationCode' :error='phoneMsg'>
 									<el-input placeholder="请输入验证码" v-model="forgetPhone.VerificationCode"  @blur="phoneCodeVali(forgetPhone.PhoneNumber,forgetPhone.VerificationCode)">
 										<template slot="prepend">验证码</template>
@@ -122,14 +88,11 @@
 							<el-form :model="formLogin" ref="formLogin" :rules='rules' class="demo-ruleForm" status-icon>
 								<el-form-item prop='PhoneNumber'>
 									<el-row :gutter="20">
-										<el-col class="loginItem mr10" :span="8" :xs="24" :sm='7' :md='9' :lg='7'>
-											<el-input placeholder="请输入手机号/邮箱" v-model="formLogin.PhoneNumber">
-												<template slot="prepend">手机/邮箱</template>
+										<el-col class="loginItem mr10" :sm='24' :md='9' :lg='8' :xl="7">
+											<el-input placeholder="请输入手机号" v-model="formLogin.PhoneNumber">
+												<template slot="prepend">手机号</template>
 											</el-input>
 
-										</el-col>
-										<el-col :span="13" :xs="24" :sm='13' :md='14' :lg='10'>
-											<span class="tipTxt" style="font-size: 12px;">使用手机或者邮箱中的任意一个均可（若采用邮箱，请确保你的帐号已绑定过该邮箱）</span>
 										</el-col>
 									</el-row>
 								</el-form-item>
@@ -138,15 +101,15 @@
 										<template slot="prepend">密码</template>
 									</el-input>
 								</el-form-item>
-								<el-row :gutter="20">
-									<el-col :span='10' :xs='24' :md='9' :lg='7'>
+<!-- 								<el-row :gutter="20">
+									<el-col :sm='24' :md='9' :lg='9' :xl="7" class='mb20'>
 										<el-form-item class="loginItem mb0" prop='imgsCode' :error='errorMsg'>
 											<el-input v-model="formLogin.imgsCode" placeholder='请输入图形码' @blur="imgCodeVali(formLogin.imgsCode)">
 												<template slot="prepend">图形码</template>
 											</el-input>
 										</el-form-item>
 									</el-col>
-									<el-col :span='14' :xs='24' :md='14' :lg='10' class='txtLeft'>
+									<el-col :sm='24' :md='14' :lg='14' :xl="10" class='txtLeft'>
 										<div class="identifybox">
 											<div>
 												<img :src="codeImg" alt="" class="avatar">
@@ -154,7 +117,7 @@
 											<el-button type='text' class="textbtn" @click="getImgCode">看不清，换一张</el-button>
 										</div>
 									</el-col>
-								</el-row>
+								</el-row> -->
 								<el-form-item class='mt20'>
 									<el-button type="primary" @click="loginIn('formLogin')" size="medium">立即登录</el-button>
 									<span class="ml30 forgetTxt" @click="forgetPwd">忘记密码</span>
@@ -168,7 +131,7 @@
 										<template slot="prepend">手机号</template>
 									</el-input>
 								</el-form-item>
-								<el-form-item class="loginItem" prop='VerificationCode' :error='phoneMsg'>
+								<el-form-item class="loginItem" :error='phoneMsg'>
 									<el-input v-model="formReg.VerificationCode" placeholder='请输入验证码' @blur="phoneCodeVali(formReg.PhoneNumber,formReg.VerificationCode)">
 										<template slot="prepend">验证码</template>
 									</el-input>
@@ -176,12 +139,6 @@
 										<span v-show="show">获取验证码</span>
 										<span v-show='!show'>{{count}}秒</span>
 									</el-button>
-								</el-form-item>
-								<el-form-item prop="name" class="loginItem">
-									<el-input v-model="formReg.name" placeholder='请输入姓名'>
-										<template slot="prepend">姓名</template>
-									</el-input>
-									<span class="tipTxt">请正确填写您的姓名,填写后不可修改</span>
 								</el-form-item>
 								<el-form-item prop="passwords" class="loginItem">
 									<el-input v-model="formReg.passwords" minlength='6' maxlength='16' type='password' placeholder='请输入密码'>
@@ -199,11 +156,11 @@
 										<template slot="prepend">推荐码</template>
 									</el-input>
 								</el-form-item>
-								<el-form-item>
+<!-- 								<el-form-item>
 									<el-checkbox-group v-model="formReg.agreeService">
 										<el-checkbox label="同意服务条款" class='col9' name="type"></el-checkbox>
 									</el-checkbox-group>
-								</el-form-item>
+								</el-form-item> -->
 								<el-form-item>
 									<el-button type="primary" @click="submitRegister('formReg')">立即注册</el-button>
 								</el-form-item>
@@ -280,7 +237,7 @@
 					</el-row>
 				</div>
 			</div>
-			<div class="taskShow">
+<!-- 			<div class="taskShow">
 				<p class="txtCenter fz30">平台</p>
 				<p class="txtCenter col6 mt20 mb50">使用我们的产品轻松提高您的服务的性能，安全性和可靠性</p>
 				<div class="widCon">
@@ -326,7 +283,7 @@
 						</el-col>
 					</el-row>
 				</div>
-			</div>
+			</div> -->
 			<!--服务-->
 			<div class="serviceBox">
 				<div>
@@ -364,7 +321,7 @@
 		<el-dialog title='验证码' :visible.sync='codeModal' :close-on-click-modal="false" width="30%">
 			<el-form :model="formReg" ref='formReg' :rules='rules' status-icon>
 				<el-form-item prop='imgsCode' :error='errorMsg'>
-					<el-input v-model="formReg.imgsCode" placeholder='请输入图形码' @blur="imgCodeVali(formReg.imgsCode)">
+					<el-input v-model="formReg.imgsCode" placeholder='请输入图形码'>
 
 					</el-input>
 				</el-form-item>
@@ -385,6 +342,7 @@
 
 <script>
 	import vali from '../common/validate'
+ import {login,register} from '@/request/api'
 	export default {
 		data() {
 			// 邮箱
@@ -482,14 +440,12 @@
 				imgcodeTxt: '', //返回的验证码
 				formReg: {
 					PhoneNumber: '',
-					name: '',
 					passwords: '',
 					confirmPassWord: '',
 					imgsCode: '',
 					VerificationCode: '',
-					RecommendCode: null,
-					agreeService: true
-				},
+					RecommendCode: null		,
+          },
 				formLogin: {
 					PhoneNumber: '',
 					passwords: '',
@@ -598,7 +554,7 @@
 		},
 		created() {
 			let _this = this
-			this.getImgCode()	
+			// this.getImgCode()
 			let indexShow = this.$route.params.indexShow
 			if(indexShow === undefined){
 			_this.indexShow = true
@@ -885,41 +841,38 @@
 			// 登录
 			loginIn(formName) {
 				let _this = this
-				let sessionid = sessionStorage.getItem('sessionid')
 				let param = {
-					SessionId: sessionid,
-					PhoneEmail: _this.formLogin.PhoneNumber,
+					Phone: _this.formLogin.PhoneNumber,
 					Password: _this.formLogin.passwords,
-					imagecode: _this.formLogin.imgsCode
 				}
-//								sessionStorage.setItem('token','23425252')
-//								_this.$router.push('/')
+								// sessionStorage.setItem('token','23425252')
+								// _this.$router.push('/loginHome')
 				_this.$refs[formName].validate((valid) => {
 					if(valid) {
-						_this.axios.post(_this.GLOBAL.BASE_URL + '/api/userLogin', param).then((res) => {
-							if(res.data.status == '200') {
-								_this.$message({
-									message: res.data.message,
-									type: 'success'
-								})
-								sessionStorage.setItem('userName',res.data.data.UserName)
-								sessionStorage.setItem('userId',res.data.data.UserId)
-								sessionStorage.setItem('token', res.data.data.sessionid)
-								_this.$router.push('/')
-							} else {
-								_this.$message({
-									message: res.data.message,
-									type: 'error'
-								})
-								_this.getImgCode()
-							}
-
-						}).catch((error) => {
-							console.log(error)
-						})
+            login(param).then((res)=>{
+              if(res.data.Code === 'ok') {
+              	_this.$message({
+              		message: res.data.Msg,
+              		type: 'success'
+              	})
+              	let types = res.data.Data
+                let datas = types.split(',')
+              	sessionStorage.setItem('userName',datas[1])
+              	sessionStorage.setItem('userId',datas[0])
+              	_this.$router.push('/')
+              } else {
+              	_this.$message({
+              		message: res.data.message,
+              		type: 'error'
+              	})
+              	// _this.getImgCode()
+              }
+            }).catch((err)=>{
+              console.log(error)
+            })
 
 					} else {
-						_this.getImgCode()
+						// _this.getImgCode()
 						return false
 
 					}
@@ -928,37 +881,34 @@
 			//注册
 			submitRegister(formName) {
 				let _this = this
-				let sessionid = sessionStorage.getItem('sessionid')
 				let param = {
-					sessionid: sessionid,
-					phonenumber: _this.formReg.PhoneNumber,
-					name: _this.formReg.name,
-					password: _this.formReg.passwords,
-					phonecode: _this.formReg.VerificationCode,
-					RecommendCode: _this.formReg.RecommendCode
+					Phone: _this.formReg.PhoneNumber,
+					Password: _this.formReg.passwords,
+					// phonecode: _this.formReg.VerificationCode,
+					Code: _this.formReg.RecommendCode
 				}
 				_this.$refs[formName].validate((valid) => {
 					if(valid) {
-						_this.axios.post(_this.GLOBAL.BASE_URL + 'api/userRegister', param).then((res) => {
-							if(res.data.status == '200') {
-								_this.$message({
-									message: res.data.message,
-									type: 'success'
-								})
-								_this.activeName = 'first'
-								_this.getImgCode()
-								
-							} else {
-								_this.$message({
-									message: res.data.message,
-									type: 'error'
-								})
-							}
-						}).catch((error) => {
+            register(param).then((res)=>{
+              if(res.data.Code === 'ok') {
+              	_this.$message({
+              		message: res.data.Msg,
+              		type: 'success'
+              	})
+              	_this.activeName = 'first'
+              	// _this.getImgCode()
+
+              } else {
+              	_this.$message({
+              		message: res.data.Msg,
+              		type: 'error'
+              	})
+              }
+            }).catch((error) => {
 							console.log(error)
 						})
 					} else {
-						_this.getImgCode()
+						// _this.getImgCode()
 						return false
 					}
 				})
@@ -992,11 +942,11 @@
 		justify-content: space-between;
 		width: 120px;
 	}
-	
+
 	.iconstyle {
 		color: #409EFF;
 	}
-	
+
 	.headNav {
 		width: 100%;
 		height: 60px;
@@ -1007,14 +957,14 @@
 		right: 0;
 		z-index: 9999;
 	}
-	
+
 	.nav li {
 		display: inline-block;
 		width: 100px;
 		height: 60px;
 		line-height: 60px;
 	}
-	
+
 	.navHeads {
 		/*width: 80%;*/
 		display: flex;
@@ -1025,15 +975,15 @@
 		width: 65%;
 		margin: 0 auto;
 	}
-	
+
 	.navHeads .navBox {
 		text-align: right;
 	}
-	
+
 	.navHeads .navBox li {
 		display: inline-block;
 	}
-	
+
 	.navHeads .navBox li a {
 		display: inline-block;
 		color: #fff;
@@ -1044,48 +994,48 @@
 		cursor: pointer;
 		text-align: center;
 	}
-	
+
 	.navHeads .navBox a:hover {
 		color: rgb(254, 203, 69);
 	}
-	
+
 	.navHeads .navRightBox {
 		width: 100%;
 	}
-	
+
 	.navHeads .navBox .loginBtn,
 	.navHeads .navBox .registerBtn {
 		display: inline-block;
 		width: 60px;
 		text-align: center;
 	}
-	
+
 	.loginBox {
 		width: 100%;
 		height: 100%;
 		background: #f2f2f2;
 	}
-	
+
 	.loginMain {
 		background: #fff;
 		padding: 30px;
 	}
-	
+
 	.footer {
 		margin-top: 50px;
 		padding: 80px 0;
 		border-top: #e2e2e2 solid 1px;
 		text-align: center;
 	}
-	
+
 	.forgetTxt {
 		cursor: pointer;
 	}
-	
+
 	.forgetTxt:hover {
 		color: #0099F0;
 	}
-	
+
 	.activeThis {
 		color: #FFF;
 		background-color: #409EFF;

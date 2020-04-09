@@ -20,7 +20,6 @@ body {
 a {
   text-decoration: none
 }
-
 .content-box {
   position: absolute;
   left: 250px;
@@ -161,11 +160,18 @@ a {
 .editor-btn {
   margin-top: 20px;
 }
-
+.el-carousel--horizontal{
+	border:#eee solid 1px;
+}
 /*markdown*/
 
 .v-note-wrapper .v-note-panel {
   min-height: 500px;
+}
+@media screen and (max-width: 414px){
+  .el-dialog {
+    width: 90% !important;
+  }
 }
 @media screen and (max-width: 580px){
   .el-dialog {
@@ -180,5 +186,10 @@ a {
 @media screen and (max-width: 1024px){
   .el-dialog {
     width: 90% !important;
+  }
+}
+@media screen and (max-width: 1440px){
+  .el-dialog {
+    width: 80% !important;
   }
 }

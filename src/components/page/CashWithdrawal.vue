@@ -25,10 +25,10 @@
 				<div>
 					<el-form-item label="提现状态">
 						<el-radio-group v-model="cashSearchForm.status">
-							<el-radio label="全部"></el-radio>
-							<el-radio label="已申请"></el-radio>
-							<el-radio label="已完成"></el-radio>
-							<el-radio label="失败"></el-radio>
+							<el-radio label="0">全部</el-radio>
+							<el-radio label="1">已申请</el-radio>
+							<el-radio label="2">已完成</el-radio>
+							<el-radio label="3">失败</el-radio>
 						</el-radio-group>
 					</el-form-item>
 				</div>
@@ -40,10 +40,10 @@
 				</div>
 				<div>
 					<el-form-item label="业务编码" class="labelNum">
-						<el-input v-model="cashSearchForm.numNo" style="width: 220px" placeholder="请输入业务编码"></el-input>
+						<el-input v-model="cashSearchForm.DealId" style="width: 220px" placeholder="请输入业务编码"></el-input>
 					</el-form-item>
 					<el-form-item>
-						<el-button type="primary" size="medium" class="ml30">搜索</el-button>
+						<el-button type="primary" size="medium" class="ml30" @click='searchData'>搜索</el-button>
 						<el-button size="medium" @click="resetForm">重置</el-button>
 					</el-form-item>
 				</div>
@@ -54,7 +54,7 @@
 			<el-table-column prop="BankName" label="开户银行" align="center"></el-table-column>
 			<el-table-column prop="AccountName" label="开户名" align="center"></el-table-column>
 			<el-table-column prop="Account" label="开户银行账号" align="center"></el-table-column>
-			<el-table-column prop="Amount" label="提现金额" align="center"></el-table-column>
+			<el-table-column prop="Amount" label="提现金额(￥)" align="center"></el-table-column>
 			<el-table-column prop="ActionTime" label="提现时间" align="center"></el-table-column>
 			<el-table-column prop="Status" label="提现状态" align="center" :formatter="statusTxt"></el-table-column>
 			<!--<el-table-column label="操作" align="center" width='100'>
@@ -62,6 +62,16 @@
 					<el-button size="small" type="primary" @click='viewCash(scope.$index,scope.row)'>查看</el-button>
 				</template>
 			</el-table-column>-->
+			<el-table-column label="操作" align="center" width="100">
+						<template slot-scope="scope">
+							<el-popover trigger="hover" placement="top" v-if='scope.row.Status=="拒绝"'>
+								<p style="width: 300px;">{{ scope.row.BankName }}</p>
+								<div slot="reference" class="name-wrapper">
+									<el-tag size="medium">查看原因</el-tag>
+								</div>
+							</el-popover>
+						</template>
+					</el-table-column>
 		</el-table>
 		<!--提现-->
 		<el-dialog title='提现' :visible.sync='CashWithdrawalModal' :close-on-click-modal="false" :before-close="closeModel">
@@ -105,16 +115,16 @@
 				}
 			};
 			return {
-				balance: '2',
+				balance: 0,
 				pickerEndDate: this.pickerOptionsEnd(),
 				pickerStartDate: this.searchStartDate(),
 				allCashData: [],
 				CashWithdrawalModal: false,
 				cashSearchForm: {
-					status: '全部',
-					startTime: '',
-					endTime: '',
-					numNo: ''
+					status: '0',
+					startTime: null,
+					endTime: null,
+					DealId: null
 				},
 				cashForm: {
 					AccountName: '',
@@ -163,18 +173,33 @@
 			getName() {
 				let _this = this
 				_this.cashForm.AccountName = sessionStorage.getItem('userName')
-//				_this.balance = sessionStorage.getItem('balance')
+				_this.balance = sessionStorage.getItem('balance')
 			},
 			//提现明细列表
 			cashList() {
 				let _this = this
 				let param = {
+					StartDate:_this.cashSearchForm.startTime,
+					EndDate:_this.cashSearchForm.endTime,
+					DealId:_this.cashSearchForm.DealId,
 					SessionId: sessionStorage.getItem('sessionid')
 				}
 				_this.axios.post(this.GLOBAL.BASE_URL + '/api/doRefundList', param).then((res) => {
 					if(res.data.status == 200) {
 						_this.allCashData = res.data.data.Result
 
+					}else if(res.data.status == 400) {
+						_this.$message({
+							type: 'error',
+							message: '登录过期，请重新登录'
+						})
+						sessionStorage.clear()
+						_this.$router.push({
+							name: 'index',
+							params: {
+								indexShow: false
+							}
+						})
 					} else {
 						_this.$message({
 							type: 'error',
@@ -204,18 +229,13 @@
 					if(valid) {
 						_this.axios.post(_this.GLOBAL.BASE_URL + '/api/doRefund', param).then(res => {
 							if(res.data.status == 200) {
-								_this.CashWithdrawalModal = false
-								_this.cashForm = {
-									AccountName: '',
-									accountBank: '',
-									accountBankNumber: '',
-									CashWithdrawal: ''
-								}
 								_this.$message({
 									type: 'success',
 									message: res.data.message
 								})
-								_this.cashWith()
+								_this.$refs['cashForm'].resetFields()
+								_this.CashWithdrawalModal = false
+								_this.cashList()
 							}
 						})
 
@@ -231,16 +251,6 @@
 					accountBank: '',
 					accountBankNumber: '',
 					CashWithdrawal: ''
-				}
-			},
-			// 重置
-			resetForm() {
-				let _this = this
-				_this.cashSearchForm = {
-					status: '全部',
-					startTime: '',
-					endTime: '',
-					numNo: ''
 				}
 			},
 			// 搜索开始时间
@@ -267,6 +277,24 @@
 						}
 					}
 				}
+			},
+			//搜索
+			searchData(){
+				let _this = this
+				let StartData = _this.cashSearchForm.startTime
+				let EndDate = _this.cashSearchForm.endTime
+				let DealId = _this.cashSearchForm.DealId
+				_this.cashList()
+			},
+			//重置
+			resetForm(){
+				let _this = this
+				_this.cashSearchForm ={
+					startTime:'',
+					endTime:'',
+					DealId:''
+				}
+				_this.cashList()
 			}
 		}
 	}

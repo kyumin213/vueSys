@@ -202,6 +202,15 @@
 		},
 
 		methods: {
+			//获取类型
+			getInfo(obj, param1, param2) {
+				for(let i = 0; i < obj.length; i++) {
+					if((obj[i].TypeName == param1 && obj[i].Value == param2) ||
+						(obj[i].Value == param1 && obj[i].TypeName == param2)) {
+						return obj[i].Display;
+					}
+				}
+			},
 			backBtn() {
 				this.$router.push('/taskManage')
 			},

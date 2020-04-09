@@ -7,49 +7,95 @@
 			<a>资金管理</a>
 			</span>
 		</div>
-		<el-tabs type="border-card" class="mt30">
-			<el-tab-pane label="账户总览">
-				<div class="ml30 mt20">
-					<div>账户余额</div>
-					<div class="money balance">￥100</div>
-					<div>
-						<el-button type="primary" size="medium" @click='recharge'>充值</el-button>
-						<el-button type="success" @click="cashPage" size="medium">提现</el-button>
-					</div>
-				</div>
-				<div style="width: 100%;overflow-x: auto">
-					<div id="account" style="width: 980px;height: 320px;margin-top: 30px;overflow-x: auto;"></div>
-				</div>
-			</el-tab-pane>
-			<el-tab-pane label="收支明细">
-				<div class="searchBox">
-					<el-form ref="form" :model="form" label-width="80px" :inline="true" class="form-item">
-						<div class="form-item">
-							<el-form-item label="交易日期" class="form-item">
-								<el-date-picker type="date" class="wid100 mb10" placeholder="选择开始时间" v-model="form.startTime" value-format="yyyy-MM-dd" :picker-options="pickerStartDate"></el-date-picker>
-								<el-date-picker type="date" class="wid100" placeholder="选择结束时间" v-model="form.endTime" value-format="yyyy-MM-dd" :picker-options="pickerEndDate"></el-date-picker>
-							</el-form-item>
-						</div>
-						<el-form-item label="业务编号">
-							<el-input v-model="form.name" placeholder="请输入业务编号" class="mb10" style="width: 220px"></el-input>
-							<el-button type="primary" class="ml30" size="medium">搜索</el-button>
-							<el-button size="medium">重置</el-button>
-						</el-form-item>
-					</el-form>
-				</div>
-				<el-table :data="tableData" border style="width: 100%">
-					<el-table-column prop="UserId" label="任务编码"></el-table-column>
-					<el-table-column prop="DealId" label="业务编号"></el-table-column>
-					<el-table-column prop="Amount" label="交易金额"></el-table-column>
-					<el-table-column prop="Currency" label="货币"></el-table-column>
-					<!--<el-table-column prop="ProductPrice" label="账户余额"></el-table-column>-->
-					<el-table-column prop="PayMethod" label="交易类型"></el-table-column>
-					<el-table-column prop="ActionTime" label="交易时间"></el-table-column>
-					<el-table-column prop="Status" label="状态"></el-table-column>
-					<el-table-column prop="Remark" label="备注"></el-table-column>
-				</el-table>
-			</el-tab-pane>
-		</el-tabs>
+    <div>
+      <el-button data-status='1' :class="accountActive===1?'active':''" @click='allAccount()'>账户总览</el-button>
+      <el-button data-status='2' :class="accountActive===2?'active':''" @click='balanceIncome()'>余额收入</el-button>
+      <el-button data-status='3' :class="accountActive===3?'active':''" @click='balanceExpenditure()'>余额支出</el-button>
+    </div>
+				<div v-show="accountActive === 1">
+          <div class="ml30 mt20 mb20">
+          	<div>账户余额</div>
+          	<div class="money balance">￥{{balance}}</div>
+          <!-- 	<div>
+          		<el-button type="primary" size="medium" @click='recharge'>充值</el-button>
+          		<el-button type="success" @click="cashPage" size="medium">提现</el-button>
+          	</div> -->
+            <div class="mt20">最近交易</div>
+          </div>
+          <el-table :data="allBalanceData" border style="width: 100%;" :header-cell-style="{background:'#fafafa'}">
+          	<el-table-column prop="BusinessNumber" label="业务编号" align="center" width='200px'></el-table-column>
+          	<el-table-column prop="TransactionAmount" label="交易金额" align="center"></el-table-column>
+          	<el-table-column prop="TransactionType" label="交易类型" align="center"></el-table-column>
+          	<el-table-column prop="TransactionTime" label="交易时间" align="center"></el-table-column>
+          	<el-table-column prop="Remarks" label="备注" align="center"></el-table-column>
+          </el-table>
+          <div class="mt30 txtRight">
+          	<el-pagination background @size-change='handleSizeChange' @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 30, 50,100]" :page-size="offset" layout="total, sizes, prev, pager, next, jumper" :total="allAccountTotal">
+          	</el-pagination>
+          </div>
+        </div>
+			<div v-show="accountActive === 2" class="mt30">
+        <div class="searchBox">
+        	<el-form ref="searchForm" :model="searchForm" label-width="80px" :inline="true" class="form-item">
+        		<div class="form-item">
+        			<el-form-item label="交易日期" class="form-item">
+        				<el-date-picker type="date" class="wid100 mb10" placeholder="选择开始时间" v-model="searchForm.startTime" value-format="yyyy-MM-dd" :picker-options="pickerStartDate"></el-date-picker>
+        				<el-date-picker type="date" class="wid100" placeholder="选择结束时间" v-model="searchForm.endTime" value-format="yyyy-MM-dd" :picker-options="pickerEndDate"></el-date-picker>
+        			</el-form-item>
+        		</div>
+        		<el-form-item label="业务编号">
+        			<el-input v-model="searchForm.dealId" placeholder="请输入业务编号" class="mb10" style="width: 220px"></el-input>
+        			<el-button type="primary" class="ml30" size="medium" @click='searchAccount()'>搜索</el-button>
+        			<el-button size="medium" @click='reasetForm'>重置</el-button>
+        		</el-form-item>
+        	</el-form>
+        </div>
+        <div class="mb20">累积收入:0</div>
+        <el-table :data="IncomeData" border style="width: 100%" :header-cell-style="{background:'#fafafa'}">
+        	<el-table-column prop="BusinessNumber" label="业务编号" align="center" width='200px'></el-table-column>
+        	<el-table-column prop="TransactionAmount" label="交易金额" align="center"></el-table-column>
+        	<!-- <el-table-column prop="ProductPrice" label="账户余额" align="center"></el-table-column> -->
+        	<el-table-column prop="TransactionType" label="交易类型" align="center"></el-table-column>
+        	<el-table-column prop="TransactionTime" label="交易时间" align="center"></el-table-column>
+        	<el-table-column prop="Remarks" label="备注" align="center"></el-table-column>
+        </el-table>
+        <div class="mt30 txtRight">
+        	<el-pagination background @size-change='handleSizeChange' @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 30, 50,100]" :page-size="offset" layout="total, sizes, prev, pager, next, jumper" :total="allAccountTotal">
+        	</el-pagination>
+        </div>
+      </div><div v-show="accountActive === 3" class="mt30">
+        <div class="searchBox">
+        	<el-form ref="searchForm" :model="searchForm" label-width="80px" :inline="true" class="form-item">
+        		<div class="form-item">
+        			<el-form-item label="交易日期" class="form-item">
+        				<el-date-picker type="date" class="wid100 mb10" placeholder="选择开始时间" v-model="searchForm.startTime" value-format="yyyy-MM-dd" :picker-options="pickerStartDate"></el-date-picker>
+        				<el-date-picker type="date" class="wid100" placeholder="选择结束时间" v-model="searchForm.endTime" value-format="yyyy-MM-dd" :picker-options="pickerEndDate"></el-date-picker>
+        			</el-form-item>
+        		</div>
+        		<el-form-item label="业务编号">
+        			<el-input v-model="searchForm.dealId" placeholder="请输入业务编号" class="mb10" style="width: 220px"></el-input>
+        			<el-button type="primary" class="ml30" size="medium" @click='searchAccount()'>搜索</el-button>
+        			<el-button size="medium" @click='reasetForm'>重置</el-button>
+        		</el-form-item>
+        	</el-form>
+        </div>
+        <div class="mb20">累积支出:0</div>
+        <el-table :data="expenditureData" border style="width: 100%" :header-cell-style="{background:'#fafafa'}">
+        	<!--<el-table-column prop="UserId" label="任务编码" align="center"></el-table-column>-->
+        	<el-table-column prop="BusinessNumber" label="业务编号" align="center" width='200px'></el-table-column>
+        	<el-table-column prop="TransactionAmount" label="交易金额" align="center"></el-table-column>
+        	<!--<el-table-column prop="Currency" label="货币" align="center"></el-table-column>-->
+        	<el-table-column prop="ProductPrice" label="账户余额" align="center"></el-table-column>
+        	<el-table-column prop="TransactionType" label="交易类型" align="center"></el-table-column>
+        	<el-table-column prop="TransactionTime" label="交易时间" align="center"></el-table-column>
+        	<!-- <el-table-column prop="Status" label="状态" align="center" width="100"></el-table-column> -->
+        	<el-table-column prop="Remarks" label="备注" align="center"></el-table-column>
+        </el-table>
+        <div class="mt30 txtRight">
+        	<el-pagination background @size-change='handleSizeChange' @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 30, 50,100]" :page-size="offset" layout="total, sizes, prev, pager, next, jumper" :total="allAccountTotal">
+        	</el-pagination>
+        </div>
+      </div>
 		<el-dialog title='充值' :visible.sync='RechargeModal' :close-on-click-modal='false'>
 			<el-form :model='rechargeForm' ref='rechargeForm' :rules='rechargeRules' class="form-item" :inline="true" label-width="80px">
 				<el-row>
@@ -122,25 +168,26 @@
 </template>
 
 <script>
-	// import echarts from 'echarts'
-	var echarts = require('echarts/lib/echarts')
-	// 引入柱状图组件
-	require('echarts/lib/chart/bar')
-	// 引入提示框和title组件
-	require('echarts/lib/component/tooltip')
-	require('echarts/lib/component/title')
 	import vali from '../common/validate'
+  import {getAllAccount,Income} from '@/request/api'
 	export default {
 		name: 'accountManage',
 		data() {
 			return {
+        accountActive: 1,//默认选中账户总览
+				allAccountTotal: 0, //账户总览总条数
+				currentPage: 1, //当前页
+				pageSize: 10,
+				offset: 10,
+				balance: 0,
 				RechargeModal: false,
 				AlipayPaymentModal: false, //支付宝支付
 				bankPayModal: false, //银行卡支付
-				tableData: [],
-				form: {
-					name: '',
-					resource: '',
+				allBalanceData: [], //账户总览
+        IncomeData:[], //余额收入
+        expenditureData:[], //余额支出
+				searchForm: {
+					dealId: '',
 					startTime: '',
 					endTime: ''
 				},
@@ -169,40 +216,109 @@
 				},
 				pickerEndDate: this.pickerOptionsEnd(),
 				pickerStartDate: this.searchStartDate(),
-				name: 'fd'
+				name: 'fd',
+				obj: []
 			}
 		},
-		created(){
+		created() {
+			let _this = this
+			_this.balance = sessionStorage.getItem('balance')
 			this.getAccount()
-		},
-		mounted() {
-			this.account()
+			// this.getObj()
+
 		},
 		methods: {
-			//明细列表
-			getAccount(){
+      // 账户总览切换
+      allAccount(){
+        let _this = this
+        _this.accountActive = 1
+      },
+      // 余额收入切换
+      balanceIncome:function(){
+        let _this = this
+        _this.accountActive = 2
+      },
+      // 余额支出
+      balanceExpenditure:function(){
+        let _this = this
+        _this.accountActive = 3
+      },
+			//充值
+			reasetForm() {
 				let _this = this
-				let param ={
-					SessionId:sessionStorage.getItem('sessionid'),
-					StartDate:'',
-					EndDate:"",
-					Page:'1',
-					OffSet:'10',
-					DealId:''
-				} 
-				_this.axios.post(_this.GLOBAL.BASE_URL+'/api/userAccountDetails',param).then(res=>{
-					if(res.data.status==200){
-						_this.tableData = res.data.data.acountDetails
-					}if(res.data.status==400){
-						_this.$message({
-							type:'error',
-							message:'登录过期，请重新登录'
-						})
-						sessionStorage.clear()
-						_this.$router.push({name:'index',params:{indexShow: false}})
-					}
-				})
+				_this.searchForm = {
+					dealId: '',
+					startTime: '',
+					endTime: ''
+				}
+				_this.getAccount()
 			},
+			//搜索账户明细
+			searchAccount() {
+				let _this = this
+				let StartDate = _this.searchForm.startTime
+				let EndDate = _this.searchForm.endTime
+				let DealId = _this.searchForm.dealId
+				_this.getIncome()
+			},
+			getObj() {
+				let _this = this
+				let types = sessionStorage.getItem('typeData')
+				let obj = JSON.parse(types)
+				_this.obj = obj
+			},
+			//获取类型
+			getInfo(obj, param1, param2) {
+				for(let i = 0; i < obj.length; i++) {
+					if((obj[i].TypeName == param1 && obj[i].Value == param2) ||
+						(obj[i].Value == param1 && obj[i].TypeName == param2)) {
+						return obj[i].Display;
+					}
+				}
+			},
+			//账户总览列表
+			getAccount() {
+				let _this = this
+        let userid = sessionStorage.getItem('userId')
+        let pageNum = _this.currentPage
+        let pagesize = _this.pageSize
+				let param = {
+					userid: sessionStorage.getItem('userId'),
+					pageNum: parseInt(10),
+					pagesize: parseInt(10)
+				}
+        getAllAccount(param).then((res)=>{
+          _this.allAccountTotal = res.data.total
+          _this.allBalanceData = res.data.list
+        })
+				// _this.axios.get(this.GLOBAL.BASE_URL + `/api/CustomerFinance/GetCustomerFinance?userid=${userid}&pageNum=${pageNum}&pagesize=${pagesize}`).then(res => {
+				// 		_this.total = res.data.total
+				// 		_this.allBalanceData = res.data.list
+				// 		let len = res.data.data.acountDetails
+				// 		for(let i = 0; i < len.length; i++) {
+				// 			let amount = len[i].Amount
+				// 			let curr = len[i].Currency
+				// 			len[i].Amount = curr + ' ' + amount
+				// 			len[i].Action = _this.getInfo(_this.obj, 'DealAction', len[i].Action)
+				// 			len[i].Status = _this.getInfo(_this.obj, 'RefundStatus', len[i].Status)
+				// 		}
+				// })
+			},
+      // 余额支出
+      getIncome:function(){
+        let _this = this
+        let param = {
+          userid:sessionStorage.getItem('userId'),
+          statetime:_this.searchForm.startTime,
+          endtime:_this.searchForm.endTime,
+          number:_this.searchForm.dealId,
+          pageNum:parseInt(_this.currentPage),
+          pagesize:parseInt(_this.pageSize)
+        }
+        Income(param).then((res)=>{
+          _this.IncomeData = res.data.list
+        })
+      },
 			//充值
 			recharge() {
 				let _this = this
@@ -236,7 +352,7 @@
 			searchStartDate() {
 				return {
 					disabledDate: time => {
-						let endDateVal = this.form.endTime
+						let endDateVal = this.searchForm.endTime
 						if(endDateVal) {
 							return time.getTime() > new Date(endDateVal).getTime()
 						}
@@ -247,7 +363,7 @@
 			pickerOptionsEnd() {
 				return {
 					disabledDate: time => {
-						let beginDateVal = this.form.startTime
+						let beginDateVal = this.searchForm.startTime
 						if(beginDateVal) {
 							return(
 								time.getTime() <
@@ -261,90 +377,54 @@
 			cashPage() {
 				this.$router.push('/CashWithdrawal')
 			},
-			account() {
-				var dom = document.getElementById('account')
-				var myChart = echarts.init(dom)
-				myChart.setOption({
-					title: {
-						text: '近12个月消费趋势'
-					},
-					tooltip: {
-						trigger: 'axis'
-					},
-					legend: {
-						data: ['账平', '账不平']
-					},
-					calculable: true,
-					xAxis: [{
-						type: 'category',
-						data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
-					}],
-					yAxis: [{
-						type: 'value'
-					}],
-					series: [{
-							name: '账平',
-							type: 'bar',
-							data: [2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3],
-							markPoint: {
-								data: [{
-										type: 'max',
-										name: '最大值'
-									},
-									{
-										type: 'min',
-										name: '最小值'
-									}
-								]
-							}
-						},
-						{
-							name: '账不平',
-							type: 'bar',
-							data: [2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3],
-							markPoint: {
-								data: [{
-										name: '年最高',
-										value: 182.2,
-										xAxis: 7,
-										yAxis: 183
-									},
-									{
-										name: '年最低',
-										value: 2.3,
-										xAxis: 11,
-										yAxis: 3
-									}
-								]
-							}
-						}
-					]
-				})
-			}
+			// 分页导航
+			handleCurrentChange(val) {
+				let _this = this
+				_this.currentPage = val
+				console.log(_this.currentPage)
+				_this.getAccount()
+			},
+			//每页条数
+			handleSizeChange(val) {
+				let _this = this
+				console.log(val)
+				_this.pageSize = val
+				_this.offset = val
+				_this.handleCurrentChange(_this.currentPage)
+			},
 		}
 	}
 </script>
 
 <style scoped>
 	/*@import '../../../static/css/mystyle.css';*/
-		.accountCon{
+
+	.accountCon {
 		width: 85%;
-		margin:  20px auto;
+		margin: 20px auto;
 		padding: 20px;
 		box-sizing: border-box;
 		background: #eee;
 	}
-	.accountCon p{
+
+	.accountCon p {
 		line-height: 40px;
 	}
+
 	.alipayImg {
 		width: 350px;
 	}
-	.colred{
+
+	.colred {
 		color: #f00;
 	}
+
 	.line {
 		text-align: center;
 		margin-right: 10px;
 	}
+  .active{
+    background: #0098EF;
+    color: #fff;
+  }
 </style>
