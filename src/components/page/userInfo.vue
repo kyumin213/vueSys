@@ -68,7 +68,7 @@
 </template>
 
 <script>
-  import {updateName,updateQQ,updateWeCatch} from '@/request/api'
+  import {updateName,updateQQ,updateWeCatch,getIndex} from '@/request/api'
 export default {
   name: 'userInfo',
   data () {
@@ -114,25 +114,12 @@ created() {
 		getHome() {
 			let _this = this
 			let param = {
-				SessionId: sessionStorage.getItem('sessionid')
+				Id: sessionStorage.getItem('userId')
 			}
-			_this.axios.post(this.GLOBAL.BASE_URL + '/api/frontConsoleHome', param).then((res) => {
-				if(res.data.status == 200) {
-					if(res.data.data.QQ != null) {
-						_this.userQQ = res.data.data.QQ
-					}
-					if(res.data.data.wechat != null) {
-						_this.userWX = res.data.data.wechat
-					}
-				}if(res.data.status==400){
-						_this.$message({
-							type:'error',
-							message:'登录过期，请重新登录'
-						})
-						sessionStorage.clear()
-						_this.$router.push({name:'index',params:{indexShow: false}})
-					}
-			})
+      getIndex(param).then((res)=>{
+        _this.userNames = res.data.name
+      })
+
 		},//  修改QQ弹窗
     editQqHandel () {
       let _this = this

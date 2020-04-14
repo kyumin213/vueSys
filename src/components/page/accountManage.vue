@@ -169,7 +169,7 @@
 
 <script>
 	import vali from '../common/validate'
-  import {getAllAccount,Income} from '@/request/api'
+  import {getAllAccount,Income,Expenditure} from '@/request/api'
 	export default {
 		name: 'accountManage',
 		data() {
@@ -224,6 +224,7 @@
 			let _this = this
 			_this.balance = sessionStorage.getItem('balance')
 			this.getAccount()
+      _this.getIncome()
 			// this.getObj()
 
 		},
@@ -288,7 +289,7 @@
 					pagesize: parseInt(10)
 				}
         getAllAccount(param).then((res)=>{
-          _this.allAccountTotal = res.data.total
+          _this.allAccountTotal = parseInt(res.data.total)
           _this.allBalanceData = res.data.list
         })
 				// _this.axios.get(this.GLOBAL.BASE_URL + `/api/CustomerFinance/GetCustomerFinance?userid=${userid}&pageNum=${pageNum}&pagesize=${pagesize}`).then(res => {
@@ -304,7 +305,7 @@
 				// 		}
 				// })
 			},
-      // 余额支出
+      // 余额收入
       getIncome:function(){
         let _this = this
         let param = {
@@ -317,6 +318,24 @@
         }
         Income(param).then((res)=>{
           _this.IncomeData = res.data.list
+        })
+        Expenditure(param).then((res)=>{
+          _this.expenditureData = res.data.list
+        })
+      },
+      // 余额支出列表
+      getExpend(){
+        let _this = this
+        let param = {
+          userId:sessionStorage.getItem('userId'),
+          statetime:_this.searchForm.orderStartTime,
+          endtime:_this.searchForm.orderEndTime,
+          number:_this.searchForm.number,
+          pageNum:_this.currentPage,
+          pagesize:_this.pageSize
+        }
+        Expenditure(param).then((res)=>{
+          _this.expenditureData = res.data.list
         })
       },
 			//充值

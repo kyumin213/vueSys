@@ -23,15 +23,6 @@
 					</el-col>
 				</el-row>
 				<div class="form-item">
-<!-- 					<el-form-item label='任务类型'>
-						<el-select v-model="searchForm.BaseTaskType" placeholder="请选择" class="disInline wid100" @change='checkTask'>
-							<el-option value="1" label="FBA"></el-option>
-							<el-option value="2" label="加购"></el-option>
-							<el-option value="3" label="心愿"></el-option>
-							<el-option value="4" label="点赞"></el-option>
-							<el-option value="5" label="QA"></el-option>
-						</el-select>
-					</el-form-item> -->
 					<el-form-item label="下单时间">
 						<el-date-picker v-model="searchForm.orderStartTime" type="date" placeholder="选择开始时间" :picker-options="pickerStartDate" value-format="yyyy-MM-dd" class="mb10"></el-date-picker>
 						<el-date-picker v-model="searchForm.orderEndTime" type="date" placeholder="选择结束时间" :picker-options="pickerEndDate" value-format="yyyy-MM-dd"></el-date-picker>
@@ -58,21 +49,21 @@
 					<!-- <li :class="active === 3 ? 'active':''" :data-index="3" @click="daifh">待发货<span>({{StatusSum[3]}})</span></li> -->
 					<!-- <li :class="active === 4 ? 'active':''" :data-index="4" @click="daish">待收货<span>({{StatusSum[4]}})</span></li> -->
 					<li :class="active === 5 ? 'active':''" :data-index="5" @click="daipj">待评价<span>({{StatusSum[5]}})</span></li>
-					<li :class="active === 5 ? 'active':''" :data-index="5" @click="daipj">评价待确认<span>({{StatusSum[5]}})</span></li>
-					<li :class="active === 6 ? 'active':''" :data-index="6" @click="ywc">已完成<span>({{StatusSum[6]}})</span></li>
-					<li :class="active === 7 ? 'active':''" :data-index="7" @click="daiCancel">已取消<span>({{StatusSum[7]}})</span></li>
+					<li :class="active === 6 ? 'active':''" :data-index="6" @click="evaluationComfir">评价待确认<span>({{StatusSum[5]}})</span></li>
+					<li :class="active === 7 ? 'active':''" :data-index="7" @click="ywc">已完成<span>({{StatusSum[6]}})</span></li>
+					<li :class="active === 8 ? 'active':''" :data-index="8" @click="daiCancel">已取消<span>({{StatusSum[7]}})</span></li>
 					<!-- <li :class="active === 8 ? 'active':''" :data-index="8" @click="errData">异常<span>({{StatusSum[8]}})</span></li> -->
 					<!--<li :class="active === 9 ? 'active':''" :data-index="9" @click="returnMoney">退款<span>({{StatusSum[9]}})</span></li>-->
 				</ul>
 			</div>
 		</div>
-		<div class="mt10 tableBg" style="overflow-x: auto" v-show='BaseTaskType==1 || BaseTaskType==2 || BaseTaskType==3'>
+		<div class="mt10 tableBg" style="overflow-x: auto">
 			<el-table :data="allOrderData" border style="width: 100%;overflow-x: auto" id="allOrder" @row-click="brushShowRow">
-				<el-table-column show-overflow-tooltip width="40px" align="center">
+<!-- 				<el-table-column show-overflow-tooltip width="40px" align="center">
 					<template slot-scope="scope">
 						<el-radio class="radio" v-model="brushRadio" :label="scope.$index">&nbsp;</el-radio>
 					</template>
-				</el-table-column>
+				</el-table-column> -->
 				<el-table-column prop="Id" label="任务编码" align="center" width="170">
 					<template slot-scope="scope">
 						<el-button type="text" @click="viewDetails(scope.$index,scope.row)">{{scope.row.Id}}</el-button>
@@ -262,7 +253,6 @@
         checkAll: false,
         cities: cityOptions,
         isIndeterminate: true,
-				brushRadio: '',
 				disable1: true,
 				disable2: true,
 				disable3: true,
@@ -410,73 +400,7 @@
         this.checkAll = checkedCount === this.cities.length;
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cities.length;
       },
-			//选中的行
-			brushShowRow(row) {
-				let _this = this
-				_this.brushRadio = _this.allOrderData.indexOf(row)
-				_this.selected = row
-				if(row.Status == '代付款') {
-					_this.disable1 = false
-					_this.disable2 = false
-					_this.disable3 = true
-					_this.disable4 = true
-					_this.disable5 = true
-					_this.disable6 = true
-					_this.disable7 = true
-					_this.disable8 = true
-					_this.disable9 = true
-				} else if(row.Status == '取消') {
-					_this.disable1 = true
-					_this.disable2 = true
-					_this.disable3 = true
-					_this.disable4 = false
-					_this.disable5 = true
-					_this.disable6 = true
-					_this.disable7 = true
-					_this.disable8 = true
-					_this.disable9 = true
-				} else if(row.Status == '待收货') {
-					_this.disable1 = true
-					_this.disable2 = true
-					_this.disable3 = true
-					_this.disable4 = true
-					_this.disable5 = false
-					_this.disable6 = false
-					_this.disable7 = true
-					_this.disable8 = true
-					_this.disable9 = true
-				} else if(row.Status == '退款') {
-					_this.disable1 = true
-					_this.disable2 = true
-					_this.disable3 = true
-					_this.disable4 = true
-					_this.disable5 = true
-					_this.disable6 = true
-					_this.disable7 = false
-					_this.disable8 = true
-					_this.disable9 = true
-				} else if(row.Status == '取消') {
-					_this.disable1 = true
-					_this.disable2 = true
-					_this.disable3 = true
-					_this.disable4 = true
-					_this.disable5 = true
-					_this.disable6 = true
-					_this.disable7 = true
-					_this.disable8 = false
-					_this.disable9 = false
-				} else {
-					_this.disable1 = true
-					_this.disable2 = true
-					_this.disable3 = true
-					_this.disable4 = true
-					_this.disable5 = true
-					_this.disable6 = true
-					_this.disable7 = true
-					_this.disable8 = true
-					_this.disable9 = true
-				}
-			},
+			
 
 			//更新余额
 			getBalance() {
@@ -847,7 +771,6 @@
 				let _this = this
 				_this.active = 0
 				_this.getDataStatus(0)
-				_this.brushRadio = ''
 			},
 
 			//待付款
@@ -855,41 +778,42 @@
 				let _this = this
 				_this.active = 1
 				_this.getDataStatus(1)
-				_this.brushRadio = ''
 			},
 			// 待购买
 			daiBuy() {
 				let _this = this
 				_this.active = 2
 				_this.getDataStatus(2)
-				_this.brushRadio = ''
 			},
 			// 待发货
 			daifh() {
 				let _this = this
 				_this.active = 3
 				_this.getDataStatus(3)
-				_this.brushRadio = ''
 			},
 			// 待收货
 			daish() {
 				let _this = this
 				_this.active = 4
 				_this.getDataStatus(4)
-				_this.brushRadio = ''
 			},
 			// 待评价
 			daipj() {
 				let _this = this
 				_this.active = 5
 				_this.getDataStatus(5)
-				_this.brushRadio = ''
 			},
+      // 待评价确认
+      evaluationComfir(){
+        let _this = this
+        _this.active = 6
+        _this.getDataStatus(6)
+      },
 			// 已完成
 			ywc() {
 				let _this = this
-				_this.active = 6
-				_this.getDataStatus(6)
+				_this.active = 7
+				_this.getDataStatus(7)
 				_this.brushRadio = ''
 			},
 			// 已取消
@@ -897,22 +821,21 @@
 				let _this = this
 				_this.active = 7
 				_this.getDataStatus(7)
-				_this.brushRadio = ''
 			},
 			// 异常
-			errData() {
-				let _this = this
-				_this.active = 8
-				_this.getDataStatus(8)
-				_this.brushRadio = ''
-			},
+			// errData() {
+			// 	let _this = this
+			// 	_this.active = 8
+			// 	_this.getDataStatus(8)
+			// 	_this.brushRadio = ''
+			// },
 			// 退款
-			returnMoney() {
-				let _this = this
-				_this.active = 9
-				_this.getDataStatus(9)
-				_this.brushRadio = ''
-			},
+			// returnMoney() {
+			// 	let _this = this
+			// 	_this.active = 9
+			// 	_this.getDataStatus(9)
+			// 	_this.brushRadio = ''
+			// },
 			searchStartDate() {
 				return {
 					disabledDate: time => {

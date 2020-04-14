@@ -57,11 +57,6 @@
 			<el-table-column prop="Amount" label="提现金额(￥)" align="center"></el-table-column>
 			<el-table-column prop="ActionTime" label="提现时间" align="center"></el-table-column>
 			<el-table-column prop="Status" label="提现状态" align="center" :formatter="statusTxt"></el-table-column>
-			<!--<el-table-column label="操作" align="center" width='100'>
-				<template slot-scope="scope">
-					<el-button size="small" type="primary" @click='viewCash(scope.$index,scope.row)'>查看</el-button>
-				</template>
-			</el-table-column>-->
 			<el-table-column label="操作" align="center" width="100">
 						<template slot-scope="scope">
 							<el-popover trigger="hover" placement="top" v-if='scope.row.Status=="拒绝"'>
@@ -73,20 +68,24 @@
 						</template>
 					</el-table-column>
 		</el-table>
+    <div class="mt30 txtRight">
+    	<el-pagination background @size-change='handleSizeChange' @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 30, 50,100]" :page-size="offset" layout="total, sizes, prev, pager, next, jumper" :total="total">
+    	</el-pagination>
+    </div>
 		<!--提现-->
 		<el-dialog title='提现' :visible.sync='CashWithdrawalModal' :close-on-click-modal="false" :before-close="closeModel">
 			<el-form :model="cashForm" ref="cashForm" label-width='120px' :rules="rules" status-icon>
-				<el-form-item label='开户名'>
-					<span>{{cashForm.AccountName}}</span>
+				<el-form-item label='开户名' prop="BankName">
+					<el-input v-model='cashForm.BankName' placeholder="请输入开户银行"></el-input>
 				</el-form-item>
-				<el-form-item label='开户银行' prop="accountBank">
-					<el-input v-model='cashForm.accountBank' placeholder="请输入开户银行"></el-input>
+				<el-form-item label='开户银行' prop="Bank">
+					<el-input v-model='cashForm.Bank' placeholder="请输入开户银行"></el-input>
 				</el-form-item>
-				<el-form-item label='开户银行账号' prop="accountBankNumber">
-					<el-input v-model='cashForm.accountBankNumber' placeholder="请输入开户银行账号"></el-input>
+				<el-form-item label='开户银行账号' prop="BankAccount">
+					<el-input v-model='cashForm.BankAccount' placeholder="请输入开户银行账号"></el-input>
 				</el-form-item>
-				<el-form-item label='提现金额' prop='CashWithdrawal'>
-					<el-input v-model='cashForm.CashWithdrawal' placeholder="请输入提现金额"></el-input>
+				<el-form-item label='提现金额' prop='removeMoney'>
+					<el-input v-model='cashForm.removeMoney' placeholder="请输入提现金额"></el-input>
 				</el-form-item>
 			</el-form>
 			<span slot='footer' class="dialog-footer">
@@ -99,6 +98,7 @@
 
 <script>
 	import vali from '../common/validate'
+  import {cashWith,cashWithList} from '@/request/api'
 	export default {
 		name: 'CashWithdrawal',
 		data() {
@@ -115,6 +115,9 @@
 				}
 			};
 			return {
+        total:0,
+        currentPage:10,
+        pageSize:1,
 				balance: 0,
 				pickerEndDate: this.pickerOptionsEnd(),
 				pickerStartDate: this.searchStartDate(),
@@ -122,28 +125,33 @@
 				CashWithdrawalModal: false,
 				cashSearchForm: {
 					status: '0',
-					startTime: null,
-					endTime: null,
-					DealId: null
+					startTime: '',
+					endTime: '',
+					DealId: ''
 				},
 				cashForm: {
-					AccountName: '',
-					accountBank: '',
-					accountBankNumber: '',
-					CashWithdrawal: ''
+					BankName: '',
+					BankAccount: '',
+					Bank: '',
+					removeMoney: ''
 				},
 				rules: {
-					accountBank: [{
+          BankName:[{
+            required: true,
+            message:'请输入开户名',
+            trigger:'blur'
+          }],
+					Bank: [{
 						required: true,
 						message: '请输入开户银行',
 						trigger: 'change'
 					}],
-					accountBankNumber: [{
+					BankAccount: [{
 						required: true,
 						message: '请输入开户银行账号',
 						trigger: 'change'
 					}],
-					CashWithdrawal: [{
+					removeMoney: [{
 							required: true,
 							message: '请输入提现金额',
 							trigger: 'change'
@@ -161,6 +169,20 @@
 			this.getName()
 		},
 		methods: {
+      // 分页导航
+      handleCurrentChange(val) {
+      	let _this = this
+      	_this.currentPage = val
+      	console.log(_this.currentPage)
+      },
+      //每页条数
+      handleSizeChange(val) {
+      	let _this = this
+      	console.log(val)
+      	_this.pageSize = val
+      	_this.offset = val
+      	_this.handleCurrentChange(_this.currentPage)
+      },
 			//状态转文字
 			statusTxt(val){
 				if(val.Status == 0) {
@@ -179,34 +201,17 @@
 			cashList() {
 				let _this = this
 				let param = {
-					StartDate:_this.cashSearchForm.startTime,
-					EndDate:_this.cashSearchForm.endTime,
-					DealId:_this.cashSearchForm.DealId,
-					SessionId: sessionStorage.getItem('sessionid')
+					userId: sessionStorage.getItem('userId'),
+					statetime:_this.cashSearchForm.startTime,
+					endtime:_this.cashSearchForm.endTime,
+					kWord:_this.cashSearchForm.DealId,
+          state:0,
+          pageNum:_this.currentPage,
+          pagesize:_this.pageSize
 				}
-				_this.axios.post(this.GLOBAL.BASE_URL + '/api/doRefundList', param).then((res) => {
-					if(res.data.status == 200) {
-						_this.allCashData = res.data.data.Result
-
-					}else if(res.data.status == 400) {
-						_this.$message({
-							type: 'error',
-							message: '登录过期，请重新登录'
-						})
-						sessionStorage.clear()
-						_this.$router.push({
-							name: 'index',
-							params: {
-								indexShow: false
-							}
-						})
-					} else {
-						_this.$message({
-							type: 'error',
-							message: res.data.message
-						})
-					}
-				})
+        cashWithList(param).then((res)=>{
+          _this.allCashData = res.data.list
+        })
 			},
 			//立即提现
 			cashWith() {
@@ -217,28 +222,23 @@
 			comfirCash(formName) {
 				let _this = this
 				let param = {
-					SessionId: sessionStorage.getItem('sessionid'),
-					UserName: _this.cashForm.AccountName,
-					BankName: _this.cashForm.accountBank,
-					Account: _this.cashForm.accountBankNumber,
-					Amount: _this.cashForm.CashWithdrawal,
-					Balance: _this.balance,
-					Currency: 'CN'
+					Id: sessionStorage.getItem('userId'),
+					BankName: _this.cashForm.BankName,
+					Bank: _this.cashForm.Bank,
+					BankAccount: _this.cashForm.BankAccount,
+					removeMoney: _this.cashForm.removeMoney,
 				}
 				_this.$refs[formName].validate((valid) => {
 					if(valid) {
-						_this.axios.post(_this.GLOBAL.BASE_URL + '/api/doRefund', param).then(res => {
-							if(res.data.status == 200) {
-								_this.$message({
-									type: 'success',
-									message: res.data.message
-								})
-								_this.$refs['cashForm'].resetFields()
-								_this.CashWithdrawalModal = false
-								_this.cashList()
-							}
-						})
-
+            cashWith(param).then((res)=>{
+              _this.$message({
+              	type: 'success',
+              	message: res.data.Msg
+              })
+              _this.$refs['cashForm'].resetFields()
+              _this.CashWithdrawalModal = false
+              // _this.cashList()
+            })
 					}
 				})
 			},

@@ -25,7 +25,7 @@
 							<i class="el-icon-goods icons" style="color: #fff;"></i>
 						</div>
 						<div style="width: 60%;">
-							<div class="count">{{userSmmary.totalTasks}}</div>
+							<div class="count">{{TotalCount}}</div>
 							<div class="col fz">总任务</div>
 						</div>
 					</div>
@@ -38,7 +38,7 @@
 							<i class="el-icon-pie-chart icons" style="color: #fff;"></i>
 						</div>
 						<div style="width: 60%;">
-							<div class="count">{{userSmmary.ongoingTasks}}</div>
+							<div class="count">{{OrderStateInThree}}</div>
 							<div class="col fz">进行中的任务</div>
 						</div>
 					</div>
@@ -51,7 +51,7 @@
 							<i class="el-icon-time icons" style="color: #fff;"></i>
 						</div>
 						<div style="width: 60%;">
-							<div class="count">{{userSmmary.doneTasks}}</div>
+							<div class="count">{{OrderStateInFour}}</div>
 							<div class="col fz">已完成的任务</div>
 						</div>
 					</div>
@@ -64,7 +64,7 @@
 							<i class="el-icon-warning-outline icons" style="color: #fff;"></i>
 						</div>
 						<div style="width: 60%;">
-							<div class="count">{{userSmmary.weirdTasks}}</div>
+							<div class="count">{{OrderStateInFive}}</div>
 							<div class="col fz">已取消任务</div>
 						</div>
 					</div>
@@ -128,7 +128,7 @@
 <script>
 	import bus from '../common/bus'
 	import vali from '../common/validate'
-  import {getIndex} from '@/request/api'
+  import {getIndex,OrderSum} from '@/request/api'
 	export default {
 		name: 'loginHome',
 		data() {
@@ -147,6 +147,10 @@
 				homeData: [],
 				userSmmary: [],
 				tasksItems: [],
+        userSmmary:0, //总任务
+        OrderStateInThree:0, //进行中的任务
+        OrderStateInFour:0, //已完成任务
+        OrderStateInFive:0, //已取消任务
 				//银行卡信息
 				bankPayForm: {
 					accountName: '',
@@ -194,7 +198,13 @@
            }
            sessionStorage.setItem('userName', _this.homeData[0].name)
            sessionStorage.setItem('balance', _this.homeData[0].accountbalance)
-         }))
+         }));
+         OrderSum(param).then((res)=>{
+           _this.TotalCount = TotalCount
+           _this.OrderStateInThree = OrderStateInThree
+           _this.OrderStateInFour = OrderStateInFour
+           _this.OrderStateInFive = OrderStateInFive
+         })
 			},
 			//充值
 			viewAccount() {

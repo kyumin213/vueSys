@@ -13,6 +13,7 @@ import global_ from '@/components/global'
 import 'element-ui/lib/theme-chalk/index.css'
 import './assets/css/mystyle.css'
 import vali from '@/components/common/validate'
+// import request from '@/request/https'
 Vue.config.productionTip = false
 Vue.use(ElementUI,{size: 'medium'}, VueResource, vuex, vali)
 axios.defaults.headers.post['Content-Type'] = 'application/json'
@@ -22,13 +23,12 @@ axios.defaults.headers.post['Content-Type'] = 'application/json'
 //axios.defaults.headers.common['fileext'] = sessionStorage.getItem('fileext')
 Vue.prototype.axios = axios
 Vue.prototype.GLOBAL = global_
-if (process.env.NODE_ENV === 'production') {
-  Vue.prototype.GLOBAL.BASE_URL = 'http://47.115.37.202:8090/' // 测试接口
-  // Vue.prototype.GLOBAL.BASE_URL = 'http://www.handyfitness.com.cn:8094' // 正式接口
-} else {
-  // Vue.prototype.GLOBAL.BASE_URL = '开发测试地址'
-  Vue.prototype.GLOBAL.BASE_URL = '/api'
-}
+// if (process.env.NODE_ENV === 'production') {
+//   Vue.prototype.GLOBAL.BASE_URL = 'http://47.115.37.202:8090/' // 测试接口
+// } else {
+//   // Vue.prototype.GLOBAL.BASE_URL = '开发测试地址'
+//   Vue.prototype.GLOBAL.BASE_URL = '/api'
+// }
 /* eslint-disable no-new */
 // 使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {

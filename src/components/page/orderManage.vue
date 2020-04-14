@@ -53,11 +53,11 @@
         </ul>
       </div>
       <div class="tabRight">
-        <el-button type="primary" size="medium" @click="createTsk">创建订单</el-button>
+        <el-button type="primary" size="medium" @click="createOrder">创建订单</el-button>
       </div>
     </div>
     <div class="mt10 tableBg" style="overflow-x: auto">
-      <el-table :data="allOrderData" border style="width: 100%;overflow-x: auto" id="allOrder" @row-click="brushShowRow">
+      <el-table :data="allOrderData" border style="width: 100%;overflow-x: auto" id="allOrder">
         <el-table-column show-overflow-tooltip width="40px" align="center">
           <template slot-scope="scope">
             <el-radio class="radio" v-model="brushRadio" :label="scope.$index">&nbsp;</el-radio>
@@ -78,15 +78,15 @@
         <el-table-column prop="Status" label="状态" align="center" width="100"></el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <el-button size="small" :disabled="disable1" type="primary" @click="payMent">付款</el-button>
-            <el-button size="small" :disabled="disable2" @click="cancelHandel">取消</el-button>
+            <el-button size="small" type="primary" @click="payMent">付款</el-button>
+            <el-button size="small" @click="cancelHandel">取消</el-button>
             <!--<el-button size="small" :disabled="disable3" type="success" @click="evalEdit()">填写评价</el-button>-->
-            <el-button size="small" :disabled="disable4" type="warning" @click="viewDaily()">日志</el-button>
-            <el-button size="small" :disabled="disable5" type="danger" @click="delhandel">删除</el-button>
+            <el-button size="small" type="warning" @click="viewDaily()">日志</el-button>
+            <el-button size="small" type="danger" @click="delhandel">删除</el-button>
             <!--<el-button size="small" :disabled="disable6" type="primary" @click="confirmBtn">确认完成</el-button>-->
-            <el-button size="small" :disabled="disable7" type="danger" @click="refundBtn">申请退款</el-button>
-            <el-button size="small" :disabled="disable8" type="danger" @click="cancelRefundBtn">取消退款</el-button>
-            <el-button size="small" :disabled="disable9" @click="cancelReasonBtn">取消原因</el-button>
+            <el-button size="small" type="danger" @click="refundBtn">申请退款</el-button>
+            <el-button size="small" type="danger" @click="cancelRefundBtn">取消退款</el-button>
+            <el-button size="small" @click="cancelReasonBtn">取消原因</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -99,30 +99,30 @@
       </el-row>
       <el-row>
         <el-col :span="16" :xs="24" :sm="24" :md="24" :lg="16">
-          <el-form :model="taskForm" ref="taskForm"  :rules="taskRule" class="demo-ruleForm" status-icon>
+          <el-form :model="taskForm" ref="taskForm" :rules="taskRule" class="demo-ruleForm" status-icon>
             <el-row>
               <el-col :span="12" :xs="24">
-                <el-form-item label="下单类型" class="disInline minWid" prop="CountryId">
-                  <el-select v-model="taskForm.CountryId" placeholder="请选择" class="disInline wid100" @change='checkCountry'>
-                    <el-option  value="0" label="见单返本"></el-option>
-                    <el-option  value="1" label="评后返"></el-option>
+                <el-form-item label="下单类型" class="disInline minWid" prop="ServiceType">
+                  <el-select v-model="taskForm.ServiceType" placeholder="请选择" class="disInline wid100" @change="checkOrderType">
+                    <el-option v-for="(item,index) in orderTypes" :value="index" :label="item.label"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="12" :xs="24">
-                <el-form-item label="产品ASIN" class="disInline minWid" prop="ASIN">
-                  <el-input v-model="taskForm.ASIN" maxlength="10" show-word-limit placeholder="长度为10的数字和字母组合"></el-input>
-                  <!-- <el-button size='small' @click='helpCenter'>帮助中心</el-button> -->
+                <el-form-item label="国家" class="disInline minWid" prop="CountryId">
+                  <!-- <el-select v-model="taskForm.CountryId" placeholder="请选择" class="disInline wid100" @change='checkCountry'> -->
+                  <el-select v-model="taskForm.CountryId" placeholder="请选择" class="disInline wid100" @change='checkCountry'>
+                    <el-option v-for="(item,index) in countryData" :key="index" :value="index" :label="item.CountryName"></el-option>
+                  </el-select>
                 </el-form-item>
               </el-col>
+
             </el-row>
             <el-row>
-
               <el-col :span="12" :xs="24">
-                <el-form-item label="店铺名称" class="disInline minWid">
-                  <el-select v-model="taskForm.ShopName" placeholder="请选择" class="disInline wid100">
-                    <!--<el-option></el-option>-->
-                  </el-select>
+                <el-form-item label="产品ASIN" class="disInline minWid" prop="Asin">
+                  <el-input v-model="taskForm.Asin" maxlength="10" show-word-limit placeholder="长度为10的数字和字母组合"></el-input>
+                  <!-- <el-button size='small' @click='helpCenter'>帮助中心</el-button> -->
                 </el-form-item>
               </el-col>
               <el-col :span="12" :xs="24">
@@ -132,32 +132,52 @@
               </el-col>
             </el-row>
             <el-row>
-
               <el-col :span="12" :xs="24">
-                <el-form-item label="产品价格" class="disInline minWid" prop="Price">
-                  <el-input type="text" @blur="checkBuyNumFBA" v-model="taskForm.Price" placeholder="请输入数字">
+                <el-form-item label="产品价格" class="disInline minWid" prop="ProductPrice">
+                  <el-input type="text" @blur="checkBuyNumFBA" v-model="taskForm.ProductPrice" placeholder="请输入数字">
                     <template slot="prepend">{{taskForm.Currency}}</template>
                   </el-input>
                 </el-form-item>
               </el-col>
-              <el-col :span="12" :xs="24">
-                <p class="lh40">产品评分</p>
-                <el-form-item prop='StarScore'>
-                  <el-rate v-model="taskForm.StarScore"></el-rate>
-                </el-form-item>
-              </el-col>
+
             </el-row>
             <div>
               <el-col :span="12" :xs="24" class="fright">
                 <el-form-item label="产品图片" class="disInline">
-                  <img :src="taskForm.ProductImage" alt="" class="proImg">
+                  <!-- <img :src="taskForm.ProductImage" alt="" class="proImg"> -->
+                  <el-upload action="#" list-type="picture-card" :auto-upload="false">
+                    <i slot="default" class="el-icon-plus"></i>
+                    <div slot="file" slot-scope="{file}">
+                      <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
+                      <span class="el-upload-list__item-actions">
+                        <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
+                          <i class="el-icon-zoom-in"></i>
+                        </span>
+                        <span v-if="!disabledImg" class="el-upload-list__item-delete" @click="handleDownload(file)">
+                          <i class="el-icon-download"></i>
+                        </span>
+                        <span v-if="!disabledImg" class="el-upload-list__item-delete" @click="handleRemove(file)">
+                          <i class="el-icon-delete"></i>
+                        </span>
+                      </span>
+                    </div>
+                  </el-upload>
+                  <el-dialog :visible.sync="dialogVisible">
+                    <img width="100%" :src="taskForm.image" alt="">
+                  </el-dialog>
                 </el-form-item>
               </el-col>
             </div>
             <el-row>
+              <el-col :span="12" :xs="24">
+                <p class="lh40">产品评分</p>
+                <el-form-item prop='ProductScore'>
+                  <el-rate v-model="taskForm.ProductScore"></el-rate>
+                </el-form-item>
+              </el-col>
               <el-col :span="12" :xs="24" class="fleft">
-                <el-form-item label="产品链接" class="wid" prop="ProductURL">
-                  <el-input type="text" v-model="taskForm.ProductURL" placeholder="请以http://或者https://开头"></el-input>
+                <el-form-item label="产品链接" class="wid" prop="ProductLink">
+                  <el-input type="textarea" v-model="taskForm.ProductLink" placeholder="请以http://或者https://开头"></el-input>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -176,20 +196,41 @@
                   </el-radio-group>
                 </el-form-item>
               </el-col>
-             <el-col :span="12" :xs="24">
-               <el-form-item label="搜索关键词" class="disInline minWid" prop="Keyword">
-                 <el-input v-model="taskForm.Keyword" placeholder='请输入关键词'></el-input>
-               </el-form-item>
-             </el-col>
+
             </el-row>
-            <el-row>
+            <el-row v-show="taskForm.KeywordType == '1'">
               <el-col :span="12" :xs="24">
-                <el-form-item label="订单数量" class="disInline minWid" prop="OrderNum">
-                  <el-input v-model="taskForm.OrderNum" @blur="checkBuyNumFBA" placeholder="请输入正整数"></el-input>
+                <el-form-item label="产品关键词" class="disInline minWid" prop="ProductKeyword">
+                  <el-input v-model="taskForm.ProductKeyword" placeholder='请输入关键词'></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12" :xs="24">
+                <el-form-item label="产品位置" class="disInline minWid" prop="ProductPosition">
+                  <el-input v-model="taskForm.ProductPosition" placeholder="例:第一页,第五个"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row v-show="taskForm.KeywordType == '2'">
+              <el-col :span="12" :xs="24">
+                <el-form-item label="CPC关键词" class="disInline minWid">
+                  <el-input v-model="taskForm.CpcKeyword" placeholder='请输入关键词'></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12" :xs="24">
+                <el-form-item label="CPC位置" class="disInline minWid" prop="CpcPosition">
+                  <el-input v-model="taskForm.CpcPosition" placeholder="例:第一页,第五个"></el-input>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
+              <el-col :span="12" :xs="24">
+                <el-form-item label="订单数量" class="disInline minWid" prop="Number">
+                  <el-input v-model="taskForm.Number" @blur="checkBuyNumFBA" placeholder="请输入正整数"></el-input>
+                </el-form-item>
+              </el-col>
+
+            </el-row>
+            <!-- <el-row>
               <el-col :span="12" :xs="24">
                 <el-form-item label="留评类型" class="disInline minWid" prop="ServiceType">
                   <el-select v-model="taskForm.ServiceType" class="disInline wid100" placeholder="请选择" @change="lpType">
@@ -203,8 +244,8 @@
                   <p><span class="tipRed" v-if="parseInt(this.taskForm.Facebook)>parseInt(this.taskForm.OrderNum) || parseInt(this.taskForm.fbNumber)<0">数量必须小于等于订购数量{{taskForm.buyNum}}</span></p>
                 </el-form-item>
               </el-col>
-            </el-row>
-            <el-row>
+            </el-row> -->
+            <!--       <el-row>
               <el-col :span="12" :xs="24">
                 <el-form-item label="是否使用优惠券" prop='Coupon'>
                   <el-radio-group v-model="taskForm.Coupon">
@@ -213,58 +254,59 @@
                   </el-radio-group>
                 </el-form-item>
               </el-col>
-<!--              <el-col :span="12" :xs="24">
+             <el-col :span="12" :xs="24">
                 <el-form-item label="是否自发货" prop='SelfShip'>
                   <el-radio-group v-model="taskForm.SelfShip">
                     <el-radio label="1">是</el-radio>
                     <el-radio label="0">否</el-radio>
                   </el-radio-group>
                 </el-form-item>
-              </el-col> -->
-            </el-row>
+              </el-col>
+            </el-row> -->
             <div class="con">
-                <el-row>
-                  <el-col :span='12' :xs="24">
-                    <el-form-item label="任务开始时间" class="disInline minWid" :rules="{required: true, message: '任务时间不能为空', trigger: 'change'}">
-                      <el-date-picker  v-model="taskForm.startDate" value-format="yyyy-MM-dd" style="display: inline-block;width: 100%;"  type="date" placeholder="选择日期"
-                        :picker-options="pickerOptions0">
-                      </el-date-picker>
-                    </el-form-item>
-                  </el-col>
-                  <el-col :span='12' :xs="24" >
-                    <el-form-item label="任务结束时间" class="disInline minWid">
-                      <el-date-picker v-model="taskForm.endDate" value-format="yyyy-MM-dd" style="display: inline-block;width: 100%;"  type="date" placeholder="选择日期"
-                        :picker-options="taskEndDate">
-                      </el-date-picker>
-                    </el-form-item>
-                  </el-col>
-                </el-row>
               <el-row>
+                <el-col :span='12' :xs="24">
+                  <el-form-item label="任务开始时间" class="disInline minWid" :rules="{required: true, message: '任务时间不能为空', trigger: 'change'}">
+                    <el-date-picker v-model="taskForm.StartTime" value-format="yyyy-MM-dd" style="display: inline-block;width: 100%;"
+                      type="date" placeholder="选择日期" :picker-options="pickerOptions0">
+                    </el-date-picker>
+                  </el-form-item>
+                </el-col>
+                <el-col :span='12' :xs="24">
+                  <el-form-item label="任务结束时间" class="disInline minWid">
+                    <el-date-picker v-model="taskForm.EndTime" value-format="yyyy-MM-dd" style="display: inline-block;width: 100%;"
+                      type="date" placeholder="选择日期" :picker-options="taskEndDate">
+                    </el-date-picker>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row v-show="priceShow">
                 <el-col :span="24" :xs="24">
-                  <el-form-item prop='ProductTotal'>
+                  <el-form-item prop='TotalProductPrice'>
                     <span class="spanTxt">产品总价：</span>
-                    <span class="colTxt labels fz20">￥{{taskForm.ProductTotal}}</span>
-                    <span class="labels col9">(产品总价) = {{taskForm.Price}} (产品价格) * {{taskForm.OrderNum}} (数量) *</span>
+                    <span class="colTxt labels fz20">￥{{taskForm.TotalProductPrice}}</span>
+                    <span class="labels col9">(产品总价) = {{taskForm.ProductPrice}} (产品价格) * {{taskForm.Number}} (数量) *</span>
                     <span class='col9'>{{ExRate}} (汇率)</span>
                   </el-form-item>
                 </el-col>
               </el-row>
-              <el-form-item prop='ServiceFee'>
+              <el-form-item prop='ServiceCharge'>
                 <span class="spanTxt">服务费：</span>
-                <span class="colTxt labels fz20">￥{{taskForm.ServiceFee}}</span>
-                <span class="labels col9">(服务费) = {{serviceUnit}} (服务费单价) * {{taskForm.OrderNum}} (数量) + {{addService}}
-                  (增值费单价) * {{taskForm.OrderNum}} (数量)</span>
+                <span class="colTxt labels fz20">￥{{taskForm.ServiceCharge}}</span>
+                <span class="labels col9">(服务费) = {{serviceUnit}} (服务费单价) * {{taskForm.Number}} (数量) + {{addService}}
+                  (增值费单价) * {{taskForm.Number}} (数量)</span>
               </el-form-item>
               <div>
-                <el-form-item prop='OrderTotal'>
+                <el-form-item prop='Total'>
                   <span class="spanTxt">合计：</span>
-                  <span class="colTxt labels fz20">￥{{taskForm.OrderTotal}}</span>
-                  <span class="labels col9">(合计) = {{taskForm.ProductTotal}} (产品总价) + {{taskForm.ServiceFee}} (服务费)</span>
+                  <span class="colTxt labels fz20">￥{{taskForm.Total}}</span>
+                  <span class="labels col9">(合计) = {{taskForm.TotalProductPrice}} (产品总价) + {{taskForm.ServiceCharge}}
+                    (服务费)</span>
                 </el-form-item>
               </div>
               <el-row>
-                <el-form-item label='备注' prop='Memo'>
-                  <el-input type='textarea' :autosize="{ minRows: 2, maxRows: 6}" v-model='taskForm.Memo'></el-input>
+                <el-form-item label='备注' prop='Remarks'>
+                  <el-input type='textarea' :autosize="{ minRows: 2, maxRows: 6}" v-model='taskForm.Remarks'></el-input>
                 </el-form-item>
               </el-row>
             </div>
@@ -273,9 +315,9 @@
         <el-col :span="8" :xs="24" :sm="24" :md="24" :lg="8" class="minRight">
           <div class="tabTitle fl mt20 mb20" @click="toggleRate"><i class="el-icon-dish mr10"></i>费率</div>
           <el-table :data="rateData" border style="width: 100%" v-show="rateTab">
-            <el-table-column prop="CurSymbol" label="币种" align="center"></el-table-column>
-            <el-table-column prop="CurCode" label="单位" align="center"></el-table-column>
-            <el-table-column prop="ExRate" label="汇率" align="center"></el-table-column>
+            <el-table-column prop="CurrencyName" label="币种" align="center"></el-table-column>
+            <el-table-column prop="CurrencySymbol" label="单位" align="center"></el-table-column>
+            <el-table-column prop="ExchangeRate" label="汇率" align="center"></el-table-column>
           </el-table>
           <div class="tabTitle zengTit mt20 mb20" @click="toggleAddFree"><i class="el-icon-coin mr10"></i>增值费</div>
           <el-table :data="addFreeData" border style="width: 100%" v-show="addFreeTab">
@@ -330,7 +372,7 @@
           <!--<el-input type='file' name='file' accept="image/png,image/jpeg,image/jpg" @change="update"></el-input>-->
           <input ref='file' name="file" style='display: none;' type="file" accept="image/png,image/jpeg,image/jpg"
             @change="update" />
-          <span  class="fileBtn">选择图片</span>
+          <span class="fileBtn">选择图片</span>
         </el-form-item>
         <el-form-item class='txtCenter'>
           <div class="Upload_pictures">
@@ -340,7 +382,7 @@
             <p class="colred" v-show='videlIng'>视频上传中...</p>
           </div>
           <input name="files" type="file" ref='files' style='display: none;' />
-          <span  class="fileBtn" v-show="videoTip">选择视频</span>
+          <span class="fileBtn" v-show="videoTip">选择视频</span>
         </el-form-item>
       </el-form>
       <span slot='footer' class='dialog-footer'>
@@ -445,29 +487,29 @@
 <script>
   import vali from '../common/validate'
   import viewTask from '../common/viewTaskDetails'
-  import qaTask from '../common/QaDetails'
-  import likeTask from '../common/likeDetails'
   import FileSaver from 'file-saver'
   import XLSX from 'xlsx'
   const cityOptions = ['美国', '日本', '韩国', '加拿大'];
+  import {
+    addOrder,
+    orderList,
+    getCountry,
+    Rate,
+    getServiceFee,
+    getService
+  } from '@/request/api'
   export default {
     name: 'orderManage',
     data() {
       return {
+        priceShow: true, //总价显示
+        dialogVisible: false,
+        disabledImg: false,
         checkAll: false,
         cities: cityOptions,
         isIndeterminate: true,
-      allDataNum: 0,
+        allDataNum: 0,
         brushRadio: '',
-        disable1: true,
-        disable2: true,
-        disable3: true,
-        disable4: true,
-        disable5: true,
-        disable6: true,
-        disable7: true,
-        disable8: true,
-        disable9: true,
         serviceUnit: 0, //服务费单价
         addService: 0, //增值费
         ExRate: 0, //汇率
@@ -486,17 +528,10 @@
         OrderId: '', //任务ID
         Amount: 0,
         uploadUrl: this.GLOBAL.BASE_URL + '/api/doFileUpload',
-        BaseTaskType: 1, //任务列表类型
         addBuyData: [], //加购列表
-        wishListData: [], //心愿列表
-        likeListData: [], //点赞列表
-        QAListData: [], //QA列表
-        PlatformId: 0, //平台ID
         viewTaskData: [],
-        OrderSchedule: {}, //查看任务开始时间
         allOrderData: [],
         hasBalance: 0,
-        taskTypeData: [], //任务类型
         commentTypeData: [], //留评类型
         dialogImageUrl: '',
         dialogVisible: false,
@@ -514,26 +549,16 @@
         refundModal: false, //申请退款
         cancelRefundModal: false, //取消退款
         viewDetailModal: false, //FBA查看详情
-        QaViewDetailsModal: false, //QA查看详情
-        likeViewDetailModal: false, //点赞查看详情
         reasonTxt: '系统取消', //取消原因
         activities: [],
         active: 0,
 
-        QaType: true,
-        allNum: 0,
+        allNum: 0, //总条数
         dailyModel: false,
         searchType: false,
         disabled: true,
-        disabled2: true,
-        disabled3: true,
-        likesModel: false,
-        buyCarModel: false,
-        QAtaskModel: false,
-        wishModel: false,
         assessModel: false,
         addTaskModal: false,
-        taskTypeModel: false,
         errorMes: false,
         startTime: '',
         buyNumData: [],
@@ -556,7 +581,7 @@
           Keyword: '',
           orderStartTime: '',
           orderEndTime: '',
-          checkedCities:[]
+          checkedCities: []
         },
         assessForm: {
           assessValue: null,
@@ -572,53 +597,45 @@
           pickTime: [new Date(2016, 9, 10, 0, 0), new Date(2016, 9, 10, 23, 59)],
           numbers: ''
         }],
-        activeName: 'first',
         taskType: 'all',
-
+        orderTypes: [{
+          value: '0',
+          label: '见单返本'
+        }, {
+          value: '1',
+          label: '评后返'
+        }],
         taskForm: {
-          PlatformId: 1,
-          Platform: '亚马逊',
-          baseTaskId: 1,
-          baseTaskType: 1,
-          OrderSchedule: [{
-            StartDate: '',
-            StartHourMin: '',
-            EndHourMin: '',
-            Number: '',
-            pickTime: []
-          }],
+          UserId: sessionStorage.getItem('userId'),
           CountryId: '',
-          Country: '', //国家
-          ASIN: '', //产品ASIN
+          ServiceType: '', //订单类型
+          // Country: '', //国家
+          Asin: '', //产品ASIN
           ShopName: 'nike', //店铺名称
           ProductName: '', //产品名称
-          Price: '0', //价格
+          ProductPrice: '0', //价格
           Currency: '', //货币符号
-          Comments: 22, //评论数
-          StarScore: null, //评分
-          ProductURL: '', //产品链接
-          PredictSales: 0, //预估月销量
-          ProductImage: '', //产品图片
-          ProductRank: 8, //品类排名
+          ProductScore: null, //评分
+          ProductLink: '', //产品链接
+          image: '', //产品图片
           KeywordType: '1', //关键词类型
-          DeviceType: '1', //终端平台
-          //					TerminalPlatform: 'PC',
-          Keyword: '', //搜索关键词
-          OrderNum: 0, //订单数量
-          ServiceType: '', //留评类型
-          Facebook: 0, //feedback数量
-          Coupon: '0', //是否使用优惠券
-          SelfShip: '1', //是否自发货
-          startDate:'', //任务开始时间
-          endDate:'', //任务结束时间
-          ProductTotal: 0, //产品总价
-          ServiceFee: 0, //服务费
-          OrderTotal: 0, //合计
-          LinkURL: '', //链接
-          Memo: '' //备注
+          ProductKeyword: '', //搜索关键词
+          ProductPosition: '', //产品位置,
+          CpcKeyword: '', //CPC关键字
+          CpcPosition: '', //CPC位置
+          Number: 0, //订单数量
+          // Coupon: '0', //是否使用优惠券
+          // SelfShip: '1', //是否自发货
+          StartTime: '', //任务开始时间
+          EndTime: '', //任务结束时间
+          TotalProductPrice: 0, //产品总价
+          ServiceCharge: 0, //服务费
+          Total: 0, //合计
+          // LinkURL: '', //链接
+          Remarks: '' //备注
         },
         taskRule: {
-          ASIN: [{
+          Asin: [{
               required: true,
               message: '请输入产品ASIN',
               trigger: 'change'
@@ -628,12 +645,12 @@
               trigger: 'change'
             }
           ],
-          Country: [{
+          CountryId: [{
             required: true,
-            message: '请输选择国家',
+            message: '请选择国家',
             trigger: 'change'
           }],
-          Price: [{
+          ProductPrice: [{
               required: true,
               message: '请输入产品价格',
               trigger: 'change'
@@ -643,7 +660,7 @@
               trigger: 'change'
             }
           ],
-          ProductURL: [{
+          ProductLink: [{
               required: true,
               message: '请输入产品链接',
               trigger: 'change'
@@ -653,12 +670,12 @@
               trigger: 'change'
             }
           ],
-          Keyword: [{
+          ProductKeyword: [{
             required: true,
             message: '请输入关键字',
             trigger: 'change'
           }],
-          OrderNum: [{
+          Number: [{
               required: true,
               message: '请输入购买数量',
               trigger: 'change'
@@ -668,14 +685,6 @@
               trigger: 'change'
             }
           ],
-          Facebook: [{
-            required: false,
-            message: '请输入关键字',
-            trigger: 'change'
-          }, {
-            validator: vali.checkNum,
-            trigger: 'change'
-          }],
           VideoNum: [{
             validator: vali.checkNum,
             trigger: 'change'
@@ -684,21 +693,6 @@
             validator: vali.checkNum,
             trigger: 'change'
           }],
-          ServiceType: [{
-            required: true,
-            message: '请选择留评类型',
-            trigger: 'change'
-          }],
-          proService: [{
-              required: true,
-              message: '请输入数量',
-              trigger: 'change'
-            },
-            {
-              validator: vali.checkNum,
-              trigger: 'change'
-            }
-          ],
           tradingFlow: [{
             required: true,
             message: '请输入交易流水',
@@ -713,20 +707,28 @@
         obj: [],
         StatusSum: [], //任务状态数量
         selected: [] //选中的值
-    }
-  },
-  components: {
-      viewTask,
-      qaTask,
-      likeTask
+      }
+    },
+    components: {
+      viewTask
     },
     created() {
-
-
+      this.allTaskNum()
     },
     methods: {
+      // 上传产品图片
+      handleRemove(file) {
+        console.log(file);
+      },
+      handlePictureCardPreview(file) {
+        this.taskForm.image = file.url;
+        this.dialogVisible = true;
+      },
+      handleDownload(file) {
+        console.log(file);
+      },
       handleCheckAllChange(val) {
-        this.checkedCities = val ? cityOptions : [];
+        this.searchForm.checkedCities = val ? cityOptions : [];
         this.isIndeterminate = false;
       },
       handleCheckedCitiesChange(value) {
@@ -734,97 +736,38 @@
         this.checkAll = checkedCount === this.cities.length;
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cities.length;
       },
-      //选中的行
-      brushShowRow(row) {
+      // 创建订单
+      createOrder() {
         let _this = this
-        _this.brushRadio = _this.allOrderData.indexOf(row)
-        _this.selected = row
-        if (row.Status == '代付款') {
-          _this.disable1 = false
-          _this.disable2 = false
-          _this.disable3 = true
-          _this.disable4 = true
-          _this.disable5 = true
-          _this.disable6 = true
-          _this.disable7 = true
-          _this.disable8 = true
-          _this.disable9 = true
-        } else if (row.Status == '取消') {
-          _this.disable1 = true
-          _this.disable2 = true
-          _this.disable3 = true
-          _this.disable4 = false
-          _this.disable5 = true
-          _this.disable6 = true
-          _this.disable7 = true
-          _this.disable8 = true
-          _this.disable9 = true
-        } else if (row.Status == '待收货') {
-          _this.disable1 = true
-          _this.disable2 = true
-          _this.disable3 = true
-          _this.disable4 = true
-          _this.disable5 = false
-          _this.disable6 = false
-          _this.disable7 = true
-          _this.disable8 = true
-          _this.disable9 = true
-        } else if (row.Status == '退款') {
-          _this.disable1 = true
-          _this.disable2 = true
-          _this.disable3 = true
-          _this.disable4 = true
-          _this.disable5 = true
-          _this.disable6 = true
-          _this.disable7 = false
-          _this.disable8 = true
-          _this.disable9 = true
-        } else if (row.Status == '取消') {
-          _this.disable1 = true
-          _this.disable2 = true
-          _this.disable3 = true
-          _this.disable4 = true
-          _this.disable5 = true
-          _this.disable6 = true
-          _this.disable7 = true
-          _this.disable8 = false
-          _this.disable9 = false
-        } else {
-          _this.disable1 = true
-          _this.disable2 = true
-          _this.disable3 = true
-          _this.disable4 = true
-          _this.disable5 = true
-          _this.disable6 = true
-          _this.disable7 = true
-          _this.disable8 = true
-          _this.disable9 = true
-        }
-      },
-      //任务类型列表
-      getTaskList() {
-        let _this = this
+        _this.addTaskModal = true
         let param = {
-          SessionId: sessionStorage.getItem('sessionid'),
-          Platform: 99
+          Id: sessionStorage.getItem('userId')
         }
-        _this.axios.post(_this.GLOBAL.BASE_URL + '/api/newOrderOne', param).then(res => {
-          if (res.data.status == 200) {
-            _this.taskTypeData = res.data.data.TasksList
-          } else if (res.data.status == 400) {
-            _this.$message({
-              type: 'error',
-              message: '登录过期，请重新登录'
-            })
-            sessionStorage.clear()
-            _this.$router.push({
-              name: 'index',
-              params: {
-                indexShow: false
-              }
-            })
-          }
+        getCountry(param).then((res) => {
+          _this.countryData = res.data.list
         })
+        // 汇率
+        Rate().then((res)=>{
+          _this.rateData = res.data.list
+        })
+        // 增值费
+        getServiceFee().then((res)=>{
+          _this.addFreeData = res.data.list
+        })
+        // 服务费
+        getService().then((res)=>{
+          _this.serviceData = res.data.list
+        })
+      },
+      // 下单类型选择
+      checkOrderType: function() {
+        let _this = this
+        let types = _this.taskForm.ServiceType
+        if (types == '1') {
+          _this.priceShow = false
+        } else {
+          _this.priceShow = true
+        }
       },
       //更新余额
       getBalance() {
@@ -875,25 +818,10 @@
       getRate(obj, param) {
         let _this = this
         for (let i = 0; i < obj.length; i++) {
-          if (obj[i].CurSymbol == param) {
-            return obj[i].ExRate
+          if (obj[i].CurrencySymbol == param) {
+            return obj[i].ExchangeRate
           }
         }
-      },
-      //任务类型搜索
-      checkTask(value) {
-        let _this = this
-        _this.BaseTaskType = value
-        _this.currentPage = 1
-        _this.brushRadio = ''
-        _this.disable1 = true
-        _this.disable2 = true
-        _this.disable4 = true
-        _this.disable5 = true
-        _this.disable7 = true
-        _this.disable8 = true
-        _this.disable9 = true
-        _this.getAllData(value)
       },
       handleRemove(file, fileList) {
         console.log(file, fileList);
@@ -903,6 +831,7 @@
         this.dialogImageUrl = file.url;
         this.dialogVisible = true;
       },
+
       //列表确认付款弹窗
       payMent() {
         let _this = this
@@ -1057,49 +986,7 @@
           this.errData()
         }
       },
-      // 点赞任务提交
-      confirLikeForm(formName) {
-        let _this = this
-        _this.$refs[formName].validate((valid) => {
-          if (valid) {
-            let param = Object.assign({}, _this.likesForm)
-            _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doNewOrder', param).then(res => {
-              if (res.data.status == 200) {
-                _this.$message({
-                  type: 'success',
-                  message: res.data.message
-                })
-                _this.OrderId = res.data.data.OrderId
-                _this.paymentForm.payMoney = _this.likesForm.OrderTotal
-                _this.paymentForm.balance = sessionStorage.getItem('balance')
-                _this.paymentModel = true
-                _this.likesModel = false
-                _this.taskTypeModel = false
-                _this.$refs['likesForm'].resetFields()
-                _this.getAllData(4)
-                _this.BaseTaskType = '4'
-              }
-              if (res.data.status == 400) {
-                _this.$message({
-                  type: 'error',
-                  message: '登录过期，请重新登录'
-                })
-                sessionStorage.clear()
-                _this.$router.push({
-                  name: 'index',
-                  params: {
-                    indexShow: false
-                  }
-                })
-              }
-            })
 
-          } else {
-            return false
-
-          }
-        })
-      },
       // 重置
       resetTask() {
         let _this = this
@@ -1162,19 +1049,6 @@
         let serviceUnit = _this.serviceUnit
         _this.taskForm.ServiceFee = nums * serviceFree + nums * serviceUnit
         _this.taskForm.OrderTotal = _this.taskForm.ServiceFee + _this.taskForm.ProductTotal
-        _this.taskForm.OrderSchedule = [{
-          StartDate: '',
-          pickTime: [new Date(2016, 9, 10, 0, 0), new Date(2016, 9, 10, 23, 59)],
-          Number: ''
-        }]
-        if (parseInt(nums) === 1) {
-          _this.btnTask = true
-          _this.taskForm.OrderSchedule[0].Number = 1
-        } else {
-          _this.btnTask = false
-          _this.taskForm.OrderSchedule[0].Number = ''
-        }
-        _this.getDate()
       },
 
 
@@ -1191,31 +1065,14 @@
         let errorMes = _this.errorMes
         _this.$refs[formName].validate((valid) => {
           if (valid && !errorMes) {
-            let len = _this.taskForm.OrderSchedule
-            for (let i = 0; i < len.length; i++) {
-              len[i].StartHourMin = len[i].pickTime[0]
-              len[i].EndHourMin = len[i].pickTime[1]
-            }
-            let pick = _this.taskForm.OrderSchedule.pickTime
             let param = Object.assign({}, _this.taskForm)
-            _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doNewOrder', param).then(res => {
-              if (res.data.status == 200) {
-                _this.$message({
-                  type: 'success',
-                  message: res.data.message
-                })
-                _this.OrderId = res.data.OrderId
-                _this.paymentModel = true
-                _this.paymentForm.payMoney = _this.taskForm.OrderTotal
-                _this.paymentForm.balance = sessionStorage.getItem('balance')
-                _this.addTaskModal = false
-                _this.taskTypeModel = false
-                _this.$refs['taskForm'].resetFields()
-                _this.getAllData(1)
-                _this.BaseTaskType = '1'
-              } else {
-                console.log(res.data.message)
-              }
+            addOrder(param).then((res) => {
+              _this.OrderId = res.data.OrderId
+              _this.paymentModel = true
+              _this.addTaskModal = false
+              _this.$refs['taskForm'].resetFields()
+              _this.payMent()
+              // _this.getAllData(1)
             })
           }
         })
@@ -1234,40 +1091,11 @@
         let Amount = parseFloat(_this.Amount)
         let Reason = _this.reasonTxt
         let param = {
-          SessionId: sessionStorage.getItem('sessionid'),
           OrderId: orderId,
           Amount: Amount,
           ActionType: 2,
           Reason: Reason
         }
-        _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doOrderAction', param).then(res => {
-          if (res.data.status == 200) {
-            _this.cancelModal = false
-            _this.getAllData(_this.BaseTaskType)
-            _this.$message({
-              type: 'success',
-              message: res.data.message
-            })
-          } else if (res.data.status == 400) {
-            _this.$message({
-              type: 'error',
-              message: '登录过期，请重新登录'
-            })
-            sessionStorage.clear()
-            _this.$router.push({
-              name: 'index',
-              params: {
-                indexShow: false
-              }
-            })
-          } else {
-            _this.$message({
-              type: 'error',
-              message: res.data.message
-            })
-            console.log(res.data.message)
-          }
-        })
       },
       // 删除弹窗
       delhandel() {
@@ -1305,29 +1133,10 @@
         let orderId = _this.selected.Id
         let Amount = _this.selected.TotalPrice
         let param = {
-          SessionId: sessionStorage.getItem('sessionid'),
           OrderId: orderId,
           Amount: Amount,
           ActionType: 4
         }
-        _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doOrderAction', param).then(res => {
-          if (res.data.status == 200) {
-            _this.activities = res.data.data.Logs
-          }
-          if (res.data.status == 400) {
-            _this.$message({
-              type: 'error',
-              message: '登录过期，请重新登录'
-            })
-            sessionStorage.clear()
-            _this.$router.push({
-              name: 'index',
-              params: {
-                indexShow: false
-              }
-            })
-          }
-        })
       },
       //全部
       getAllStatus() {
@@ -1429,11 +1238,11 @@
         }
       },
       // 任务结束时间
-      endDate(){
+      endDate() {
         let _this = this
         return {
           disabledDate: time => {
-            let beginDateVal = _this.taskForm.startDate
+            let beginDateVal = _this.taskForm.StartTime
             if (beginDateVal) {
               return (
                 time.getTime() <
@@ -1451,8 +1260,6 @@
         let _this = this
         _this.addTaskModal = false
         _this.disabled = true
-        _this.buyCarModel = false
-        _this.wishModel = false
         _this.btnTask = true
         _this.$refs['taskForm'].resetFields()
         _this.taskForm.ServiceFee = 0
@@ -1465,12 +1272,7 @@
         let _this = this
         _this.index = index
         let buyNum = _this.taskForm.OrderNum
-        let taskTime = _this.taskForm.OrderSchedule
         var result = 0
-        for (let i = 0; i < taskTime.length; i++) {
-          result += parseInt(taskTime[i].Number)
-        }
-        console.log(result)
         if (parseInt(result) > parseInt(buyNum)) {
           _this.errorMes = true
           return false
@@ -1546,8 +1348,6 @@
           if (res.data.status == 200) {
             _this.viewTaskData = res.data.data.Order
             //						_this.OrderSchedule=res.data.data.OrderSchedule
-            let order = res.data.data.OrderSchedule
-            _this.viewTaskData.OrderSchedule = order
             _this.viewTaskData.OrderType = this.getInfo(obj, 'BaseTaskType', _this.viewTaskData.OrderType)
             _this.viewTaskData.Status = this.getInfo(obj, 'OrderStatus', _this.viewTaskData.Status)
             _this.viewTaskData.KeyType = this.getInfo(obj, 'KeyType', _this.viewTaskData.KeyType)
@@ -1600,11 +1400,6 @@
           _this.rateTab = true
         }
       },
-      // 留评类型
-      lpType(index) {
-        let _this = this
-        let lp = _this.commentTypeData[index].Service
-      },
       startDate() {
         return {
           disabledDate(time) {
@@ -1614,58 +1409,6 @@
       },
       handleClick(tab, event) {
         console.log(tab)
-      },
-      // 任务类型弹窗
-      createTsk() {
-        let _this = this
-        _this.addTaskModal = true
-      },
-      //进入新任务页面
-      intoNewTask(index) {
-        let _this = this
-        _this.PlatformId = _this.taskTypeData[index].PlatformId
-        _this.taskForm.PlatformId = _this.taskTypeData[index].PlatformId
-        _this.likesForm.PlatformId = _this.taskTypeData[index].PlatformId
-        let param = {
-          SessionId: sessionStorage.getItem('sessionid'),
-          PlatformId: _this.taskTypeData[index].PlatformId,
-          Platform: _this.taskTypeData[index].Platform,
-          baseTaskId: '1',
-          baseTaskType: '1'
-        }
-        _this.axios.post(_this.GLOBAL.BASE_URL + '/api/newOrderTwo', param).then(res => {
-          if (res.data.status == 200) {
-            _this.countryData = res.data.data.Country
-            _this.rateData = res.data.data.ExRate
-            _this.addFreeData = res.data.data.ValueAdded
-            _this.QaForm.QAFee = res.data.data.QAFee
-            _this.likesForm.LikeFee = res.data.data.LikeFee
-            let fee = res.data.data.ValueAdded
-            for (let i = 0; i < fee.length; i++) {
-              let min = fee[i].MinVal
-              let max = fee[i].MaxVal
-              let UnitPrice = fee[i].UnitPrice
-              let productPrice = '$ ' + min + ' - ' + '$ ' + max
-              _this.addFreeData[i].productPrice = productPrice
-              _this.addFreeData[i].UnitPrice = '￥' + UnitPrice
-              _this.addFreeData[i].price = UnitPrice
-            }
-
-          }
-          if (res.data.status == 400) {
-            _this.$message({
-              type: 'error',
-              message: '登录过期，请重新登录'
-            })
-            sessionStorage.clear()
-            _this.$router.push({
-              name: 'index',
-              params: {
-                indexShow: false
-              }
-            })
-          }
-        })
       },
 
       //产品总价
@@ -1683,6 +1426,7 @@
         _this.taskForm.Currency = _this.countryData[index].CurrSymbal
         _this.taskForm.Country = _this.countryData[index].Code
         let obj = _this.rateData
+        console.log(_this.taskForm.Currency)
         _this.ExRate = _this.getRate(obj, _this.taskForm.Currency)
         _this.getProTotal()
         let param = {
@@ -1690,110 +1434,30 @@
           PlatformId: _this.PlatformId,
           Country: _this.countryData[index].Code
         }
-        _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doGetService', param).then(res => {
-          if (res.data.status == 200) {
-            _this.commentTypeData = res.data.data.Service
-            let service = res.data.data.Service
-            _this.serviceData = res.data.data.Service
-            for (let i = 0; i < service.length; i++) {
-              let rate = service[i].CommentRate
-              let country = service[i].Country
-              let price = service[i].UnitPrice
-              let newRate = rate * 100 + '%'
-              _this.serviceData[i].CommentRate = newRate
-              _this.serviceData[i].servicePrice = country + ' ￥' + price
-            }
-          }
-        })
-      },
-
-      //任务列表操作
-      orderAction(ActionType, orderId, Amount) {
-        let _this = this
-        let param = {
-          SessionId: sessionStorage.getItem('sessionid'),
-          OrderId: orderId,
-          ActionType: ActionType,
-          Amount: parseInt(Amount)
-        }
-        _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doOrderAction', param).then(res => {
-          if (res.data.status == 200) {
-            _this.paymentModel = false
-            _this.cancelModal = false //取消
-            _this.assessModel = false //评论
-            _this.delModel = false //删除
-            _this.submitModal = false //确认完成
-            _this.refundModal = false //申请退款
-            _this.cancelRefundModal = false //取消退款
-            _this.disable1 = true
-            _this.disable2 = true
-            _this.disable3 = true
-            _this.disable4 = true
-            _this.disable5 = true
-            _this.disable6 = true
-            _this.disable7 = true
-            _this.disable8 = true
-            _this.disable9 = true
-            _this.getAllData(_this.BaseTaskType)
-            _this.$message({
-              type: 'success',
-              message: res.data.message
-            })
-          } else if (res.data.status == 400) {
-            _this.$message({
-              type: 'error',
-              message: '登录过期，请重新登录'
-            })
-            sessionStorage.clear()
-            _this.$router.push({
-              name: 'index',
-              params: {
-                indexShow: false
-              }
-            })
-          } else {
-            _this.$message({
-              type: 'error',
-              message: res.data.message
-            })
-            console.log(res.data.message)
-          }
-        })
+        // _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doGetService', param).then(res => {
+        //   if (res.data.status == 200) {
+        //     _this.commentTypeData = res.data.data.Service
+        //     let service = res.data.data.Service
+        //     _this.serviceData = res.data.data.Service
+        //     for (let i = 0; i < service.length; i++) {
+        //       let rate = service[i].CommentRate
+        //       let country = service[i].Country
+        //       let price = service[i].UnitPrice
+        //       let newRate = rate * 100 + '%'
+        //       _this.serviceData[i].CommentRate = newRate
+        //       _this.serviceData[i].servicePrice = country + ' ￥' + price
+        //     }
+        //   }
+        // })
       },
       //下单成功后确定付款
       paymentOrder() {
         let _this = this
         let BaseTaskType = _this.searchForm.BaseTaskType
         let param = {
-          SessionId: sessionStorage.getItem('sessionid'),
           OrderId: _this.OrderId,
           Amount: _this.paymentForm.payMoney
         }
-        _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doOrderPayment', param).then(res => {
-          if (res.data.status == 200) {
-            _this.$message({
-              type: 'success',
-              message: res.data.message
-            })
-            _this.paymentModel = false
-            _this.taskTypeModel = false
-            _this.getAllData(BaseTaskType)
-            _this.getBalance()
-          }
-          if (res.data.status == 400) {
-            _this.$message({
-              type: 'error',
-              message: '登录过期，请重新登录'
-            })
-            sessionStorage.clear()
-            _this.$router.push({
-              name: 'index',
-              params: {
-                indexShow: false
-              }
-            })
-          }
-        })
       },
       //去充值
       toRecharge() {
@@ -1887,48 +1551,56 @@
       },
 
       //全部
-      allTaskNum(e) {
+      allTaskNum() {
         let _this = this
         _this.active = 0
         let param = {
-          SessionId: sessionStorage.getItem('sessionid'),
-          PlatformId: parseInt(_this.searchForm.PlatformId),
-          BaseTaskType: parseInt(_this.BaseTaskType),
-          Status: 0,
+          userId: sessionStorage.getItem('userId'),
+          countryIdx: [],
+          state: 0,
           Page: 1,
-          offset: _this.offset
+          // offset: _this.offset,
+          statetime: '',
+          endtime: '',
+          kWord: '',
+          pageNum: _this.currentPage,
+          pagesize: _this.pageSize
         }
-        _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doOrderList', param).then((res) => {
-          if (res.data.status == 200) {
-            let len = res.data.data.RstList
-            let status = res.data.data.StatusSum
-            _this.StatusSum = status
-            for (let i = 0; i < len.length; i++) {
-              let plat = len[i].Platform
-              let country = len[i].Country
-              len[i].Platform = plat + '/' + country
-              len[i].OrderType = _this.getInfo(_this.obj, 'BaseTaskType', len[i].OrderType)
-              len[i].Status = _this.getInfo(_this.obj, 'OrderStatus', len[i].Status)
-            }
-            _this.allOrderData = res.data.data.RstList
-            _this.loading = false
-          }
-          if (res.data.status == 400) {
-            _this.$message({
-              type: 'error',
-              message: res.data.message
-            })
-            sessionStorage.clear()
-            _this.$router.push({
-              name: 'index',
-              params: {
-                indexShow: false
-              }
-            })
-          }
-        }).catch((error) => {
-          console.log(error)
+        orderList(param).then((res) => {
+          _this.allOrderData = res.data
         })
+        // _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doOrderList', param).then((res) => {
+
+        //   if (res.data.status == 200) {
+        //     let len = res.data.data.RstList
+        //     let status = res.data.data.StatusSum
+        //     _this.StatusSum = status
+        //     for (let i = 0; i < len.length; i++) {
+        //       let plat = len[i].Platform
+        //       let country = len[i].Country
+        //       len[i].Platform = plat + '/' + country
+        //       len[i].OrderType = _this.getInfo(_this.obj, 'BaseTaskType', len[i].OrderType)
+        //       len[i].Status = _this.getInfo(_this.obj, 'OrderStatus', len[i].Status)
+        //     }
+        //     _this.allOrderData = res.data.data.RstList
+        //     _this.loading = false
+        //   }
+        //   if (res.data.status == 400) {
+        //     _this.$message({
+        //       type: 'error',
+        //       message: res.data.message
+        //     })
+        //     sessionStorage.clear()
+        //     _this.$router.push({
+        //       name: 'index',
+        //       params: {
+        //         indexShow: false
+        //       }
+        //     })
+        //   }
+        // }).catch((error) => {
+        //   console.log(error)
+        // })
       },
       //查看取消原因
       cancelReasonBtn(index, row) {
@@ -2008,17 +1680,6 @@
       errorOther() {
         let _this = this
         _this.activeTask = 4
-      },
-      //按钮全部禁用
-      allDisable() {
-        let _this = this
-        _this.disable1 = true
-        _this.disable2 = true
-        _this.disable4 = true
-        _this.disable5 = true
-        _this.disable7 = true
-        _this.disable8 = true
-        _this.disable9 = true
       }
     }
   }
