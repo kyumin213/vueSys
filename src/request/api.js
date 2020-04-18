@@ -11,7 +11,7 @@ export const updateName = (params) => post('/api/CustomerUser/ChangeName', param
 export const updateWeCatch = (params) => post('/api/CustomerUser/ChangeWeChat', params) //修改微信
 export const updatePhone = (params) => post('/api/CustomerUser/ChangePhone', params) //修改手机号
 export const addOrder = (params) => post('/api/Order/AddOrder', params) //创建订单
-export const orderList = (params) => getAction('/api/Order/GetOrders', params) //订单列表
+export const orderList = (params) => post('/api/Order/GetOrders', params) //订单列表
 export const getAllAccount = (params) => getAction('/api/CustomerFinance/GetCustomerFinance', params) //账户总览
 export const Income = (params) => getAction('/api/CustomerFinance/GetPayStateOne', params) //余额收入
 export const Expenditure = (params) => getAction('/api/CustomerFinance/GetPayExpenditure', params) //余额支出
@@ -21,3 +21,4 @@ export const getCountry = (params) => getAction('/api/Country/GetCountry', param
 export const Rate = (params) => getAction('/api/Rate/GetRate', params) //汇率
 export const getServiceFee = (params) => getAction('/api/IncrementServiceFee/IncrementServiceFee', params) //增值费
 export const getService = (params) => getAction('/api/Fee/GetFee', params) //服务费
+export const getProbalibi = (params) => getAction('/api/Order/GetProbability', params) //留评比例

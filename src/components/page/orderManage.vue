@@ -58,35 +58,35 @@
     </div>
     <div class="mt10 tableBg" style="overflow-x: auto">
       <el-table :data="allOrderData" border style="width: 100%;overflow-x: auto" id="allOrder">
-        <el-table-column show-overflow-tooltip width="40px" align="center">
-          <template slot-scope="scope">
+        <!--        <el-table-column show-overflow-tooltip width="40px" align="center">
+         <template slot-scope="scope">
             <el-radio class="radio" v-model="brushRadio" :label="scope.$index">&nbsp;</el-radio>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column prop="Id" label="任务编码" align="center" width="170">
           <template slot-scope="scope">
-            <el-button type="text" @click="viewDetails(scope.$index,scope.row)">{{scope.row.Id}}</el-button>
+            <el-button type="text" @click="viewDetails(scope.$index,scope.row)">{{scope.row.OrderNumber}}</el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="Platform" label="国家" align="center" width="150"></el-table-column>
-        <el-table-column prop="TaskAmount" label="任务数量" align="center" width="100"></el-table-column>
+        <el-table-column prop="CountryId" label="国家" align="center" width="150"></el-table-column>
+        <el-table-column prop="Number" label="任务数量" align="center" width="100"></el-table-column>
         <el-table-column prop="ProductName" label="产品名称" align="center" width="100"></el-table-column>
-        <el-table-column prop="ASIN" label="产品ASIN" align="center" width="120"></el-table-column>
-        <el-table-column prop="OrderType" label="关键词" align="center"></el-table-column>
-        <el-table-column prop="TotalPrice" label="总价" align="center"></el-table-column>
-        <el-table-column prop="CreateTime" label="下单时间" align="center" width="200"></el-table-column>
-        <el-table-column prop="Status" label="状态" align="center" width="100"></el-table-column>
-        <el-table-column label="操作" align="center">
+        <el-table-column prop="Asin" label="产品ASIN" align="center" width="120"></el-table-column>
+        <el-table-column prop="ProductKeyWord" label="关键词" align="center"></el-table-column>
+        <el-table-column prop="TotalProductPrice" label="总价" align="center"></el-table-column>
+        <el-table-column prop="StartTime" label="下单时间" align="center" width="200"></el-table-column>
+        <el-table-column prop="OrderState" label="状态" align="center" width="100"></el-table-column>
+        <el-table-column label="操作" align="center" width="200">
           <template slot-scope="scope">
             <el-button size="small" type="primary" @click="payMent">付款</el-button>
             <el-button size="small" @click="cancelHandel">取消</el-button>
             <!--<el-button size="small" :disabled="disable3" type="success" @click="evalEdit()">填写评价</el-button>-->
-            <el-button size="small" type="warning" @click="viewDaily()">日志</el-button>
-            <el-button size="small" type="danger" @click="delhandel">删除</el-button>
+            <!-- <el-button size="small" type="warning" @click="viewDaily()">日志</el-button> -->
+            <!-- <el-button size="small" type="danger" @click="delhandel">删除</el-button> -->
             <!--<el-button size="small" :disabled="disable6" type="primary" @click="confirmBtn">确认完成</el-button>-->
-            <el-button size="small" type="danger" @click="refundBtn">申请退款</el-button>
-            <el-button size="small" type="danger" @click="cancelRefundBtn">取消退款</el-button>
-            <el-button size="small" @click="cancelReasonBtn">取消原因</el-button>
+            <!-- <el-button size="small" type="danger" @click="refundBtn">申请退款</el-button> -->
+            <!-- <el-button size="small" type="danger" @click="cancelRefundBtn">取消退款</el-button> -->
+            <!-- <el-button size="small" @click="cancelReasonBtn">取消原因</el-button> -->
           </template>
         </el-table-column>
       </el-table>
@@ -112,7 +112,7 @@
                 <el-form-item label="国家" class="disInline minWid" prop="CountryId">
                   <!-- <el-select v-model="taskForm.CountryId" placeholder="请选择" class="disInline wid100" @change='checkCountry'> -->
                   <el-select v-model="taskForm.CountryId" placeholder="请选择" class="disInline wid100" @change='checkCountry'>
-                    <el-option v-for="(item,index) in countryData" :key="index" :value="index" :label="item.CountryName"></el-option>
+                    <el-option v-for="(item,index) in countryData" :key="index" :value="item.Id" :label="item.CountryName"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -167,6 +167,42 @@
                   </el-dialog>
                 </el-form-item>
               </el-col>
+              <el-col>
+                <el-upload
+                  action="#"
+                  list-type="picture-card"
+                  :auto-upload="false">
+                    <i slot="default" class="el-icon-plus"></i>
+                    <div slot="file" slot-scope="{file}">
+                      <img
+                        class="el-upload-list__item-thumbnail"
+                        :src="file.url" alt=""
+                      >
+                      <span class="el-upload-list__item-actions">
+                        <span
+                          class="el-upload-list__item-preview"
+                          @click="handlePictureCardPreview(file)"
+                        >
+                          <i class="el-icon-zoom-in"></i>
+                        </span>
+                        <span
+                          v-if="!disabled"
+                          class="el-upload-list__item-delete"
+                          @click="handleDownload(file)"
+                        >
+                          <i class="el-icon-download"></i>
+                        </span>
+                        <span
+                          v-if="!disabled"
+                          class="el-upload-list__item-delete"
+                          @click="handleRemove(file)"
+                        >
+                          <i class="el-icon-delete"></i>
+                        </span>
+                      </span>
+                    </div>
+                </el-upload>
+              </el-col>
             </div>
             <el-row>
               <el-col :span="12" :xs="24">
@@ -205,8 +241,10 @@
                 </el-form-item>
               </el-col>
               <el-col :span="12" :xs="24">
-                <el-form-item label="产品位置" class="disInline minWid" prop="ProductPosition">
-                  <el-input v-model="taskForm.ProductPosition" placeholder="例:第一页,第五个"></el-input>
+                <el-form-item label="留评类型" class="disInline minWid" prop="ProductPosition">
+                  <el-select v-model="taskForm.ProductPosition" class="disInline wid100" placeholder="请选择" @change="lpType">
+                    <el-option v-for="(item,index) in commentTypeData" :key="index" :value="item.Probability" :label="item.Probability"></el-option>
+                  </el-select>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -216,11 +254,11 @@
                   <el-input v-model="taskForm.CpcKeyword" placeholder='请输入关键词'></el-input>
                 </el-form-item>
               </el-col>
-              <el-col :span="12" :xs="24">
+              <!--              <el-col :span="12" :xs="24">
                 <el-form-item label="CPC位置" class="disInline minWid" prop="CpcPosition">
                   <el-input v-model="taskForm.CpcPosition" placeholder="例:第一页,第五个"></el-input>
                 </el-form-item>
-              </el-col>
+              </el-col> -->
             </el-row>
             <el-row>
               <el-col :span="12" :xs="24">
@@ -313,7 +351,7 @@
           </el-form>
         </el-col>
         <el-col :span="8" :xs="24" :sm="24" :md="24" :lg="8" class="minRight">
-          <div class="tabTitle fl mt20 mb20" @click="toggleRate"><i class="el-icon-dish mr10"></i>费率</div>
+          <div class="tabTitle fl mt20 mb20" @click="toggleRate"><i class="el-icon-dish mr10"></i>汇率</div>
           <el-table :data="rateData" border style="width: 100%" v-show="rateTab">
             <el-table-column prop="CurrencyName" label="币种" align="center"></el-table-column>
             <el-table-column prop="CurrencySymbol" label="单位" align="center"></el-table-column>
@@ -326,9 +364,9 @@
           </el-table>
           <div class="tabTitle serviceTit mt20 mb20" @click="toggleService"><i class="el-icon-guide mr10"></i>服务费</div>
           <el-table :data="serviceData" border style="width: 100%" v-show="serviceTab">
-            <el-table-column prop="Service" label="服务类型" align="center"></el-table-column>
-            <el-table-column prop="CommentRate" label="留评率" align="center" width='100'></el-table-column>
-            <el-table-column prop="servicePrice" label="服务费单价" align="center" width='150'></el-table-column>
+            <el-table-column prop="CountryName" label="国家" align="center"></el-table-column>
+            <el-table-column prop="Probability" label="留评率" align="center" width='100'></el-table-column>
+            <el-table-column prop="FeePrice" label="服务费单价" align="center" width='150'></el-table-column>
           </el-table>
         </el-col>
       </el-row>
@@ -496,12 +534,16 @@
     getCountry,
     Rate,
     getServiceFee,
-    getService
+    getService,
+    getProbalibi
   } from '@/request/api'
   export default {
     name: 'orderManage',
     data() {
       return {
+         dialogImageUrl: '',
+                dialogVisible: false,
+                disabled: false,
         priceShow: true, //总价显示
         dialogVisible: false,
         disabledImg: false,
@@ -527,7 +569,7 @@
         fileId: '',
         OrderId: '', //任务ID
         Amount: 0,
-        uploadUrl: this.GLOBAL.BASE_URL + '/api/doFileUpload',
+        uploadUrl: this.GLOBAL.BASE_URL + '/api/Order/GetProductPictures',
         addBuyData: [], //加购列表
         viewTaskData: [],
         allOrderData: [],
@@ -620,9 +662,9 @@
           image: '', //产品图片
           KeywordType: '1', //关键词类型
           ProductKeyword: '', //搜索关键词
-          ProductPosition: '', //产品位置,
+          ProductPosition: '', //留评比例,
           CpcKeyword: '', //CPC关键字
-          CpcPosition: '', //CPC位置
+          // CpcPosition: '', //CPC位置
           Number: 0, //订单数量
           // Coupon: '0', //是否使用优惠券
           // SelfShip: '1', //是否自发货
@@ -702,6 +744,11 @@
             required: true,
             message: '请输入付款账号',
             trigger: 'change'
+          }],
+          ProductPosition: [{
+            required: true,
+            message: '请选择留评比例',
+            trigger: 'change'
           }]
         },
         obj: [],
@@ -716,6 +763,7 @@
       this.allTaskNum()
     },
     methods: {
+
       // 上传产品图片
       handleRemove(file) {
         console.log(file);
@@ -747,15 +795,28 @@
           _this.countryData = res.data.list
         })
         // 汇率
-        Rate().then((res)=>{
+        Rate().then((res) => {
           _this.rateData = res.data.list
         })
         // 增值费
-        getServiceFee().then((res)=>{
+        getServiceFee().then((res) => {
           _this.addFreeData = res.data.list
+          console.log(res.data.list)
+          let fee = res.data.list
+          for (let i = 0; i < fee.length; i++) {
+            let min = fee[i].Start
+            let max = fee[i].Ent
+            let UnitPrice = fee[i].IServiceFee
+            let productPrice = '$ ' + min + ' - ' + '$ ' + max
+            _this.addFreeData[i].productPrice = productPrice
+            _this.addFreeData[i].UnitPrice = '￥' + UnitPrice
+            _this.addFreeData[i].price = UnitPrice
+          }
+        }).catch(err => {
+          console.log(err)
         })
         // 服务费
-        getService().then((res)=>{
+        getService().then((res) => {
           _this.serviceData = res.data.list
         })
       },
@@ -769,6 +830,7 @@
           _this.priceShow = true
         }
       },
+
       //更新余额
       getBalance() {
         let _this = this
@@ -805,12 +867,23 @@
           }
         }
       },
+      // 获取服务费单价
+      getFee(obj, param1, param2) {
+        for (let i = 0; i < obj.length; i++) {
+          if ((obj[i].CountryId === param1 && obj[i].Probability === param2) ||
+            (obj[i].Probability === param1 && obj[i].CountryId === param2)) {
+            return obj[i].FeePrice;
+          }
+        }
+      },
       //取增值费
       getAddService(obj, param3) {
         let _this = this
         for (let i = 0; i < obj.length; i++) {
-          if (param3 >= obj[i].MinVal && param3 <= obj[i].MaxVal) {
-            return obj[i].price
+          if (param3 >= obj[i].Start && param3 <= obj[i].Ent) {
+            return obj[i].IServiceFee
+          } else {
+            return 0
           }
         }
       },
@@ -818,8 +891,17 @@
       getRate(obj, param) {
         let _this = this
         for (let i = 0; i < obj.length; i++) {
-          if (obj[i].CurrencySymbol == param) {
+          if (obj[i].CountryId == param) {
             return obj[i].ExchangeRate
+          }
+        }
+      },
+      // 取货币符号
+      getSymbol(obj, param) {
+        let _this = this
+        for (let i = 0; i < obj.length; i++) {
+          if (obj[i].CountryId == param) {
+            return obj[i].CurrencySymbol
           }
         }
       },
@@ -831,7 +913,18 @@
         this.dialogImageUrl = file.url;
         this.dialogVisible = true;
       },
-
+      // 留评比例
+      lpType(index) {
+        let _this = this
+        let lp = _this.taskForm.ProductPosition
+        let countryId = _this.taskForm.CountryId
+        console.log(countryId)
+        let types = _this.taskForm.ProductPosition
+        console.log(types)
+        let obj = _this.serviceData
+        _this.serviceUnit = _this.getFee(obj, countryId, types)
+        console.log(_this.serviceUnit)
+      },
       //列表确认付款弹窗
       payMent() {
         let _this = this
@@ -913,7 +1006,7 @@
               len[i].Status = _this.getInfo(_this.obj, 'OrderStatus', len[i].Status)
               len[i].Device = _this.getInfo(_this.obj, 'DeviceType', len[i].Device)
             }
-            _this.allOrderData = res.data.data.RstList
+            _this.allOrderData = res.data.RstList
             _this.loading = false
           } else if (res.data.status == 400) {
             _this.$message({
@@ -1039,16 +1132,16 @@
       // FBA代购数量为1
       checkBuyNumFBA() {
         let _this = this
-        let nums = _this.taskForm.OrderNum
+        let nums = _this.taskForm.Number
         let obj = _this.addFreeData
-        let price = _this.taskForm.Price
-        _this.getAddService(obj, nums)
+        let price = _this.taskForm.ProductPrice
+        // _this.getAddService(obj, nums)
         _this.getProTotal()
         _this.addService = _this.getAddService(obj, price)
         let serviceFree = _this.addService
         let serviceUnit = _this.serviceUnit
-        _this.taskForm.ServiceFee = nums * serviceFree + nums * serviceUnit
-        _this.taskForm.OrderTotal = _this.taskForm.ServiceFee + _this.taskForm.ProductTotal
+        _this.taskForm.ServiceCharge = (nums * serviceFree) + (nums * serviceUnit)
+        _this.taskForm.TotalProductPrice = (_this.taskForm.ProductPrice * nums * _this.ExRate).toFixed(2)
       },
 
 
@@ -1423,17 +1516,19 @@
       checkCountry(index) {
         let _this = this
         _this.taskForm.ServiceType = null
-        _this.taskForm.Currency = _this.countryData[index].CurrSymbal
-        _this.taskForm.Country = _this.countryData[index].Code
         let obj = _this.rateData
-        console.log(_this.taskForm.Currency)
-        _this.ExRate = _this.getRate(obj, _this.taskForm.Currency)
+        console.log(_this.taskForm.CountryId)
+        let Id = _this.taskForm.CountryId
+        _this.ExRate = _this.getRate(obj, Id)
+        _this.taskForm.Currency = _this.getSymbol(obj, Id)
         _this.getProTotal()
         let param = {
-          SessionId: sessionStorage.getItem('sessionid'),
-          PlatformId: _this.PlatformId,
-          Country: _this.countryData[index].Code
+          cid: _this.taskForm.CountryId
         }
+        getProbalibi(param).then(res => {
+          _this.commentTypeData = res.data
+        })
+        // _this.getInfo(_this.obj, 'BaseTaskType', len[i].OrderType)
         // _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doGetService', param).then(res => {
         //   if (res.data.status == 200) {
         //     _this.commentTypeData = res.data.data.Service
@@ -1567,7 +1662,7 @@
           pagesize: _this.pageSize
         }
         orderList(param).then((res) => {
-          _this.allOrderData = res.data
+          _this.allOrderData = res.data.list
         })
         // _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doOrderList', param).then((res) => {
 

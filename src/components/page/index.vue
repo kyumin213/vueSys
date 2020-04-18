@@ -862,7 +862,7 @@
               	_this.$router.push('/')
               } else {
               	_this.$message({
-              		message: res.data.message,
+              		message: res.data.Msg,
               		type: 'error'
               	})
               	// _this.getImgCode()

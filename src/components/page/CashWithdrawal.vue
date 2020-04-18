@@ -50,13 +50,13 @@
 			</el-form>
 		</div>
 		<el-table :data="allCashData" border style="width: 100%">
-			<el-table-column prop="DealId" label="业务编码" align="center"></el-table-column>
-			<el-table-column prop="BankName" label="开户银行" align="center"></el-table-column>
-			<el-table-column prop="AccountName" label="开户名" align="center"></el-table-column>
-			<el-table-column prop="Account" label="开户银行账号" align="center"></el-table-column>
-			<el-table-column prop="Amount" label="提现金额(￥)" align="center"></el-table-column>
-			<el-table-column prop="ActionTime" label="提现时间" align="center"></el-table-column>
-			<el-table-column prop="Status" label="提现状态" align="center" :formatter="statusTxt"></el-table-column>
+			<el-table-column prop="RemoveMoenyNumber" label="业务编码" align="center"></el-table-column>
+			<el-table-column prop="Bank" label="开户银行" align="center"></el-table-column>
+			<el-table-column prop="BankName" label="开户名" align="center"></el-table-column>
+			<el-table-column prop="BankAccount" label="开户银行账号" align="center"></el-table-column>
+			<el-table-column prop="RemoveMoeny" label="提现金额(￥)" align="center"></el-table-column>
+			<el-table-column prop="RemoveMoenyTime" label="提现时间" align="center"></el-table-column>
+			<el-table-column prop="RemoveMoenyStae" label="提现状态" align="center" :formatter="statusTxt"></el-table-column>
 			<el-table-column label="操作" align="center" width="100">
 						<template slot-scope="scope">
 							<el-popover trigger="hover" placement="top" v-if='scope.row.Status=="拒绝"'>
@@ -115,16 +115,17 @@
 				}
 			};
 			return {
+        offset:10,
         total:0,
-        currentPage:10,
-        pageSize:1,
+        currentPage:1,
+        pageSize:10,
 				balance: 0,
 				pickerEndDate: this.pickerOptionsEnd(),
 				pickerStartDate: this.searchStartDate(),
 				allCashData: [],
 				CashWithdrawalModal: false,
 				cashSearchForm: {
-					status: '0',
+					status: '',
 					startTime: '',
 					endTime: '',
 					DealId: ''
@@ -185,11 +186,13 @@
       },
 			//状态转文字
 			statusTxt(val){
-				if(val.Status == 0) {
-					return '待确认'
-				} else if(val.Status == 1) {
-					return '已确认'
-				}
+				if(val.RemoveMoenyStae == 1) {
+					return '已申请'
+				} else if(val.RemoveMoenyStae == 2) {
+					return '已完成'
+				}else if(val.RemoveMoenyStae == 3){
+          return '失败'
+        }
 			},
 			//获取用户名
 			getName() {
@@ -205,7 +208,7 @@
 					statetime:_this.cashSearchForm.startTime,
 					endtime:_this.cashSearchForm.endTime,
 					kWord:_this.cashSearchForm.DealId,
-          state:0,
+          state:1,
           pageNum:_this.currentPage,
           pagesize:_this.pageSize
 				}
@@ -237,7 +240,7 @@
               })
               _this.$refs['cashForm'].resetFields()
               _this.CashWithdrawalModal = false
-              // _this.cashList()
+              _this.cashList()
             })
 					}
 				})
