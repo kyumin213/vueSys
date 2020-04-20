@@ -15,7 +15,7 @@
           <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
           <div style="margin: 15px 0;"></div>
           <el-checkbox-group v-model="searchForm.checkedCities" @change="handleCheckedCitiesChange">
-            <el-checkbox v-for="city in cities" :label="city" :key="city">{{city}}</el-checkbox>
+            <el-checkbox v-for="(item,index) in cities" :label="item.Id" :key="index">{{item.CountryName}}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
         <div class="form-item">
@@ -28,7 +28,7 @@
         </div>
         <div>
           <el-form-item label="关键字" class="labelNum">
-            <el-input v-model="searchForm.Keyword" style="width: 220px" placeholder="请输入关键字"></el-input>
+            <el-input v-model="searchForm.Keyword" style="width: 220px" placeholder="单号,产品名称,ASIN,关键词"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" size="medium" @click='searchOrder'>搜索</el-button>
@@ -41,13 +41,13 @@
     <div class="tabBox">
       <div class="tabList">
         <ul class="tabBlock">
-          <li :class="active === 0 ? 'active':''" data-index="0" @click="getAllStatus">全部<span>({{allDataNum}})</span></li>
-          <li :class="active === 1 ? 'active':''" data-index="1" @click="daiPay">待付款<span>({{StatusSum[1]}})</span></li>
-          <li :class="active === 2 ? 'active':''" data-index="2" @click="daiConfirm">待确认<span>({{StatusSum[1]}})</span></li>
-          <li :class="active === 3 ? 'active':''" data-index="3" @click="daifp">待分配<span>({{StatusSum[1]}})</span></li>
-          <li :class="active === 4 ? 'active':''" data-index="4" @click="yfp">已分配<span>({{StatusSum[1]}})</span></li>
-          <li :class="active === 5 ? 'active':''" data-index="5" @click="ywc">已完成<span>({{StatusSum[2]}})</span></li>
-          <li :class="active === 6 ? 'active':''" data-index="6" @click="daiCancel">已取消<span>({{StatusSum[3]}})</span></li>
+          <li :class="active === 1 ? 'active':''" data-index="1" @click="getAllStatus">全部<span>({{allDataNum}})</span></li>
+          <!-- <li :class="active === 1 ? 'active':''" data-index="1" @click="daiPay">待付款<span>({{StatusSum[1]}})</span></li> -->
+          <li :class="active === 2 ? 'active':''" data-index="2" @click="daiConfirm">待确认<span>({{TotalToBeParker}})</span></li>
+          <li :class="active === 3 ? 'active':''" data-index="3" @click="daifp">待分配<span>({{TotalToBeAllocated}})</span></li>
+          <li :class="active === 4 ? 'active':''" data-index="4" @click="yfp">已分配<span>({{TotalAlreadyAllocated}})</span></li>
+          <li :class="active === 5 ? 'active':''" data-index="5" @click="ywc">已完成<span>({{TotalCompleted}})</span></li>
+          <li :class="active === 6 ? 'active':''" data-index="6" @click="daiCancel">已取消<span>({{TotalCancel}})</span></li>
           <!--<li :class="active === 4 ? 'active':''" :data-index="4" @click="errData">异常<span>({{StatusSum[4]}})</span></li>-->
           <!-- <li :class="active === 4 ? 'active':''" :data-index="4" @click="returnMoney">退款<span>({{StatusSum[4]}})</span></li> -->
         </ul>
@@ -68,13 +68,13 @@
             <el-button type="text" @click="viewDetails(scope.$index,scope.row)">{{scope.row.OrderNumber}}</el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="CountryId" label="国家" align="center" width="150"></el-table-column>
+        <el-table-column prop="CountryName" label="国家" align="center" width="100"></el-table-column>
         <el-table-column prop="Number" label="任务数量" align="center" width="100"></el-table-column>
         <el-table-column prop="ProductName" label="产品名称" align="center" width="100"></el-table-column>
         <el-table-column prop="Asin" label="产品ASIN" align="center" width="120"></el-table-column>
-        <el-table-column prop="ProductKeyWord" label="关键词" align="center"></el-table-column>
+        <el-table-column prop="keywords" label="关键词" align="center"></el-table-column>
         <el-table-column prop="TotalProductPrice" label="总价" align="center"></el-table-column>
-        <el-table-column prop="StartTime" label="下单时间" align="center" width="200"></el-table-column>
+        <el-table-column prop="OrderTime" label="下单时间" align="center" width="200"></el-table-column>
         <el-table-column prop="OrderState" label="状态" align="center" width="100"></el-table-column>
         <el-table-column label="操作" align="center" width="200">
           <template slot-scope="scope">
@@ -90,6 +90,12 @@
           </template>
         </el-table-column>
       </el-table>
+      <div class="mt30 txtRight">
+        <el-pagination background @size-change='handleSizeChange' @current-change="handleCurrentChange" :current-page="currentPage"
+          :page-sizes="[10, 20, 30, 50,100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
+          :total="totalNum">
+        </el-pagination>
+      </div>
     </div>
     <!-- FBA任务-->
     <el-dialog title="创建任务" :visible.sync="addTaskModal" width="90%" custom-class="fixed-dialog" :close-on-click-modal="false"
@@ -104,7 +110,7 @@
               <el-col :span="12" :xs="24">
                 <el-form-item label="下单类型" class="disInline minWid" prop="ServiceType">
                   <el-select v-model="taskForm.ServiceType" placeholder="请选择" class="disInline wid100" @change="checkOrderType">
-                    <el-option v-for="(item,index) in orderTypes" :value="index" :label="item.label"></el-option>
+                    <el-option v-for="(item,index) in orderTypes" :key='index' :value="item.value" :label="item.label"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -139,82 +145,30 @@
                   </el-input>
                 </el-form-item>
               </el-col>
-
-            </el-row>
-            <div>
-              <el-col :span="12" :xs="24" class="fright">
-                <el-form-item label="产品图片" class="disInline">
-                  <!-- <img :src="taskForm.ProductImage" alt="" class="proImg"> -->
-                  <el-upload action="#" list-type="picture-card" :auto-upload="false">
-                    <i slot="default" class="el-icon-plus"></i>
-                    <div slot="file" slot-scope="{file}">
-                      <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
-                      <span class="el-upload-list__item-actions">
-                        <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
-                          <i class="el-icon-zoom-in"></i>
-                        </span>
-                        <span v-if="!disabledImg" class="el-upload-list__item-delete" @click="handleDownload(file)">
-                          <i class="el-icon-download"></i>
-                        </span>
-                        <span v-if="!disabledImg" class="el-upload-list__item-delete" @click="handleRemove(file)">
-                          <i class="el-icon-delete"></i>
-                        </span>
-                      </span>
-                    </div>
-                  </el-upload>
-                  <el-dialog :visible.sync="dialogVisible">
-                    <img width="100%" :src="taskForm.image" alt="">
-                  </el-dialog>
-                </el-form-item>
-              </el-col>
-              <el-col>
-                <el-upload
-                  action="#"
-                  list-type="picture-card"
-                  :auto-upload="false">
-                    <i slot="default" class="el-icon-plus"></i>
-                    <div slot="file" slot-scope="{file}">
-                      <img
-                        class="el-upload-list__item-thumbnail"
-                        :src="file.url" alt=""
-                      >
-                      <span class="el-upload-list__item-actions">
-                        <span
-                          class="el-upload-list__item-preview"
-                          @click="handlePictureCardPreview(file)"
-                        >
-                          <i class="el-icon-zoom-in"></i>
-                        </span>
-                        <span
-                          v-if="!disabled"
-                          class="el-upload-list__item-delete"
-                          @click="handleDownload(file)"
-                        >
-                          <i class="el-icon-download"></i>
-                        </span>
-                        <span
-                          v-if="!disabled"
-                          class="el-upload-list__item-delete"
-                          @click="handleRemove(file)"
-                        >
-                          <i class="el-icon-delete"></i>
-                        </span>
-                      </span>
-                    </div>
-                </el-upload>
-              </el-col>
-            </div>
-            <el-row>
               <el-col :span="12" :xs="24">
                 <p class="lh40">产品评分</p>
                 <el-form-item prop='ProductScore'>
                   <el-rate v-model="taskForm.ProductScore"></el-rate>
                 </el-form-item>
               </el-col>
+            </el-row>
+            <el-row>
               <el-col :span="12" :xs="24" class="fleft">
                 <el-form-item label="产品链接" class="wid" prop="ProductLink">
                   <el-input type="textarea" v-model="taskForm.ProductLink" placeholder="请以http://或者https://开头"></el-input>
                 </el-form-item>
+              </el-col>
+              <el-col :span="12" :xs="24">
+                <p class="mb10 mt10">产品图片</p>
+                <el-upload action=" " :auto-upload='true' accept="image/jpeg,image/jpg,image/png" list-type="picture-card"
+                  :limit='1' :http-request="uploadFile" :on-preview="handlePictureCardPreview"
+                  :on-remove="handleRemove" :before-upload="beforeUpload">
+                  <i class="el-icon-plus"></i>
+                </el-upload>
+                <el-dialog :visible.sync="dialogVisible">
+                  <img width="100%" :src="taskForm.ProductPictures" alt="">
+                </el-dialog>
+                <p class="mt20 colred pl30" v-show='proImg'>上传中</p>
               </el-col>
             </el-row>
             <el-row>
@@ -227,17 +181,22 @@
               <el-col :span="12" :xs="24">
                 <el-form-item label="关键词类型" prop='KeywordType'>
                   <el-radio-group v-model="taskForm.KeywordType">
-                    <el-radio label="1">产品关键字</el-radio>
-                    <el-radio label="2">CPC关键字</el-radio>
+                    <el-radio label="1" value='1'>产品关键字</el-radio>
+                    <el-radio label="2" value='2'>CPC关键字</el-radio>
                   </el-radio-group>
                 </el-form-item>
               </el-col>
 
             </el-row>
-            <el-row v-show="taskForm.KeywordType == '1'">
-              <el-col :span="12" :xs="24">
-                <el-form-item label="产品关键词" class="disInline minWid" prop="ProductKeyword">
+            <el-row>
+              <el-col :span="12" :xs="24" v-show="taskForm.KeywordType == '1'">
+                <el-form-item label="产品关键词" class="disInline minWid">
                   <el-input v-model="taskForm.ProductKeyword" placeholder='请输入关键词'></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12" :xs="24" v-show="taskForm.KeywordType == '2'">
+                <el-form-item label="CPC关键词" class="disInline minWid">
+                  <el-input v-model="taskForm.CpcKeyword" placeholder='请输入关键词'></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="12" :xs="24">
@@ -248,17 +207,7 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-row v-show="taskForm.KeywordType == '2'">
-              <el-col :span="12" :xs="24">
-                <el-form-item label="CPC关键词" class="disInline minWid">
-                  <el-input v-model="taskForm.CpcKeyword" placeholder='请输入关键词'></el-input>
-                </el-form-item>
-              </el-col>
-              <!--              <el-col :span="12" :xs="24">
-                <el-form-item label="CPC位置" class="disInline minWid" prop="CpcPosition">
-                  <el-input v-model="taskForm.CpcPosition" placeholder="例:第一页,第五个"></el-input>
-                </el-form-item>
-              </el-col> -->
+            <el-row>
             </el-row>
             <el-row>
               <el-col :span="12" :xs="24">
@@ -338,7 +287,7 @@
                 <el-form-item prop='Total'>
                   <span class="spanTxt">合计：</span>
                   <span class="colTxt labels fz20">￥{{taskForm.Total}}</span>
-                  <span class="labels col9">(合计) = {{taskForm.TotalProductPrice}} (产品总价) + {{taskForm.ServiceCharge}}
+                  <span class="labels col9">(合计) = <span v-show="priceShow">{{taskForm.TotalProductPrice}} (产品总价) +</span> {{taskForm.ServiceCharge}}
                     (服务费)</span>
                 </el-form-item>
               </div>
@@ -376,7 +325,7 @@
       </span>
     </el-dialog>
     <!-- 填写评价-->
-    <el-dialog title="评价" :visible.sync="assessModel" width="45%" :close-on-click-modal="false" center="">
+    <!--    <el-dialog title="评价" :visible.sync="assessModel" width="45%" :close-on-click-modal="false" center="">
       <el-form :model="assessForm">
         <el-form-item label="Feedback评分">
           <el-rate v-model="assessForm.FeedassessValue"></el-rate>
@@ -407,7 +356,6 @@
             </span>
 
           </div>
-          <!--<el-input type='file' name='file' accept="image/png,image/jpeg,image/jpg" @change="update"></el-input>-->
           <input ref='file' name="file" style='display: none;' type="file" accept="image/png,image/jpeg,image/jpg"
             @change="update" />
           <span class="fileBtn">选择图片</span>
@@ -428,7 +376,7 @@
         <el-button @click="assessModel=false" size="medium">取消</el-button>
       </span>
 
-    </el-dialog>
+    </el-dialog> -->
     <!-- 日志-->
     <el-dialog title="日志" :visible.sync="dailyModel" :close-on-click-modal="false">
       <el-timeline>
@@ -495,8 +443,6 @@
                 <span class="tipRed">￥{{paymentForm.payMoney}}</span>
               </el-form-item>
             </div>
-            <el-button type='warning' v-if='parseInt(this.paymentForm.payMoney)>parseInt(this.paymentForm.balance) || parseInt(this.paymentForm.balance)==0'
-              @click='toRecharge'>去充值</el-button>
           </el-col>
         </el-row>
       </el-form>
@@ -535,28 +481,36 @@
     Rate,
     getServiceFee,
     getService,
-    getProbalibi
+    getProbalibi,
+    uploadImg,
+    GetOrderState
   } from '@/request/api'
   export default {
     name: 'orderManage',
     data() {
       return {
-         dialogImageUrl: '',
-                dialogVisible: false,
-                disabled: false,
+        totalNum: 0, //列表总条数
+        file: 'file',
+        proImg: false, //图片上传状态
+        dialogVisible: false,
+        disabled: false,
         priceShow: true, //总价显示
         dialogVisible: false,
         disabledImg: false,
         checkAll: false,
-        cities: cityOptions,
+        cities: [],
         isIndeterminate: true,
-        allDataNum: 0,
+        allDataNum: 0, //全部状态数量
+        TotalToBeParker: 0, //待确认状态数量
+        TotalToBeAllocated: 0, //待分配状态数量
+        TotalAlreadyAllocated: 0, //已分配状态数量
+        TotalCompleted: 0, //已完成状态数量
+        TotalCancel: 0, //已取消状态数量
         brushRadio: '',
         serviceUnit: 0, //服务费单价
         addService: 0, //增值费
         ExRate: 0, //汇率
         activeTask: 0, //除FBA任务外的其它任务状态
-        offset: 10, //每页条数
         imgIng: false, //评论图片上传中
         videoTip: true, //评论视频上传错误提示
         videlIng: false, //视频上传中
@@ -580,7 +534,7 @@
         loading: true,
         status: this.$route.params.taskTypeModel,
         errorStatus: this.$route.params.active,
-        pageSize: 1,
+        pageSize: 10, //每页条数
         btnTask: true,
         currentPage: 1,
         cancelModal: false,
@@ -593,7 +547,7 @@
         viewDetailModal: false, //FBA查看详情
         reasonTxt: '系统取消', //取消原因
         activities: [],
-        active: 0,
+        active: 1,
 
         allNum: 0, //总条数
         dailyModel: false,
@@ -659,7 +613,7 @@
           Currency: '', //货币符号
           ProductScore: null, //评分
           ProductLink: '', //产品链接
-          image: '', //产品图片
+          ProductPictures: '', //产品图片
           KeywordType: '1', //关键词类型
           ProductKeyword: '', //搜索关键词
           ProductPosition: '', //留评比例,
@@ -752,21 +706,81 @@
           }]
         },
         obj: [],
-        StatusSum: [], //任务状态数量
-        selected: [] //选中的值
+        selected: [], //选中的值
+        file_list: []
       }
     },
     components: {
       viewTask
     },
     created() {
-      this.allTaskNum()
+      this.allOrderList()
+      this.getAllCountry()
+      this.allOrderStatus()
     },
     methods: {
+      // 获取订单状态数量
+      allOrderStatus(){
+        let _this = this
+        let param = {
+          Id:sessionStorage.getItem('userId')
+        }
+        GetOrderState(param).then(res=>{
+          _this.allDataNum = res.data[0].TotalCount
+          _this.TotalToBeParker = res.data[0].TotalToBeParker
+          _this.TotalToBeAllocated = res.data[0].TotalToBeAllocated
+          _this.TotalAlreadyAllocated = res.data[0].TotalAlreadyAllocated
+          _this.TotalCompleted = res.data[0].TotalCompleted
+          _this.TotalCancel = res.data[0].TotalCancel
+        })
+      },
+      //上传图片前检验图片格式和大小
+      beforeUpload(file) {
+        let _this = this
+        _this.proImg = true
+        const isImg = file.type === 'image/jpg' || file.type == 'image/jpeg' || file.type == 'image/png' || file.type ==
+          'image/gif';
+        const isLt5M = file.size / 1024 / 1024 < 5;
+        if (!isImg) {
+          this.$message.error('只能上传jpg/jpeg/png/gif的图片文件!');
+        } else if (!isLt5M) {
+          this.$message.error('上传图片大小不能超过 5MB!');
+        }
+        return isImg && isLt5M;
+      },
+      //封面图上传成功
+      uploadSuccess1(res, file) {
+        let _this = this
+        _this.productForm.shopImage = res.url
+      },
+      uploadFile: function(file) { // 上传的函数
+        let _this = this
+        let uploadData = new FormData()
+        uploadData.append('image', file.file)
+        console.log(uploadData)
+        let config = {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+        uploadImg(uploadData, config).then(res => {
+          if (res.data.Code === 'ok') {
+            _this.proImg = false
+            _this.taskForm.ProductPictures = res.data.Data
+          } else {
+            _this.$message({
+              type: 'error',
+              message: res.data.Msg
+            })
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+      },
 
       // 上传产品图片
-      handleRemove(file) {
-        console.log(file);
+      handleRemove(file, fileList) {
+        console.log(file, fileList);
       },
       handlePictureCardPreview(file) {
         this.taskForm.image = file.url;
@@ -784,6 +798,18 @@
         this.checkAll = checkedCount === this.cities.length;
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cities.length;
       },
+      // 初始化国家查询
+      getAllCountry(){
+        let _this =this
+        let param = {
+          Id: sessionStorage.getItem('userId')
+        }
+        getCountry(param).then((res) => {
+          _this.cities = res.data.list
+        }).catch(err=>{
+          console.log(err)
+        })
+      },
       // 创建订单
       createOrder() {
         let _this = this
@@ -793,10 +819,14 @@
         }
         getCountry(param).then((res) => {
           _this.countryData = res.data.list
+        }).catch(err=>{
+          console.log(err)
         })
         // 汇率
         Rate().then((res) => {
           _this.rateData = res.data.list
+        }).catch(err=>{
+          console.log(err)
         })
         // 增值费
         getServiceFee().then((res) => {
@@ -818,6 +848,8 @@
         // 服务费
         getService().then((res) => {
           _this.serviceData = res.data.list
+        }).catch(err=>{
+          console.log(err)
         })
       },
       // 下单类型选择
@@ -826,8 +858,12 @@
         let types = _this.taskForm.ServiceType
         if (types == '1') {
           _this.priceShow = false
+          _this.taskForm.Total = (parseFloat(_this.taskForm.ServiceCharge))
+            .toFixed(2)
         } else {
           _this.priceShow = true
+          _this.taskForm.Total = (parseFloat(_this.taskForm.ServiceCharge) + parseFloat(_this.taskForm.TotalProductPrice))
+            .toFixed(2)
         }
       },
 
@@ -905,25 +941,23 @@
           }
         }
       },
-      handleRemove(file, fileList) {
-        console.log(file, fileList);
-      },
-      handlePictureCardPreview(file) {
-        console.log(file)
-        this.dialogImageUrl = file.url;
-        this.dialogVisible = true;
-      },
+      // handleRemove(file, fileList) {
+      //   console.log(file, fileList);
+      // },
+      // handlePictureCardPreview(file) {
+      //   console.log(file)
+      //   this.dialogImageUrl = file.url;
+      //   this.dialogVisible = true;
+      // },
       // 留评比例
       lpType(index) {
         let _this = this
         let lp = _this.taskForm.ProductPosition
         let countryId = _this.taskForm.CountryId
-        console.log(countryId)
         let types = _this.taskForm.ProductPosition
-        console.log(types)
         let obj = _this.serviceData
         _this.serviceUnit = _this.getFee(obj, countryId, types)
-        console.log(_this.serviceUnit)
+        _this.checkBuyNumFBA()
       },
       //列表确认付款弹窗
       payMent() {
@@ -941,7 +975,6 @@
         let _this = this
         let orderId = _this.OrderId
         let Amount = _this.Amount
-        let BaseTaskType = parseInt(_this.searchForm.BaseTaskType)
         _this.orderAction(1, orderId, Amount)
         _this.getBalance()
       },
@@ -973,104 +1006,7 @@
         let Amount = _this.Amount
         _this.orderAction(6, orderId, Amount)
       },
-      // 任务管理全部状态信息
-      getAllData(value) {
-        let _this = this
-        let param = {
-          SessionId: sessionStorage.getItem('sessionid'),
-          PlatformId: parseInt(_this.searchForm.PlatformId),
-          BaseTaskType: parseInt(value),
-          Status: _this.active,
-          Page: parseInt(_this.currentPage),
-          offset: _this.offset,
-          StartDate: _this.searchForm.orderStartTime,
-          EndDate: _this.searchForm.orderEndTime,
-          Keyword: _this.searchForm.Keyword
-        }
-        _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doOrderList', param).then((res) => {
-          if (res.data.status == 200) {
-            let status = res.data.data.StatusSum
-            _this.StatusSum = status
-            _this.allNum = res.data.data.TotalRecords
-            let count = 0
-            for (let i = 1; i <= 9; i++) {
-              count += Number(_this.StatusSum[i])
-            }
-            _this.allDataNum = count
-            let len = res.data.data.RstList
-            for (let i = 0; i < len.length; i++) {
-              let plat = len[i].Platform
-              let country = len[i].Country
-              len[i].Platform = plat + '/' + country
-              len[i].OrderType = _this.getInfo(_this.obj, 'BaseTaskType', len[i].OrderType)
-              len[i].Status = _this.getInfo(_this.obj, 'OrderStatus', len[i].Status)
-              len[i].Device = _this.getInfo(_this.obj, 'DeviceType', len[i].Device)
-            }
-            _this.allOrderData = res.data.RstList
-            _this.loading = false
-          } else if (res.data.status == 400) {
-            _this.$message({
-              type: 'error',
-              message: res.data.message
-            })
-            sessionStorage.clear()
-            _this.$router.push({
-              name: 'index',
-              params: {
-                indexShow: false
-              }
-            })
-          } else {
-            console.log(res.data.message)
-          }
-        }).catch((error) => {
-          console.log(error)
-        })
-      },
-      // 任务管理状态查询信息
-      getDataStatus(status) {
-        let _this = this
-        let param = {
-          SessionId: sessionStorage.getItem('sessionid'),
-          PlatformId: parseInt(_this.searchForm.PlatformId),
-          BaseTaskType: parseInt(_this.BaseTaskType),
-          Status: parseInt(status),
-          Page: 1,
-          offset: _this.offset
-        }
-        _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doOrderList', param).then((res) => {
-          if (res.data.status == 200) {
-            let len = res.data.data.RstList
-            _this.allNum = res.data.data.TotalRecords
-            _this.StatusSum = res.data.data.StatusSum
-            for (let i = 0; i < len.length; i++) {
-              let plat = len[i].Platform
-              let country = len[i].Country
-              len[i].Platform = plat + '/' + country
-              len[i].OrderType = _this.getInfo(_this.obj, 'BaseTaskType', len[i].OrderType)
-              len[i].Status = _this.getInfo(_this.obj, 'OrderStatus', len[i].Status)
-            }
 
-            _this.allOrderData = res.data.data.RstList
-            _this.loading = false
-          }
-          if (res.data.status == 400) {
-            _this.$message({
-              type: 'error',
-              message: res.data.message
-            })
-            sessionStorage.clear()
-            _this.$router.push({
-              name: 'index',
-              params: {
-                indexShow: false
-              }
-            })
-          }
-        }).catch((error) => {
-          console.log(error)
-        })
-      },
       // 获取异常
       getError() {
         let _this = this
@@ -1083,15 +1019,13 @@
       // 重置
       resetTask() {
         let _this = this
-        let baseTaskType = _this.searchForm.BaseTaskType
         _this.searchForm = {
           PlatformId: '0',
           Keyword: '',
           orderStartTime: '',
           orderEndTime: '',
-          BaseTaskType: _this.searchForm.BaseTaskType
         }
-        _this.getAllData(parseInt(baseTaskType))
+        _this.getAllData()
       },
       // 导出
       exportExcel() {
@@ -1116,9 +1050,6 @@
         }
         return wbout
       },
-      handleSizeChange(val) {
-        console.log(`每页 ${val} 条`)
-      },
       // 时间范围
       timePicker() {
         let _this = this
@@ -1136,12 +1067,14 @@
         let obj = _this.addFreeData
         let price = _this.taskForm.ProductPrice
         // _this.getAddService(obj, nums)
-        _this.getProTotal()
+        // _this.getProTotal()
         _this.addService = _this.getAddService(obj, price)
         let serviceFree = _this.addService
         let serviceUnit = _this.serviceUnit
-        _this.taskForm.ServiceCharge = (nums * serviceFree) + (nums * serviceUnit)
+        _this.taskForm.ServiceCharge = ((nums * serviceFree) + (nums * serviceUnit)).toFixed(2)
         _this.taskForm.TotalProductPrice = (_this.taskForm.ProductPrice * nums * _this.ExRate).toFixed(2)
+        _this.taskForm.Total = (parseFloat(_this.taskForm.ServiceCharge) + parseFloat(_this.taskForm.TotalProductPrice))
+          .toFixed(2)
       },
 
 
@@ -1162,10 +1095,11 @@
             addOrder(param).then((res) => {
               _this.OrderId = res.data.OrderId
               _this.paymentModel = true
+              _this.paymentForm.payMoney = _this.taskForm.Total
               _this.addTaskModal = false
               _this.$refs['taskForm'].resetFields()
               _this.payMent()
-              // _this.getAllData(1)
+              _this.allOrderList()
             })
           }
         })
@@ -1234,10 +1168,8 @@
       //全部
       getAllStatus() {
         let _this = this
-        _this.active = 0
-        _this.getDataStatus(0)
-        _this.brushRadio = ''
-        _this.allDisable()
+        _this.active = 1
+        _this.allOrderList()
       },
 
       //待付款
@@ -1252,41 +1184,31 @@
       daiConfirm() {
         let _this = this
         _this.active = 2
-        _this.getDataStatus(2)
-        _this.brushRadio = ''
-        _this.allDisable()
+        _this.allOrderList()
       },
       // 待分配
       daifp() {
         let _this = this
         _this.active = 3
-        _this.getDataStatus(3)
-        _this.brushRadio = ''
-        _this.allDisable()
+        _this.allOrderList()
       },
-      // yfp
+      // 已分配
       yfp() {
         let _this = this
         _this.active = 4
-        _this.getDataStatus(4)
-        _this.brushRadio = ''
-        _this.allDisable()
+        _this.allOrderList()
       },
       // 已完成
       ywc() {
         let _this = this
         _this.active = 5
-        _this.getDataStatus(5)
-        _this.brushRadio = ''
-        _this.allDisable()
+        _this.allOrderList()
       },
       // 已取消
       daiCancel() {
         let _this = this
         _this.active = 6
-        _this.getDataStatus(6)
-        _this.brushRadio = ''
-        _this.allDisable()
+        _this.allOrderList()
       },
       // 异常
       errData() {
@@ -1432,36 +1354,8 @@
         let _this = this
         let obj = _this.obj
         _this.viewDetailModal = true
-        let param = {
-          SessionId: sessionStorage.getItem('sessionid'),
-          OrderId: _this.allOrderData[index].Id,
-          ActionType: 7
-        }
-        _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doOrderAction', param).then(res => {
-          if (res.data.status == 200) {
-            _this.viewTaskData = res.data.data.Order
-            //						_this.OrderSchedule=res.data.data.OrderSchedule
-            _this.viewTaskData.OrderType = this.getInfo(obj, 'BaseTaskType', _this.viewTaskData.OrderType)
-            _this.viewTaskData.Status = this.getInfo(obj, 'OrderStatus', _this.viewTaskData.Status)
-            _this.viewTaskData.KeyType = this.getInfo(obj, 'KeyType', _this.viewTaskData.KeyType)
-            _this.viewTaskData.Device = this.getInfo(obj, 'DeviceType', _this.viewTaskData.Device)
-            _this.viewTaskData.CouponUsed = this.getInfo(obj, 'CouponUsed', _this.viewTaskData.CouponUsed)
-            _this.viewTaskData.SelfShipped = this.getInfo(obj, 'SelfShipped', _this.viewTaskData.SelfShipped)
-          }
-          if (res.data.status == 400) {
-            _this.$message({
-              type: 'error',
-              message: '登录过期，请重新登录'
-            })
-            sessionStorage.clear()
-            _this.$router.push({
-              name: 'index',
-              params: {
-                indexShow: false
-              }
-            })
-          }
-        })
+        console.log(_this.allOrderData[index])
+        _this.viewTaskData = _this.allOrderData[index]
       },
       // 服务费显示与隐藏
       toggleService() {
@@ -1515,48 +1409,26 @@
       //根据国家取货币符号
       checkCountry(index) {
         let _this = this
-        _this.taskForm.ServiceType = null
         let obj = _this.rateData
         console.log(_this.taskForm.CountryId)
         let Id = _this.taskForm.CountryId
         _this.ExRate = _this.getRate(obj, Id)
         _this.taskForm.Currency = _this.getSymbol(obj, Id)
-        _this.getProTotal()
+        _this.checkBuyNumFBA()
         let param = {
           cid: _this.taskForm.CountryId
         }
         getProbalibi(param).then(res => {
           _this.commentTypeData = res.data
         })
-        // _this.getInfo(_this.obj, 'BaseTaskType', len[i].OrderType)
-        // _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doGetService', param).then(res => {
-        //   if (res.data.status == 200) {
-        //     _this.commentTypeData = res.data.data.Service
-        //     let service = res.data.data.Service
-        //     _this.serviceData = res.data.data.Service
-        //     for (let i = 0; i < service.length; i++) {
-        //       let rate = service[i].CommentRate
-        //       let country = service[i].Country
-        //       let price = service[i].UnitPrice
-        //       let newRate = rate * 100 + '%'
-        //       _this.serviceData[i].CommentRate = newRate
-        //       _this.serviceData[i].servicePrice = country + ' ￥' + price
-        //     }
-        //   }
-        // })
       },
       //下单成功后确定付款
       paymentOrder() {
         let _this = this
-        let BaseTaskType = _this.searchForm.BaseTaskType
         let param = {
           OrderId: _this.OrderId,
           Amount: _this.paymentForm.payMoney
         }
-      },
-      //去充值
-      toRecharge() {
-        this.$router.push('/accountManage')
       },
 
       //点赞选项操作
@@ -1641,61 +1513,38 @@
       //查询
       searchOrder() {
         let _this = this
-        let BaseTaskType = _this.searchForm.BaseTaskType
-        _this.getAllData(BaseTaskType)
+        _this.allOrderList()
       },
 
-      //全部
-      allTaskNum() {
+      //初始化订单列表
+      allOrderList() {
         let _this = this
-        _this.active = 0
+        // _this.active = 1
         let param = {
           userId: sessionStorage.getItem('userId'),
-          countryIdx: [],
-          state: 0,
-          Page: 1,
-          // offset: _this.offset,
-          statetime: '',
-          endtime: '',
-          kWord: '',
+          countryIdx: _this.searchForm.checkedCities,
+          state: _this.active,
+          statetime: _this.searchForm.orderStartTime,
+          endtime: _this.searchForm.orderEndTime,
+          kWord: _this.searchForm.Keyword,
           pageNum: _this.currentPage,
           pagesize: _this.pageSize
         }
         orderList(param).then((res) => {
           _this.allOrderData = res.data.list
+          _this.totalNum = parseInt(res.data.total)
+          let list = res.data.list
+          for(let i = 0;i<list.length;i++){
+            let proKey = list[i].ProductKeyword
+            let cpcKey = list[i].CpcKeyword
+            if(proKey==null){
+              proKey =''
+            }if(cpcKey==null){
+              cpcKey=''
+            }
+            _this.allOrderData[i].keywords = proKey + cpcKey
+          }
         })
-        // _this.axios.post(_this.GLOBAL.BASE_URL + '/api/doOrderList', param).then((res) => {
-
-        //   if (res.data.status == 200) {
-        //     let len = res.data.data.RstList
-        //     let status = res.data.data.StatusSum
-        //     _this.StatusSum = status
-        //     for (let i = 0; i < len.length; i++) {
-        //       let plat = len[i].Platform
-        //       let country = len[i].Country
-        //       len[i].Platform = plat + '/' + country
-        //       len[i].OrderType = _this.getInfo(_this.obj, 'BaseTaskType', len[i].OrderType)
-        //       len[i].Status = _this.getInfo(_this.obj, 'OrderStatus', len[i].Status)
-        //     }
-        //     _this.allOrderData = res.data.data.RstList
-        //     _this.loading = false
-        //   }
-        //   if (res.data.status == 400) {
-        //     _this.$message({
-        //       type: 'error',
-        //       message: res.data.message
-        //     })
-        //     sessionStorage.clear()
-        //     _this.$router.push({
-        //       name: 'index',
-        //       params: {
-        //         indexShow: false
-        //       }
-        //     })
-        //   }
-        // }).catch((error) => {
-        //   console.log(error)
-        // })
       },
       //查看取消原因
       cancelReasonBtn(index, row) {
@@ -1738,43 +1587,15 @@
       handleCurrentChange(val) {
         let _this = this
         _this.currentPage = val
-        let baseTaskType = _this.BaseTaskType
         console.log(_this.pageSize)
         console.log(_this.currentPage)
-        _this.getAllData(baseTaskType)
       },
       //每页条数
       handleSizeChange(val) {
         let _this = this
         console.log(val)
         _this.pageSize = val
-        _this.offset = val
         _this.handleCurrentChange(_this.currentPage)
-      },
-      //其它任务全部
-      allTaskOther() {
-        let _this = this
-        _this.activeTask = 0
-      },
-      //其他任务待付款
-      daifk() {
-        let _this = this
-        _this.activeTask = 1
-      },
-      //待执行
-      daizx() {
-        let _this = this
-        _this.activeTask = 2
-      },
-      //其他任务已完成
-      ywcOther() {
-        let _this = this
-        _this.activeTask = 3
-      },
-      //其他任务异常
-      errorOther() {
-        let _this = this
-        _this.activeTask = 4
       }
     }
   }

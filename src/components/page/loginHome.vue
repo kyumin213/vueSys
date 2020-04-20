@@ -75,8 +75,8 @@
       <div slot="header" class="clearfix">
         <span>公告</span>
       </div>
-      <div class="text item">
-        <p v-for="(item,index) in Notice">{{item.Notice}}</p>
+      <div class="text item" v-html='Notice'>
+        <p>{{Notice}}</p>
       </div>
     </el-card>
 		<!--提示-->
@@ -133,7 +133,7 @@
 		name: 'loginHome',
 		data() {
 			return {
-        Notice:[], //公告内容
+        Notice:'', //公告内容
 				platformId:0,
 				item: '1',
 				errorModel: false,
@@ -182,7 +182,7 @@
       getNoticeData(){
         let _this = this
         _this.axios.get(_this.GLOBAL.BASE_URL +'/api/HomePage/GetHomePage').then((res)=>{
-            _this.Notice = res.data
+            _this.Notice = res.data[0].Notice
         })
       },
 			//首页数据加载

@@ -26,9 +26,9 @@
 						</el-tab-pane>
 						<el-tab-pane label="找回密码" name="second">
 							<div v-show='switchTab!=3'>
-								<el-button size='small' :class="active === 2?'activeThis':''" @click='usePhone'>通过手机找回</el-button>
+								<el-button size='small' class="activeThis" @click='usePhone'>通过手机找回</el-button>
 							</div>
-							<el-form :model="forgetPhone" ref="forgetPhone" :rules='rules' class='mt20' status-icon v-show='active==2'>
+							<el-form :model="forgetPhone" ref="forgetPhone" :rules='rules' class='mt20' status-icon>
 
 								<el-form-item class="loginItem" prop='PhoneNumber'>
 									<el-input placeholder="请输入手机号" v-model="forgetPhone.PhoneNumber">
@@ -62,7 +62,7 @@
 									</el-button>
 								</el-form-item>
 								<el-form-item>
-									<el-button type='primary' @click="RetrievePwdPhone('forgetPhone')">确定</el-button>
+									<el-button type='primary' size='medium' @click="RetrievePwdPhone('forgetPhone')">确定</el-button>
 								</el-form-item>
 							</el-form>
 							<el-form :model='resetPwdForm' ref='resetPwdForm' :rules="setPwdRule" status-icon v-show='switchTab==3'>
@@ -311,7 +311,7 @@
 			<footer>
 				<div class='footerTit center'>
 					<p class="fz20 col mb20">加入我们，为您节省99%的研发投入</p>
-					<el-button type='warning' class='contactBtn'>立即加入</el-button>
+					<el-button type='warning' class='contactBtn' @click="loginBtn">立即加入</el-button>
 				</div>
 				<!--<p class="footerTit fz20 col">加入我们，为您节省99%的研发投入</p>-->
 				<p class="txtCenter footerTxt">Copyright ©2019 Buy System</p>

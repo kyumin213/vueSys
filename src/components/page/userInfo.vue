@@ -43,7 +43,7 @@
     <!--修改微信-->
     <el-dialog title="修改信息" :visible.sync="editWeChatModel" width="30%" center :close-on-click-modal="false">
       <el-form :model="formWeChat" ref="formWeChat" :rules='rules' class="demo-ruleForm" label-width='50px'>
-        <el-form-item prop="wx" label='微信'>
+        <el-form-item prop="WeChat" label='微信'>
           <el-input v-model="formWeChat.WeChat" placeholder='请输入新微信'></el-input>
         </el-form-item>
       </el-form>
@@ -95,7 +95,7 @@ export default {
 					message: '请输入QQ',
 					trigger: 'blur'
       	}],
-      	wx:[{
+      	WeChat:[{
       		required: true,
 					message: '请输入微信',
 					trigger: 'blur'}],
@@ -117,7 +117,9 @@ created() {
 				Id: sessionStorage.getItem('userId')
 			}
       getIndex(param).then((res)=>{
-        _this.userNames = res.data.name
+        _this.userNames = res.data[0].name
+        _this.userQQ = res.data[0].qq
+        _this.WeChat = res.data[0].wecate
       })
 
 		},//  修改QQ弹窗
@@ -144,9 +146,9 @@ created() {
     	}
     	_this.$refs[formName].validate((valid)=>{
     		if(valid){
-          updateQQ(param).then((res=>{
+          updateQQ(param).then(res=>{
             if(res.data.Code === 'ok'){
-            	// _this.userQQ = res.data.data.QQ
+            	_this.userQQ = res.data.Data
             	_this.$message({
             		type:'success',
             		message:res.data.Msg
@@ -158,9 +160,9 @@ created() {
                 message:res.data.Msg
               })
             }
-          }).catch((err)=>{
+          }).catch(err=>{
             console.log(err)
-          }))
+          })
     		}
     	})
     },
@@ -175,7 +177,7 @@ created() {
     		if(valid){
           updateWeCatch(param).then((res)=>{
             if(res.data.Code==='ok'){
-            	_this.WeChat=res.data.data.wechat
+            	_this.WeChat=res.data.Data
             	_this.$message({
             		type:'success',
             		message:res.data.Msg
@@ -187,6 +189,8 @@ created() {
                 message:res.data.Msg
               })
             }
+          }).catch(err=>{
+            console.log(err)
           })
     		}
     	})
@@ -202,6 +206,7 @@ created() {
         if(valid){
           updateName(param).then((res)=>{
             if(res.data.Code === 'ok'){
+              _this.userNames = res.data.Data
               _this.$message({
                 type:'success',
                 message:res.data.Msg
@@ -213,6 +218,8 @@ created() {
                 message:res.data.Msg
               })
             }
+          }).catch(err=>{
+            console.log(err)
           })
         }
       })
