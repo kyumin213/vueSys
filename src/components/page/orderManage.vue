@@ -41,13 +41,13 @@
     <div class="tabBox">
       <div class="tabList">
         <ul class="tabBlock">
-          <li :class="active === 1 ? 'active':''" data-index="1" @click="getAllStatus">全部<span>({{allDataNum}})</span></li>
+          <li :class="active === '' ? 'active':''" data-index="0" @click="getAllStatus">全部<span>({{allDataNum}})</span></li>
           <!-- <li :class="active === 1 ? 'active':''" data-index="1" @click="daiPay">待付款<span>({{StatusSum[1]}})</span></li> -->
-          <li :class="active === 2 ? 'active':''" data-index="2" @click="daiConfirm">待确认<span>({{TotalToBeParker}})</span></li>
-          <li :class="active === 3 ? 'active':''" data-index="3" @click="daifp">待分配<span>({{TotalToBeAllocated}})</span></li>
-          <li :class="active === 4 ? 'active':''" data-index="4" @click="yfp">已分配<span>({{TotalAlreadyAllocated}})</span></li>
-          <li :class="active === 5 ? 'active':''" data-index="5" @click="ywc">已完成<span>({{TotalCompleted}})</span></li>
-          <li :class="active === 6 ? 'active':''" data-index="6" @click="daiCancel">已取消<span>({{TotalCancel}})</span></li>
+          <li :class="active === 1 ? 'active':''" data-index="1" @click="daiConfirm">待确认<span>({{TotalToBeParker}})</span></li>
+          <li :class="active === 2 ? 'active':''" data-index="2" @click="daifp">待分配<span>({{TotalToBeAllocated}})</span></li>
+          <li :class="active === 3 ? 'active':''" data-index="3" @click="yfp">已分配<span>({{TotalAlreadyAllocated}})</span></li>
+          <li :class="active === 4 ? 'active':''" data-index="4" @click="ywc">已完成<span>({{TotalCompleted}})</span></li>
+          <li :class="active === 5 ? 'active':''" data-index="5" @click="daiCancel">已取消<span>({{TotalCancel}})</span></li>
           <!--<li :class="active === 4 ? 'active':''" :data-index="4" @click="errData">异常<span>({{StatusSum[4]}})</span></li>-->
           <!-- <li :class="active === 4 ? 'active':''" :data-index="4" @click="returnMoney">退款<span>({{StatusSum[4]}})</span></li> -->
         </ul>
@@ -68,17 +68,17 @@
             <el-button type="text" @click="viewDetails(scope.$index,scope.row)">{{scope.row.OrderNumber}}</el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="CountryName" label="国家" align="center" width="100"></el-table-column>
-        <el-table-column prop="Number" label="任务数量" align="center" width="100"></el-table-column>
-        <el-table-column prop="ProductName" label="产品名称" align="center" width="100"></el-table-column>
-        <el-table-column prop="Asin" label="产品ASIN" align="center" width="120"></el-table-column>
+        <el-table-column prop="CountryName" label="国家" align="center"></el-table-column>
+        <el-table-column prop="Number" label="任务数量" align="center"></el-table-column>
+        <el-table-column prop="ProductName" label="产品名称" align="center"></el-table-column>
+        <el-table-column prop="Asin" label="产品ASIN" align="center"></el-table-column>
         <el-table-column prop="keywords" label="关键词" align="center"></el-table-column>
         <el-table-column prop="TotalProductPrice" label="总价" align="center"></el-table-column>
-        <el-table-column prop="OrderTime" label="下单时间" align="center" width="200"></el-table-column>
-        <el-table-column prop="OrderState" label="状态" align="center" width="100"></el-table-column>
-        <el-table-column label="操作" align="center" width="200">
+        <el-table-column prop="OrderTime" label="下单时间" align="center"></el-table-column>
+        <el-table-column prop="OrderState" label="状态" align="center" :formatter="txtOrderStatus"></el-table-column>
+        <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <el-button size="small" type="primary" @click="payMent">付款</el-button>
+            <!-- <el-button size="small" type="primary" @click="payMent">付款</el-button> -->
             <el-button size="small" @click="cancelHandel">取消</el-button>
             <!--<el-button size="small" :disabled="disable3" type="success" @click="evalEdit()">填写评价</el-button>-->
             <!-- <el-button size="small" type="warning" @click="viewDaily()">日志</el-button> -->
@@ -92,8 +92,8 @@
       </el-table>
       <div class="mt30 txtRight">
         <el-pagination background @size-change='handleSizeChange' @current-change="handleCurrentChange" :current-page="currentPage"
-          :page-sizes="[10, 20, 30, 50,100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
-          :total="totalNum">
+          :page-sizes="[5, 10, 20, 50,100]" :page-size="5" layout="total, sizes, prev, pager, next, jumper"
+          :total="total">
         </el-pagination>
       </div>
     </div>
@@ -161,8 +161,8 @@
               <el-col :span="12" :xs="24">
                 <p class="mb10 mt10">产品图片</p>
                 <el-upload action=" " :auto-upload='true' accept="image/jpeg,image/jpg,image/png" list-type="picture-card"
-                  :limit='1' :http-request="uploadFile" :on-preview="handlePictureCardPreview"
-                  :on-remove="handleRemove" :before-upload="beforeUpload">
+                  :limit='1' :http-request="uploadFile" :on-preview="handlePictureCardPreview" :on-remove="handleRemove"
+                  :before-upload="beforeUpload">
                   <i class="el-icon-plus"></i>
                 </el-upload>
                 <el-dialog :visible.sync="dialogVisible">
@@ -287,7 +287,8 @@
                 <el-form-item prop='Total'>
                   <span class="spanTxt">合计：</span>
                   <span class="colTxt labels fz20">￥{{taskForm.Total}}</span>
-                  <span class="labels col9">(合计) = <span v-show="priceShow">{{taskForm.TotalProductPrice}} (产品总价) +</span> {{taskForm.ServiceCharge}}
+                  <span class="labels col9">(合计) = <span v-show="priceShow">{{taskForm.TotalProductPrice}} (产品总价) +</span>
+                    {{taskForm.ServiceCharge}}
                     (服务费)</span>
                 </el-form-item>
               </div>
@@ -447,9 +448,9 @@
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click='paymentOrder' v-if='parseInt(this.paymentForm.payMoney)<parseInt(this.paymentForm.balance) && parseInt(this.paymentForm.balance)!=0 && !payList'>确定</el-button>
-        <el-button type="primary" @click='paymentOrderList' v-if="payList">确定</el-button>
-        <el-button @click="paymentClose">取消</el-button>
+     <!--   <el-button type="primary" @click='paymentOrder' v-if='parseInt(this.paymentForm.payMoney)<parseInt(this.paymentForm.balance) && parseInt(this.paymentForm.balance)!=0 && !payList'>确定</el-button>
+        <el-button type="primary" @click='paymentOrderList' v-if="payList">确定</el-button> -->
+        <el-button @click="paymentClose">关闭</el-button>
       </div>
     </el-dialog>
     <!--FBA查看详情-->
@@ -489,7 +490,7 @@
     name: 'orderManage',
     data() {
       return {
-        totalNum: 0, //列表总条数
+        total: 0, //列表总条数
         file: 'file',
         proImg: false, //图片上传状态
         dialogVisible: false,
@@ -534,7 +535,7 @@
         loading: true,
         status: this.$route.params.taskTypeModel,
         errorStatus: this.$route.params.active,
-        pageSize: 10, //每页条数
+        pageSize: 5, //每页条数
         btnTask: true,
         currentPage: 1,
         cancelModal: false,
@@ -547,7 +548,7 @@
         viewDetailModal: false, //FBA查看详情
         reasonTxt: '系统取消', //取消原因
         activities: [],
-        active: 1,
+        active: '',
 
         allNum: 0, //总条数
         dailyModel: false,
@@ -719,13 +720,27 @@
       this.allOrderStatus()
     },
     methods: {
+      // 格式化订单状态
+      txtOrderStatus(val) {
+        if (val.OrderState == 1) {
+          return '待确认'
+        } else if (val.OrderState == 2) {
+          return '待分配'
+        } else if (val.OrderState == 3) {
+          return '已分配'
+        } else if (val.OrderState == 4) {
+          return '已完成'
+        } else if (val.OrderState == 5) {
+          return '已取消'
+        }
+      },
       // 获取订单状态数量
-      allOrderStatus(){
+      allOrderStatus() {
         let _this = this
         let param = {
-          Id:sessionStorage.getItem('userId')
+          Id: sessionStorage.getItem('userId')
         }
-        GetOrderState(param).then(res=>{
+        GetOrderState(param).then(res => {
           _this.allDataNum = res.data[0].TotalCount
           _this.TotalToBeParker = res.data[0].TotalToBeParker
           _this.TotalToBeAllocated = res.data[0].TotalToBeAllocated
@@ -799,14 +814,14 @@
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cities.length;
       },
       // 初始化国家查询
-      getAllCountry(){
-        let _this =this
+      getAllCountry() {
+        let _this = this
         let param = {
           Id: sessionStorage.getItem('userId')
         }
         getCountry(param).then((res) => {
           _this.cities = res.data.list
-        }).catch(err=>{
+        }).catch(err => {
           console.log(err)
         })
       },
@@ -819,13 +834,13 @@
         }
         getCountry(param).then((res) => {
           _this.countryData = res.data.list
-        }).catch(err=>{
+        }).catch(err => {
           console.log(err)
         })
         // 汇率
         Rate().then((res) => {
           _this.rateData = res.data.list
-        }).catch(err=>{
+        }).catch(err => {
           console.log(err)
         })
         // 增值费
@@ -848,7 +863,7 @@
         // 服务费
         getService().then((res) => {
           _this.serviceData = res.data.list
-        }).catch(err=>{
+        }).catch(err => {
           console.log(err)
         })
       },
@@ -963,11 +978,11 @@
       payMent() {
         let _this = this
         _this.paymentModel = true
-        _this.payList = true
+        // _this.payList = true
         _this.hasBalance = 1
-        _this.OrderId = _this.selected.Id
-        _this.Amount = _this.selected.TotalPrice
-        _this.paymentForm.payMoney = _this.selected.TotalPrice
+        // _this.OrderId = _this.selected.Id
+        // _this.Amount = _this.selected.TotalPrice
+        // _this.paymentForm.payMoney = _this.selected.TotalPrice
         _this.paymentForm.balance = sessionStorage.getItem('balance')
       },
       //付款确认按钮
@@ -1019,13 +1034,14 @@
       // 重置
       resetTask() {
         let _this = this
+        _this.currentPage = 1
         _this.searchForm = {
-          PlatformId: '0',
-          Keyword: '',
-          orderStartTime: '',
-          orderEndTime: '',
+         Keyword: '',
+         orderStartTime: '',
+         orderEndTime: '',
+         checkedCities: []
         }
-        _this.getAllData()
+        _this.allOrderList()
       },
       // 导出
       exportExcel() {
@@ -1071,10 +1087,20 @@
         _this.addService = _this.getAddService(obj, price)
         let serviceFree = _this.addService
         let serviceUnit = _this.serviceUnit
+        let types = _this.taskForm.ServiceType
         _this.taskForm.ServiceCharge = ((nums * serviceFree) + (nums * serviceUnit)).toFixed(2)
         _this.taskForm.TotalProductPrice = (_this.taskForm.ProductPrice * nums * _this.ExRate).toFixed(2)
-        _this.taskForm.Total = (parseFloat(_this.taskForm.ServiceCharge) + parseFloat(_this.taskForm.TotalProductPrice))
-          .toFixed(2)
+        if (types == 1) {
+          _this.priceShow = false
+          _this.taskForm.Total = (parseFloat(_this.taskForm.ServiceCharge))
+            .toFixed(2)
+        } else {
+          _this.priceShow = true
+          _this.taskForm.Total = (parseFloat(_this.taskForm.ServiceCharge) + parseFloat(_this.taskForm.TotalProductPrice))
+            .toFixed(2)
+        }
+
+
       },
 
 
@@ -1168,46 +1194,42 @@
       //全部
       getAllStatus() {
         let _this = this
-        _this.active = 1
+        _this.active = ''
         _this.allOrderList()
-      },
-
-      //待付款
-      daiPay() {
-        let _this = this
-        _this.active = 1
-        _this.getDataStatus(1)
-        _this.brushRadio = ''
-        _this.allDisable()
       },
       // 待确认
       daiConfirm() {
         let _this = this
-        _this.active = 2
+        _this.active = 1
+        _this.currentPage = 1
         _this.allOrderList()
       },
       // 待分配
       daifp() {
         let _this = this
-        _this.active = 3
+        _this.active = 2
+        _this.currentPage = 1
         _this.allOrderList()
       },
       // 已分配
       yfp() {
         let _this = this
-        _this.active = 4
+        _this.active = 3
+        _this.currentPage = 1
         _this.allOrderList()
       },
       // 已完成
       ywc() {
         let _this = this
-        _this.active = 5
+        _this.active = 4
+        _this.currentPage = 1
         _this.allOrderList()
       },
       // 已取消
       daiCancel() {
         let _this = this
-        _this.active = 6
+        _this.active = 5
+        _this.currentPage = 1
         _this.allOrderList()
       },
       // 异常
@@ -1354,7 +1376,6 @@
         let _this = this
         let obj = _this.obj
         _this.viewDetailModal = true
-        console.log(_this.allOrderData[index])
         _this.viewTaskData = _this.allOrderData[index]
       },
       // 服务费显示与隐藏
@@ -1532,15 +1553,16 @@
         }
         orderList(param).then((res) => {
           _this.allOrderData = res.data.list
-          _this.totalNum = parseInt(res.data.total)
+          _this.total = parseInt(res.data.total)
           let list = res.data.list
-          for(let i = 0;i<list.length;i++){
+          for (let i = 0; i < list.length; i++) {
             let proKey = list[i].ProductKeyword
             let cpcKey = list[i].CpcKeyword
-            if(proKey==null){
-              proKey =''
-            }if(cpcKey==null){
-              cpcKey=''
+            if (proKey == null) {
+              proKey = ''
+            }
+            if (cpcKey == null) {
+              cpcKey = ''
             }
             _this.allOrderData[i].keywords = proKey + cpcKey
           }
@@ -1583,19 +1605,19 @@
         console.log(index)
         _this.imgsData.splice(index, 1)
       },
-      // 分页导航
-      handleCurrentChange(val) {
-        let _this = this
-        _this.currentPage = val
-        console.log(_this.pageSize)
-        console.log(_this.currentPage)
-      },
+
       //每页条数
-      handleSizeChange(val) {
+      handleSizeChange(size) {
         let _this = this
-        console.log(val)
-        _this.pageSize = val
-        _this.handleCurrentChange(_this.currentPage)
+        _this.pageSize = size
+        // console.log(size)
+        _this.allOrderList()
+      },
+      // 分页导航
+      handleCurrentChange(currentPage) {
+        let _this = this
+        _this.currentPage = currentPage
+        _this.allOrderList()
       }
     }
   }

@@ -6,15 +6,19 @@
 			</div>
 			<ul class="detailbox detailbox1">
 				<li>
-					<span>任务编码：</span>
+					<span>订单编号：</span>
 					<p>{{viewTaskData.OrderNumber}}</p>
 				</li>
 				<li>
+					<span>下单类型：</span>
+					<p>{{viewTaskData.ServiceType}}</p>
+				</li>
+        <li>
 					<span>国家：</span>
 					<p>{{viewTaskData.CountryName}}</p>
 				</li>
 				<li>
-					<span>任务状态：</span>
+					<span>订单状态：</span>
 					<p>{{viewTaskData.OrderState}}</p>
 				</li>
 				<li>
@@ -30,12 +34,6 @@
 					<p>{{viewTaskData.Currency}}{{viewTaskData.ProductPrice}}</p>
 				</li>
 				<li>
-					<span>产品图片：</span>
-					<p>
-						<img :src="viewTaskData.ProductPictures" alt="" class="eval_img">
-					</p>
-				</li>
-				<li>
 					<span>产品评分：</span>
 					<!-- <p>{{viewTaskData.ProductScore}}</p> -->
           <el-rate v-model="viewTaskData.ProductScore"></el-rate>
@@ -44,6 +42,12 @@
 					<span>产品链接：</span>
 					<a :href="viewTaskData.ProductLink">{{viewTaskData.ProductLink}}</a>
 				</li>
+        <li>
+        	<span>产品图片：</span>
+        	<p>
+        		<img :src="viewTaskData.ProductPictures" alt="" class="eval_img">
+        	</p>
+        </li>
 			</ul>
 		</el-card>
 		<el-card class="box-card mt20">
@@ -56,10 +60,11 @@
 					<span>关键字类型：</span>
 					<p>{{viewTaskData.KeywordType}}</p>
 				</li>
-				<li>
+				<li v-show="viewTaskData.KeywordType=='产品关键字'">
 					<span>产品关键词：</span>
 					<p>{{viewTaskData.ProductKeyword}}</p>
-				</li>		<li>
+				</li>
+        <li  v-show="viewTaskData.KeywordType=='CPC关键字'">
 					<span>CPC关键词：</span>
 					<p>{{viewTaskData.CpcKeyword}}</p>
 				</li>
@@ -133,6 +138,7 @@
 		mounted() {
 			this.txtOrderType()
 			this.txtKeywords()
+      this.orderStatus()
 		},
 
 		methods: {
@@ -148,20 +154,14 @@
 			backBtn() {
 				this.$router.push('/taskManage')
 			},
-			//任务类型
+			//下单类型
 			txtOrderType() {
 				let _this = this
-				let types = _this.viewTaskData.OrderType
-				if(types == 1) {
-					_this.viewTaskData.OrderType = 'FBA'
-				} else if(types == 2) {
-					_this.viewTaskData.OrderType = '加购'
-				} else if(types == 3) {
-					_this.viewTaskData.OrderType = '心愿'
-				} else if(types == 4) {
-					_this.viewTaskData.OrderType = '点赞'
-				} else if(types == 5) {
-					_this.viewTaskData.OrderType = 'QA'
+				let types = _this.viewTaskData.ServiceType
+				if(types == 0) {
+					_this.viewTaskData.ServiceType = '见单返本'
+				} else if(types == 1) {
+					_this.viewTaskData.ServiceType = '评后返'
 				}
 			},
 			//关键字类型
@@ -169,11 +169,27 @@
 				let _this = this
 				let keys = _this.viewTaskData.KeywordType
 				if(keys == 1) {
-					_this.viewTaskData.KeyType = '产品关键字'
+					_this.viewTaskData.KeywordType = '产品关键字'
 				} else if(keys == 2) {
-					_this.viewTaskData.KeyType = 'CPC关键字'
+					_this.viewTaskData.KeywordType = 'CPC关键字'
 				}
-			}
+			},
+      // 订单状态
+      orderStatus(){
+        let _this = this
+        let status = _this.viewTaskData.OrderState
+        if(status == 1){
+          _this.viewTaskData.OrderState = '待确认'
+        } else if(status == 2){
+           _this.viewTaskData.OrderState = '待分配'
+        } else if(status == 3){
+           _this.viewTaskData.OrderState = '已分配'
+        }else if(status == 4){
+           _this.viewTaskData.OrderState = '已完成'
+        }else if(status == 5){
+           _this.viewTaskData.OrderState = '已取消'
+        }
+      }
 		}
 	}
 </script>
@@ -224,14 +240,14 @@
 	}
 
 	.eval_img {
-		width: 60px;
-		height: 60px;
+		width: 150px;
+		height: 150px;
 		border-radius: 4px;
 		cursor: pointer;
 		border: 1px solid #ccc;
 		margin-right: 10px;
+    background-size: cover;
 	}
-
 	.detailbox1 {
 		padding: 0;
 		margin: 0 0 0 10px;

@@ -69,7 +69,7 @@
 					</el-table-column>
 		</el-table>
     <div class="mt30 txtRight">
-    	<el-pagination background @size-change='handleSizeChange' @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 30, 50,100]" :page-size="offset" layout="total, sizes, prev, pager, next, jumper" :total="total">
+    	<el-pagination background @size-change='handleSizeChange' @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 30, 50,100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
     	</el-pagination>
     </div>
 		<!--提现-->
@@ -108,14 +108,13 @@
 					return callback(new Error('提现金额不能为空'));
 				} else if(!reg.test(value)) {
 					callback(new Error('提现金额格式不正确'));
-				} else if(value > this.hasMoney) {
+				} else if(value > this.balance) {
 					callback(new Error('提现金额不能大于余额'));
 				} else {
 					callback();
 				}
 			};
 			return {
-        offset:10,
         total:0,
         currentPage:1,
         pageSize:10,
@@ -125,7 +124,7 @@
 				allCashData: [],
 				CashWithdrawalModal: false,
 				cashSearchForm: {
-					status: '',
+					status: '0',
 					startTime: '',
 					endTime: '',
 					DealId: ''
@@ -174,15 +173,13 @@
       handleCurrentChange(val) {
       	let _this = this
       	_this.currentPage = val
-      	console.log(_this.currentPage)
       },
       //每页条数
       handleSizeChange(val) {
       	let _this = this
-      	console.log(val)
       	_this.pageSize = val
       	_this.offset = val
-      	_this.handleCurrentChange(_this.currentPage)
+      	// _this.handleCurrentChange(_this.currentPage)
       },
 			//状态转文字
 			statusTxt(val){
@@ -214,6 +211,7 @@
 				}
         cashWithList(param).then((res)=>{
           _this.allCashData = res.data.list
+          _this.total = parseInt(res.data.total)
         })
 			},
 			//立即提现
