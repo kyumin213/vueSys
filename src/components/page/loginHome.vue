@@ -8,10 +8,10 @@
 			<div class="bg-purple panRight">
 				<div class="userMsg">
 					<span>您好，</span>
-					<span>{{homeData[0].name}}</span>
+					<span>{{name}}</span>
 				</div>
 				<div>
-					<span>账户余额:￥<span class="money">{{homeData[0].accountbalance}}</span></span>
+					<span>账户余额:￥<span class="money">{{balance}}</span></span>
 					<el-button class="el-button ml30" type="primary" size="medium" @click='viewAccount'>查看明细</el-button>
 					<el-button class="el-button cashWish" type="success" @click="cashMoney" size="medium">提现</el-button>
 				</div>
@@ -38,7 +38,7 @@
 							<i class="el-icon-pie-chart icons" style="color: #fff;"></i>
 						</div>
 						<div style="width: 60%;">
-							<div class="count">{{OrderStateInThree}}</div>
+							<div class="count">{{HaveInHandByTask}}</div>
 							<div class="col fz">进行中的任务</div>
 						</div>
 					</div>
@@ -51,7 +51,7 @@
 							<i class="el-icon-time icons" style="color: #fff;"></i>
 						</div>
 						<div style="width: 60%;">
-							<div class="count">{{OrderStateInFour}}</div>
+							<div class="count">{{CompleteTask}}</div>
 							<div class="col fz">已完成的任务</div>
 						</div>
 					</div>
@@ -64,7 +64,7 @@
 							<i class="el-icon-warning-outline icons" style="color: #fff;"></i>
 						</div>
 						<div style="width: 60%;">
-							<div class="count">{{OrderStateInFive}}</div>
+							<div class="count">{{CancelTask}}</div>
 							<div class="col fz">已取消任务</div>
 						</div>
 					</div>
@@ -144,13 +144,14 @@
 				// hashBd: false,
 				name: sessionStorage.getItem('userName'),
 				times: sessionStorage.getItem('times'),
+				balance: sessionStorage.getItem('balance'),
 				homeData: [],
 				userSmmary: [],
 				tasksItems: [],
-        userSmmary:0, //总任务
-        OrderStateInThree:0, //进行中的任务
-        OrderStateInFour:0, //已完成任务
-        OrderStateInFive:0, //已取消任务
+        TotalCount:0, //总任务
+        HaveInHandByTask:0, //进行中的任务
+        CompleteTask:0, //已完成任务
+        CancelTask:0, //已取消任务
 				//银行卡信息
 				bankPayForm: {
 					accountName: '',
@@ -159,7 +160,6 @@
 					IdentificationCode: ''
 				},
 				postJson: {}
-
 			}
 		},
 		created() {
@@ -199,13 +199,20 @@
            sessionStorage.setItem('userName', _this.homeData[0].name)
            sessionStorage.setItem('balance', _this.homeData[0].accountbalance)
          }));
-         OrderSum(param).then((res)=>{
-           _this.TotalCount = TotalCount
-           _this.OrderStateInThree = OrderStateInThree
-           _this.OrderStateInFour = OrderStateInFour
-           _this.OrderStateInFive = OrderStateInFive
-         })
 			},
+      // 首页任务总览
+      getAllTaskNum(){
+        let _this = this
+        let param = {
+        	uid: sessionStorage.getItem('userId')
+        }
+        OrderSum(param).then((res)=>{
+          _this.TotalCount = TotalCount
+          _this.HaveInHandByTask = HaveInHandByTask
+          _this.CompleteTask = CompleteTask
+          _this.CancelTask = CancelTask
+        })
+      },
 			//充值
 			viewAccount() {
 				let _this = this

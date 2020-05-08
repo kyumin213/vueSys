@@ -1,12 +1,4 @@
 <template>
-</template>
-
-<script>
-</script>
-
-<style>
-</style>
-<template>
 	<div class="contentView">
 		<el-card class="box-card">
 			<div slot="header" class="clearfix">

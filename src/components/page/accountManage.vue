@@ -22,10 +22,10 @@
           	</div> -->
             <div class="mt20">最近交易</div>
           </div>
-          <el-table :data="allBalanceData" border style="width: 100%;" :header-cell-style="{background:'#fafafa'}">
+          <el-table :data="allBalanceData" border style="width: 100%;" :header-cell-style="{background:'#eef1f6'}">
           	<el-table-column prop="BusinessNumber" label="业务编号" align="center" width='200px'></el-table-column>
           	<el-table-column prop="TransactionAmount" label="交易金额" align="center"></el-table-column>
-          	<el-table-column prop="TransactionType" label="交易类型" align="center"></el-table-column>
+          	<el-table-column prop="TransactionType" label="交易类型" align="center" :formatter="typeTxt"></el-table-column>
           	<el-table-column prop="TransactionTime" label="交易时间" align="center"></el-table-column>
           	<el-table-column prop="Remarks" label="备注" align="center"></el-table-column>
           </el-table>
@@ -51,16 +51,16 @@
         	</el-form>
         </div>
         <div class="mb20">累积收入:0</div>
-        <el-table :data="IncomeData" border style="width: 100%" :header-cell-style="{background:'#fafafa'}">
+        <el-table :data="IncomeData" border style="width: 100%" :header-cell-style="{background:'#eef1f6'}">
         	<el-table-column prop="BusinessNumber" label="业务编号" align="center" width='200px'></el-table-column>
         	<el-table-column prop="TransactionAmount" label="交易金额" align="center"></el-table-column>
         	<!-- <el-table-column prop="ProductPrice" label="账户余额" align="center"></el-table-column> -->
-        	<el-table-column prop="TransactionType" label="交易类型" align="center"></el-table-column>
+        	<el-table-column prop="TransactionType" label="交易类型" align="center" :formatter="typeTxt"></el-table-column>
         	<el-table-column prop="TransactionTime" label="交易时间" align="center"></el-table-column>
         	<el-table-column prop="Remarks" label="备注" align="center"></el-table-column>
         </el-table>
         <div class="mt30 txtRight">
-        	<el-pagination background @size-change='handleSizeChange' @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 30, 50,100]" :page-size="offset" layout="total, sizes, prev, pager, next, jumper" :total="allAccountTotal">
+        	<el-pagination background @size-change='handleSizeChange' @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 30, 50,100]" :page-size="offset" layout="total, sizes, prev, pager, next, jumper" :total="intoTotal">
         	</el-pagination>
         </div>
       </div><div v-show="accountActive === 3" class="mt30">
@@ -80,19 +80,16 @@
         	</el-form>
         </div>
         <div class="mb20">累积支出:0</div>
-        <el-table :data="expenditureData" border style="width: 100%" :header-cell-style="{background:'#fafafa'}">
-        	<!--<el-table-column prop="UserId" label="任务编码" align="center"></el-table-column>-->
+        <el-table :data="expenditureData" border style="width: 100%" :header-cell-style="{background:'#eef1f6'}">
         	<el-table-column prop="BusinessNumber" label="业务编号" align="center" width='200px'></el-table-column>
         	<el-table-column prop="TransactionAmount" label="交易金额" align="center"></el-table-column>
-        	<!--<el-table-column prop="Currency" label="货币" align="center"></el-table-column>-->
-        	<el-table-column prop="ProductPrice" label="账户余额" align="center"></el-table-column>
-        	<el-table-column prop="TransactionType" label="交易类型" align="center"></el-table-column>
+        	<el-table-column prop="TransactionType" label="交易类型" align="center" :formatter="typeTxt"></el-table-column>
         	<el-table-column prop="TransactionTime" label="交易时间" align="center"></el-table-column>
         	<!-- <el-table-column prop="Status" label="状态" align="center" width="100"></el-table-column> -->
         	<el-table-column prop="Remarks" label="备注" align="center"></el-table-column>
         </el-table>
         <div class="mt30 txtRight">
-        	<el-pagination background @size-change='handleSizeChange' @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 30, 50,100]" :page-size="offset" layout="total, sizes, prev, pager, next, jumper" :total="allAccountTotal">
+        	<el-pagination background @size-change='handleSizeChange' @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 30, 50,100]" :page-size="offset" layout="total, sizes, prev, pager, next, jumper" :total="outTotal">
         	</el-pagination>
         </div>
       </div>
@@ -176,6 +173,8 @@
 			return {
         accountActive: 1,//默认选中账户总览
 				allAccountTotal: 0, //账户总览总条数
+        outTotal: 0,//余额支出总条数
+        intoTotal: 0, //余额收入总条数
 				currentPage: 1, //当前页
 				pageSize: 10,
 				offset: 10,
@@ -225,10 +224,27 @@
 			_this.balance = sessionStorage.getItem('balance')
 			this.getAccount()
       _this.getIncome()
+      _this.getExpend()
 			// this.getObj()
 
 		},
 		methods: {
+      // 格式化交易类型
+      typeTxt(val){
+        let _this = this
+        let types = val.TransactionType
+        if(types == 1){
+          return '订单'
+        } else if(types == 2){
+          return '任务'
+        } else if(types == 3){
+          return '其他支出任务'
+        } else if(types == 4){
+          return '充值'
+        } else if(types == 5){
+          return '提现'
+        }
+      },
       // 账户总览切换
       allAccount(){
         let _this = this
@@ -244,23 +260,33 @@
         let _this = this
         _this.accountActive = 3
       },
-			//充值
+			//重置
 			reasetForm() {
 				let _this = this
+        let active = _this.accountActive
 				_this.searchForm = {
 					dealId: '',
 					startTime: '',
 					endTime: ''
 				}
-				_this.getAccount()
+        if(active == '2'){
+           _this.getIncome()
+        }else if(active=='3'){
+         _this.getExpend()
+        }
 			},
 			//搜索账户明细
 			searchAccount() {
 				let _this = this
+        let active = _this.accountActive
 				let StartDate = _this.searchForm.startTime
 				let EndDate = _this.searchForm.endTime
 				let DealId = _this.searchForm.dealId
-				_this.getIncome()
+        if(active == '2'){
+           _this.getIncome()
+        }else if(active=='3'){
+         _this.getExpend()
+        }
 			},
 			getObj() {
 				let _this = this
@@ -292,18 +318,6 @@
           _this.allAccountTotal = parseInt(res.data.total)
           _this.allBalanceData = res.data.list
         })
-				// _this.axios.get(this.GLOBAL.BASE_URL + `/api/CustomerFinance/GetCustomerFinance?userid=${userid}&pageNum=${pageNum}&pagesize=${pagesize}`).then(res => {
-				// 		_this.total = res.data.total
-				// 		_this.allBalanceData = res.data.list
-				// 		let len = res.data.data.acountDetails
-				// 		for(let i = 0; i < len.length; i++) {
-				// 			let amount = len[i].Amount
-				// 			let curr = len[i].Currency
-				// 			len[i].Amount = curr + ' ' + amount
-				// 			len[i].Action = _this.getInfo(_this.obj, 'DealAction', len[i].Action)
-				// 			len[i].Status = _this.getInfo(_this.obj, 'RefundStatus', len[i].Status)
-				// 		}
-				// })
 			},
       // 余额收入
       getIncome:function(){
@@ -318,31 +332,25 @@
         }
         Income(param).then((res)=>{
           _this.IncomeData = res.data.list
-        })
-        Expenditure(param).then((res)=>{
-          _this.expenditureData = res.data.list
+          _this.intoTotal = parseInt(res.data.total)
         })
       },
-      // 余额支出列表
+      // 余额支出
       getExpend(){
         let _this = this
         let param = {
-          userId:sessionStorage.getItem('userId'),
-          statetime:_this.searchForm.orderStartTime,
-          endtime:_this.searchForm.orderEndTime,
-          number:_this.searchForm.number,
-          pageNum:_this.currentPage,
-          pagesize:_this.pageSize
+          userid:sessionStorage.getItem('userId'),
+          statetime:_this.searchForm.startTime,
+          endtime:_this.searchForm.endTime,
+          number:_this.searchForm.dealId,
+          pageNum:parseInt(_this.currentPage),
+          pagesize:parseInt(_this.pageSize)
         }
         Expenditure(param).then((res)=>{
           _this.expenditureData = res.data.list
+          _this.outTotal = parseInt(res.data.total)
         })
       },
-			//充值
-			recharge() {
-				let _this = this
-				_this.RechargeModal = true
-			},
 			//充值
 			recharge() {
 				let _this = this

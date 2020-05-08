@@ -57,13 +57,8 @@
       </div>
     </div>
     <div class="mt10 tableBg" style="overflow-x: auto">
-      <el-table :data="allOrderData" border style="width: 100%;overflow-x: auto" id="allOrder">
-        <!--        <el-table-column show-overflow-tooltip width="40px" align="center">
-         <template slot-scope="scope">
-            <el-radio class="radio" v-model="brushRadio" :label="scope.$index">&nbsp;</el-radio>
-          </template>
-        </el-table-column> -->
-        <el-table-column prop="Id" label="任务编码" align="center" width="170">
+      <el-table :data="allOrderData" border style="width: 100%" :header-cell-style="{background:'#eef1f6'}">
+        <el-table-column prop="Id" label="任务编码" align="center">
           <template slot-scope="scope">
             <el-button type="text" @click="viewDetails(scope.$index,scope.row)">{{scope.row.OrderNumber}}</el-button>
           </template>
@@ -72,14 +67,14 @@
         <el-table-column prop="Number" label="任务数量" align="center"></el-table-column>
         <el-table-column prop="ProductName" label="产品名称" align="center"></el-table-column>
         <el-table-column prop="Asin" label="产品ASIN" align="center"></el-table-column>
-        <el-table-column prop="keywords" label="关键词" align="center"></el-table-column>
+        <el-table-column prop="ProductKeyword" label="关键词" align="center"></el-table-column>
         <el-table-column prop="TotalProductPrice" label="总价" align="center"></el-table-column>
-        <el-table-column prop="OrderTime" label="下单时间" align="center"></el-table-column>
+        <el-table-column prop="OrderTime" label="下单时间" align="center" width="200"></el-table-column>
         <el-table-column prop="OrderState" label="状态" align="center" :formatter="txtOrderStatus"></el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <!-- <el-button size="small" type="primary" @click="payMent">付款</el-button> -->
-            <el-button size="small" @click="cancelHandel">取消</el-button>
+            <el-button size="small" @click="cancelHandel(scope.$index,scope.row)" type="danger" v-show="scope.row.OrderState=='1'">取消</el-button>
             <!--<el-button size="small" :disabled="disable3" type="success" @click="evalEdit()">填写评价</el-button>-->
             <!-- <el-button size="small" type="warning" @click="viewDaily()">日志</el-button> -->
             <!-- <el-button size="small" type="danger" @click="delhandel">删除</el-button> -->
@@ -90,10 +85,9 @@
           </template>
         </el-table-column>
       </el-table>
-      <div class="mt30 txtRight">
+      <div class="mt30 txtRight" v-if="total>0">
         <el-pagination background @size-change='handleSizeChange' @current-change="handleCurrentChange" :current-page="currentPage"
-          :page-sizes="[5, 10, 20, 50,100]" :page-size="5" layout="total, sizes, prev, pager, next, jumper"
-          :total="total">
+          :page-sizes="[5, 10, 20, 50,100]" :page-size="5" layout="total, sizes, prev, pager, next, jumper" :total="total">
         </el-pagination>
       </div>
     </div>
@@ -132,7 +126,7 @@
                 </el-form-item>
               </el-col>
               <el-col :span="12" :xs="24">
-                <el-form-item label="产品名称" class="disInline minWid">
+                <el-form-item label="产品名称" class="disInline minWid" prop="ProductName">
                   <el-input v-model="taskForm.ProductName" type='textarea'></el-input>
                 </el-form-item>
               </el-col>
@@ -159,20 +153,16 @@
                 </el-form-item>
               </el-col>
               <el-col :span="12" :xs="24">
-                <p class="mb10 mt10">产品图片</p>
-                <el-upload action=" " :auto-upload='true' accept="image/jpeg,image/jpg,image/png" list-type="picture-card"
-                  :limit='1' :http-request="uploadFile" :on-preview="handlePictureCardPreview" :on-remove="handleRemove"
-                  :before-upload="beforeUpload">
-                  <i class="el-icon-plus"></i>
-                </el-upload>
-                <el-dialog :visible.sync="dialogVisible">
-                  <img width="100%" :src="taskForm.ProductPictures" alt="">
-                </el-dialog>
-                <p class="mt20 colred pl30" v-show='proImg'>上传中</p>
+                <el-form-item label="产品图片" prop="ProductPictures">
+                      <el-upload :class="{hide:hideUpload}" :action="uploadUrl" name='image' list-type="picture-card"
+                     :on-success="handlePictureCardSuccess" :on-remove="handleRemove"
+                    :before-upload="beforeUpload"  :on-change="handleChange">
+                    <i class="el-icon-plus"></i>
+                  </el-upload>
+                </el-form-item>
               </el-col>
             </el-row>
             <el-row>
-
             </el-row>
             <el-row>
               <div class="mt30 mb20">下单信息</div>
@@ -253,14 +243,14 @@
             <div class="con">
               <el-row>
                 <el-col :span='12' :xs="24">
-                  <el-form-item label="任务开始时间" class="disInline minWid" :rules="{required: true, message: '任务时间不能为空', trigger: 'change'}">
+                  <el-form-item label="任务开始时间" class="disInline minWid" prop="StartTime">
                     <el-date-picker v-model="taskForm.StartTime" value-format="yyyy-MM-dd" style="display: inline-block;width: 100%;"
                       type="date" placeholder="选择日期" :picker-options="pickerOptions0">
                     </el-date-picker>
                   </el-form-item>
                 </el-col>
                 <el-col :span='12' :xs="24">
-                  <el-form-item label="任务结束时间" class="disInline minWid">
+                  <el-form-item label="任务结束时间" class="disInline minWid" prop="EndTime">
                     <el-date-picker v-model="taskForm.EndTime" value-format="yyyy-MM-dd" style="display: inline-block;width: 100%;"
                       type="date" placeholder="选择日期" :picker-options="taskEndDate">
                     </el-date-picker>
@@ -424,7 +414,7 @@
     </el-dialog>
     <!--取消-->
     <el-dialog title="取消订单" :visible.sync="cancelModal" :close-on-click-modal="false" center="" width="30%">
-      <el-input placeholder='请输入取消原因' v-model='reasonTxt'></el-input>
+      <div class="del-dialog-cnt">是否确定取消该订单？</div>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" size="medium" @click='cancelSubmit'>确定</el-button>
         <el-button @click="cancelModal=false" size="medium">取消</el-button>
@@ -433,22 +423,29 @@
     <!-- 付款-->
     <el-dialog title="付款" :visible.sync="paymentModel" :close-on-click-modal="false" width="40%" :before-close="paymentClose"
       top='5vh'>
-      <el-form :model="paymentForm" class="demo-ruleForm">
-        <el-row>
-          <el-col :span="12" :xs="24">
-            <el-form-item label="当前余额">
-              <span class="tipRed">￥{{paymentForm.balance}}</span>
-            </el-form-item>
-            <div>
-              <el-form-item label="待付款金额">
-                <span class="tipRed">￥{{paymentForm.payMoney}}</span>
-              </el-form-item>
-            </div>
-          </el-col>
-        </el-row>
-      </el-form>
+      <!-- <el-form :model="paymentForm" class="demo-ruleForm"> -->
+      <el-row class="mb20 center">
+        <el-col :span="12" :xs="24">
+          <p>
+            <span>当前余额：</span>
+            <span class="colred fz20">￥{{paymentForm.balance}}</span>
+          </p>
+        </el-col>
+        <el-col :span="12" :xs="24">
+          <p>
+            <span>待付款金额：</span>
+            <span class="colred fz20 disInline">￥{{paymentForm.payMoney}}</span>
+          </p>
+        </el-col>
+      </el-row>
+      <!-- </el-form> -->
+      <div class="center mb20 fz18 mt20">请选择以下方式充值</div>
+      <div v-for="(item,index) in paymentCode" :key='index' class="center">
+        <div class="fz18 colred mb10">{{item.PaymentState}}</div>
+        <img :src="item.Image" alt="">
+      </div>
       <div slot="footer" class="dialog-footer">
-     <!--   <el-button type="primary" @click='paymentOrder' v-if='parseInt(this.paymentForm.payMoney)<parseInt(this.paymentForm.balance) && parseInt(this.paymentForm.balance)!=0 && !payList'>确定</el-button>
+        <!--   <el-button type="primary" @click='paymentOrder' v-if='parseInt(this.paymentForm.payMoney)<parseInt(this.paymentForm.balance) && parseInt(this.paymentForm.balance)!=0 && !payList'>确定</el-button>
         <el-button type="primary" @click='paymentOrderList' v-if="payList">确定</el-button> -->
         <el-button @click="paymentClose">关闭</el-button>
       </div>
@@ -457,7 +454,7 @@
     <el-dialog title='详情' :visible.sync="viewDetailModal" width='80%'>
       <view-task :viewTaskData="viewTaskData"></view-task>
       <span slot='footer' class="dialog-footer">
-        <el-button type='primary' @click='viewDetailModal=false'>返回</el-button>
+        <el-button type='primary' @click='closeViewModel'>返回</el-button>
       </span>
     </el-dialog>
     <!--取消原因-->
@@ -471,7 +468,7 @@
 </template>
 <script>
   import vali from '../common/validate'
-  import viewTask from '../common/viewTaskDetails'
+  import viewTask from '../common/viewOrderDetails'
   import FileSaver from 'file-saver'
   import XLSX from 'xlsx'
   const cityOptions = ['美国', '日本', '韩国', '加拿大'];
@@ -484,19 +481,23 @@
     getService,
     getProbalibi,
     uploadImg,
-    GetOrderState
+    GetOrderState,
+    orderState,
+    getPayment
   } from '@/request/api'
   export default {
     name: 'orderManage',
     data() {
       return {
+        hideUpload: false,
+        limitCount:1,
+        paymentCode: [], //充值二维码
         total: 0, //列表总条数
         file: 'file',
         proImg: false, //图片上传状态
         dialogVisible: false,
         disabled: false,
         priceShow: true, //总价显示
-        dialogVisible: false,
         disabledImg: false,
         checkAll: false,
         cities: [],
@@ -524,14 +525,13 @@
         fileId: '',
         OrderId: '', //任务ID
         Amount: 0,
-        uploadUrl: this.GLOBAL.BASE_URL + '/api/Order/GetProductPictures',
+        uploadUrl: this.axios.defaults.baseURL+'/api/Order/GetProductPictures',
         addBuyData: [], //加购列表
         viewTaskData: [],
         allOrderData: [],
         hasBalance: 0,
         commentTypeData: [], //留评类型
         dialogImageUrl: '',
-        dialogVisible: false,
         loading: true,
         status: this.$route.params.taskTypeModel,
         errorStatus: this.$route.params.active,
@@ -546,7 +546,6 @@
         refundModal: false, //申请退款
         cancelRefundModal: false, //取消退款
         viewDetailModal: false, //FBA查看详情
-        reasonTxt: '系统取消', //取消原因
         activities: [],
         active: '',
 
@@ -612,7 +611,7 @@
           ProductName: '', //产品名称
           ProductPrice: '0', //价格
           Currency: '', //货币符号
-          ProductScore: null, //评分
+          ProductScore: 0, //评分
           ProductLink: '', //产品链接
           ProductPictures: '', //产品图片
           KeywordType: '1', //关键词类型
@@ -645,6 +644,31 @@
           CountryId: [{
             required: true,
             message: '请选择国家',
+            trigger: 'change'
+          }],
+          ServiceType: [{
+            required: true,
+            message: '请选择下单类型',
+            trigger: 'change'
+          }],
+          ProductPictures: [{
+            required: true,
+            message: '请选择产品图片',
+            trigger: 'change'
+          }],
+          StartTime: [{
+            required: true,
+            message: '请选择任务开始时间',
+            trigger: 'change'
+          }],
+          EndTime: [{
+            required: true,
+            message: '请选择任务结束时间',
+            trigger: 'change'
+          }],
+          ProductName: [{
+            required: true,
+            message: '请输入产品名称',
             trigger: 'change'
           }],
           ProductPrice: [{
@@ -763,16 +787,10 @@
         }
         return isImg && isLt5M;
       },
-      //封面图上传成功
-      uploadSuccess1(res, file) {
-        let _this = this
-        _this.productForm.shopImage = res.url
-      },
       uploadFile: function(file) { // 上传的函数
         let _this = this
         let uploadData = new FormData()
         uploadData.append('image', file.file)
-        console.log(uploadData)
         let config = {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -782,6 +800,10 @@
           if (res.data.Code === 'ok') {
             _this.proImg = false
             _this.taskForm.ProductPictures = res.data.Data
+            _this.$message({
+              type:'success',
+              message:res.data.Msg
+            })
           } else {
             _this.$message({
               type: 'error',
@@ -792,22 +814,38 @@
           console.log(err)
         })
       },
-
+      // 上传图片change
+      handleChange(file,fileList){
+        let _this = this
+        _this.hideUpload = fileList.length >= _this.limitCount;
+      },
       // 上传产品图片
       handleRemove(file, fileList) {
-        console.log(file, fileList);
+        let _this = this
+        _this.taskForm.ProductPictures = ''
+        _this.hideUpload = fileList.length >= _this.limitCount;
       },
-      handlePictureCardPreview(file) {
-        this.taskForm.image = file.url;
-        this.dialogVisible = true;
+      handlePictureCardSuccess(res,file) {
+        let _this = this
+        _this.taskForm.ProductPictures =  res.Data;
+        if(file.status == 'success'){
+          _this.$message({
+            type:'success',
+            message:'上传成功'
+          });
+        }else{
+          _this.$message.error('上传失败')
+        }
       },
       handleDownload(file) {
         console.log(file);
       },
+      // 全选
       handleCheckAllChange(val) {
         this.searchForm.checkedCities = val ? cityOptions : [];
         this.isIndeterminate = false;
       },
+      // 选择国家
       handleCheckedCitiesChange(value) {
         let checkedCount = value.length;
         this.checkAll = checkedCount === this.cities.length;
@@ -846,7 +884,6 @@
         // 增值费
         getServiceFee().then((res) => {
           _this.addFreeData = res.data.list
-          console.log(res.data.list)
           let fee = res.data.list
           for (let i = 0; i < fee.length; i++) {
             let min = fee[i].Start
@@ -956,14 +993,6 @@
           }
         }
       },
-      // handleRemove(file, fileList) {
-      //   console.log(file, fileList);
-      // },
-      // handlePictureCardPreview(file) {
-      //   console.log(file)
-      //   this.dialogImageUrl = file.url;
-      //   this.dialogVisible = true;
-      // },
       // 留评比例
       lpType(index) {
         let _this = this
@@ -984,6 +1013,21 @@
         // _this.Amount = _this.selected.TotalPrice
         // _this.paymentForm.payMoney = _this.selected.TotalPrice
         _this.paymentForm.balance = sessionStorage.getItem('balance')
+        getPayment().then(res => {
+          let list = res.data.list
+          _this.paymentCode = res.data.list
+          for (let i = 0; i < list.length; i++) {
+            let state = list[i].PaymentState
+            if (state == 1) {
+              _this.paymentCode[i].PaymentState = '支付宝'
+            } else if (state == 2) {
+              _this.paymentCode[i].PaymentState = '微信'
+            }
+          }
+
+        }).catch(err => {
+          console.log(err)
+        })
       },
       //付款确认按钮
       paymentOrderList() {
@@ -1036,35 +1080,12 @@
         let _this = this
         _this.currentPage = 1
         _this.searchForm = {
-         Keyword: '',
-         orderStartTime: '',
-         orderEndTime: '',
-         checkedCities: []
+          Keyword: '',
+          orderStartTime: '',
+          orderEndTime: '',
+          checkedCities: []
         }
         _this.allOrderList()
-      },
-      // 导出
-      exportExcel() {
-        var xlsxParam = {
-          raw: true
-        }
-        // 导出的内容只做解析，不进行格式转换
-        var wb = XLSX.utils.table_to_book(document.querySelector('#allOrder'), xlsxParam)
-        var wbout = XLSX.write(wb, {
-          bookType: 'xlsx',
-          bookSST: true,
-          type: 'array'
-        })
-        try {
-          FileSaver.saveAs(new Blob([wbout], {
-            type: 'application/octet-stream'
-          }), '任务订单表.xlsx')
-        } catch (e) {
-          if (typeof console !== 'undefined') {
-            console.log(e, wbout)
-          }
-        }
-        return wbout
       },
       // 时间范围
       timePicker() {
@@ -1115,6 +1136,7 @@
       submitPay(formName) {
         let _this = this
         let errorMes = _this.errorMes
+        let fileList = _this.FileList
         _this.$refs[formName].validate((valid) => {
           if (valid && !errorMes) {
             let param = Object.assign({}, _this.taskForm)
@@ -1124,31 +1146,40 @@
               _this.paymentForm.payMoney = _this.taskForm.Total
               _this.addTaskModal = false
               _this.$refs['taskForm'].resetFields()
+              _this.taskForm.ProductKeyword = ''
+              _this.taskForm.CpcKeyword = ''
               _this.payMent()
               _this.allOrderList()
+              _this.allOrderStatus()
             })
           }
         })
       },
       // 取消
-      cancelHandel() {
+      cancelHandel(index, row) {
         let _this = this
         _this.cancelModal = true
-        _this.OrderId = _this.selected.Id
-        _this.Amount = _this.selected.TotalPrice
+        _this.OrderId = row.Id
       },
       //取消确定
       cancelSubmit() {
         let _this = this
         let orderId = _this.OrderId
-        let Amount = parseFloat(_this.Amount)
-        let Reason = _this.reasonTxt
         let param = {
-          OrderId: orderId,
-          Amount: Amount,
-          ActionType: 2,
-          Reason: Reason
+          UserId: parseInt(sessionStorage.getItem('userId')),
+          Id: parseInt(orderId)
         }
+        orderState(param).then(res => {
+          if (res.data.Code === 'ok') {
+            _this.cancelModal = false
+            _this.$message({
+              type: 'success',
+              message: '操作成功'
+            })
+            _this.allOrderList()
+            _this.allOrderStatus()
+          }
+        })
       },
       // 删除弹窗
       delhandel() {
@@ -1295,6 +1326,7 @@
       // FB任务弹窗返回按钮
       closeModel() {
         let _this = this
+        let fileList = _this.FileList
         _this.addTaskModal = false
         _this.disabled = true
         _this.btnTask = true
@@ -1377,6 +1409,34 @@
         let obj = _this.obj
         _this.viewDetailModal = true
         _this.viewTaskData = _this.allOrderData[index]
+        let val = _this.allOrderData[index]
+        if (val.OrderState == 1) {
+         _this.viewTaskData.OrderState = '待确认'
+        } else if (val.OrderState == 2) {
+           _this.viewTaskData.OrderState = '待分配'
+        } else if (val.OrderState == 3) {
+           _this.viewTaskData.OrderState = '已分配'
+        } else if (val.OrderState == 4) {
+           _this.viewTaskData.OrderState = '已完成'
+        } else if (val.OrderState == 5) {
+           _this.viewTaskData.OrderState = '已取消'
+        }if(val.ServiceType == 0){
+          _this.viewTaskData.ServiceType = '见单返本'
+        }else if(val.ServiceType == 1){
+           _this.viewTaskData.ServiceType = '评后返'
+        } if(val.KeywordType == 1){
+          _this.viewTaskData.KeywordType = '产品关键字'
+        }else if(val.KeywordType == 2){
+          _this.viewTaskData.KeywordType = 'CPC关键字'
+        }else{
+          return
+        }
+      },
+      // 详情关闭
+      closeViewModel() {
+        let _this = this
+        _this.viewDetailModal = false
+        _this.viewTaskData = []
       },
       // 服务费显示与隐藏
       toggleService() {
@@ -1431,7 +1491,6 @@
       checkCountry(index) {
         let _this = this
         let obj = _this.rateData
-        console.log(_this.taskForm.CountryId)
         let Id = _this.taskForm.CountryId
         _this.ExRate = _this.getRate(obj, Id)
         _this.taskForm.Currency = _this.getSymbol(obj, Id)
@@ -1540,7 +1599,6 @@
       //初始化订单列表
       allOrderList() {
         let _this = this
-        // _this.active = 1
         let param = {
           userId: sessionStorage.getItem('userId'),
           countryIdx: _this.searchForm.checkedCities,
@@ -1564,7 +1622,7 @@
             if (cpcKey == null) {
               cpcKey = ''
             }
-            _this.allOrderData[i].keywords = proKey + cpcKey
+            _this.allOrderData[i].ProductKeyword = proKey + cpcKey
           }
         })
       },
@@ -1624,6 +1682,9 @@
 </script>
 
 <style scoped>
+/deep/.hide .el-upload--picture-card {
+display: none;
+}
   .fileBtn {
     display: inline-block;
     width: 120px;

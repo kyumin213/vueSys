@@ -3,7 +3,7 @@ import router from '../router/index.js'
 import store from '../components/store/store'
 
 if (process.env.NODE_ENV === 'production') {
-  axios.defaults.baseURL = 'http://47.115.37.202:8090/' // 测试接口
+  axios.defaults.baseURL = 'http://47.115.37.202:8080/' // 测试接口
 } else {
   axios.defaults.baseURL = '/api'
 }

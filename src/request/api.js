@@ -4,7 +4,7 @@ export const login = (params) => post('/api/Login/UserLogin', params) //登录
 export const register = (params) => post('/api/CustomerUser/AddUser', params) //注册
 export const getIndex = (params) => post('/api/HomePage/GetUserInformation', params) //首页获取用户信息、余额
 export const getNotice = (params) => get('/api/HomePage/GetHomePage') //首页公告
-export const OrderSum = (params) => post('/api/HomePage/GetOrderSum') //首页任务明细
+export const OrderSum = (params) => getAction('/api/Task/GetAllTaskState') //首页任务数量
 export const updatePwd = (params) => post('/api/CustomerUser/ChangePassWord', params) //修改密码
 export const updateQQ = (params) => post('/api/CustomerUser/ChangeQQ', params) //修改QQ
 export const updateName = (params) => post('/api/CustomerUser/ChangeName', params) //修改姓名
@@ -24,3 +24,9 @@ export const getServiceFee = (params) => getAction('/api/IncrementServiceFee/Inc
 export const getService = (params) => getAction('/api/Fee/GetFee', params) //服务费
 export const getProbalibi = (params) => getAction('/api/Order/GetProbability', params) //留评比例
 export const GetOrderState = (params) => getAction('/api/Order/GetOrderState', params) //订单管理状态数
+export const orderState = (params) => post('/api/Order/ChangeOrderState', params) //取消订单
+export const getPayment = (params) => getAction('/api/Order/GetPayment', params) //下单返回二维码
+export const taskList = (params) => post('/api/Task/GetMyTaskList', params) //任务管理
+export const taskStatus = (params) => post('/api/Task/MyTaskStates', params) //任务管理状态
+export const taskConfirm = (params) => post('/api/Task/ConfirmTaskThree', params) //任务订单确认
+export const taskCancel = (params) => post('/api/Task/ConfirmTaskFiveOrSeven', params) //任务取消、评价待确认

@@ -49,7 +49,7 @@
 				</div>
 			</el-form>
 		</div>
-		<el-table :data="allCashData" border style="width: 100%">
+		<el-table :data="allCashData" border style="width: 100%" :header-cell-style="{background:'#eef1f6'}">
 			<el-table-column prop="RemoveMoenyNumber" label="业务编码" align="center"></el-table-column>
 			<el-table-column prop="Bank" label="开户银行" align="center"></el-table-column>
 			<el-table-column prop="BankName" label="开户名" align="center"></el-table-column>
@@ -76,7 +76,7 @@
 		<el-dialog title='提现' :visible.sync='CashWithdrawalModal' :close-on-click-modal="false" :before-close="closeModel">
 			<el-form :model="cashForm" ref="cashForm" label-width='120px' :rules="rules" status-icon>
 				<el-form-item label='开户名' prop="BankName">
-					<el-input v-model='cashForm.BankName' placeholder="请输入开户银行"></el-input>
+					<el-input v-model='cashForm.BankName' placeholder="请输入开户名"></el-input>
 				</el-form-item>
 				<el-form-item label='开户银行' prop="Bank">
 					<el-input v-model='cashForm.Bank' placeholder="请输入开户银行"></el-input>
@@ -108,7 +108,7 @@
 					return callback(new Error('提现金额不能为空'));
 				} else if(!reg.test(value)) {
 					callback(new Error('提现金额格式不正确'));
-				} else if(value > this.balance) {
+				} else if(parseFloat(value) > parseFloat(this.balance)) {
 					callback(new Error('提现金额不能大于余额'));
 				} else {
 					callback();
@@ -205,7 +205,7 @@
 					statetime:_this.cashSearchForm.startTime,
 					endtime:_this.cashSearchForm.endTime,
 					kWord:_this.cashSearchForm.DealId,
-          state:1,
+          state:_this.cashSearchForm.status,
           pageNum:_this.currentPage,
           pagesize:_this.pageSize
 				}
@@ -282,9 +282,9 @@
 			//搜索
 			searchData(){
 				let _this = this
-				let StartData = _this.cashSearchForm.startTime
-				let EndDate = _this.cashSearchForm.endTime
-				let DealId = _this.cashSearchForm.DealId
+				// let StartData = _this.cashSearchForm.startTime
+				// let EndDate = _this.cashSearchForm.endTime
+				// let DealId = _this.cashSearchForm.DealId
 				_this.cashList()
 			},
 			//重置
@@ -293,7 +293,8 @@
 				_this.cashSearchForm ={
 					startTime:'',
 					endTime:'',
-					DealId:''
+					DealId:'',
+          status:'0'
 				}
 				_this.cashList()
 			}
