@@ -9,318 +9,269 @@
 								<img src="../../assets/image/logo.png" class="img-log" />
 							</div>
 						</div>
-						<div class="navRightBox loginRi">
-							<el-menu background-color="#2F4056" text-color="#fff" active-text-color="#5FB878" class="el-menu-demo navBox" mode="horizontal" unique-opened router>
-								<el-menu-item class="loginIn"><i class="el-icon-user"></i>登录
-								</el-menu-item>
-								<el-menu-item class="loginOut"><i class="el-icon-s-custom"></i>注册
-								</el-menu-item>
-							</el-menu>
-						</div>
 					</div>
 				</div>
 				<div class="loginMain">
-					<el-tabs v-model="forgetType" v-show='typeShow' @tab-click="forgetClick">
-						<el-tab-pane label="登录" name="first">
+					<div>
+						<el-row :gurre='20'>
+							<el-col :span='12' :xs='24'>
+								<div>
+									<img src="../../assets/image/log-in.png" alt="" style="width: 100%;" />
+								</div>
+							</el-col>
+							<el-col :span='12' :xs='24' style='margin-top: 50px;'>
+								<el-tabs v-model="forgetType" class='ml50' v-show='LoginShow==1' @tab-click="forgetClick">
+									<el-tab-pane label="登录" name="first">
 
-						</el-tab-pane>
-						<el-tab-pane label="找回密码" name="second">
-							<div v-show='switchTab!=3'>
-								<el-button size='small' class="activeThis" @click='usePhone'>通过手机找回</el-button>
-							</div>
-							<el-form :model="forgetPhone" ref="forgetPhone" :rules='rules' class='mt20' status-icon>
-
-								<el-form-item class="loginItem" prop='PhoneNumber'>
-									<el-input placeholder="请输入手机号" v-model="forgetPhone.PhoneNumber">
-										<template slot="prepend">手机号</template>
-									</el-input>
-								</el-form-item>
-<!-- 								<el-row>
-									<el-col :span='8' :xs='24'>
-										<el-form-item class="loginItem" prop='imgsCode' :error='errorMsg'>
-											<el-input v-model="forgetPhone.imgsCode" placeholder='请输入图形码' @blur="imgCodeVali(forgetPhone.imgsCode)">
-												<template slot="prepend">图形码</template>
-											</el-input>
-										</el-form-item>
-									</el-col>
-									<el-col :span='7' :xs='24' class='txtLeft'>
-										<div class="identifybox">
-											<div>
-												<img :src="codeImg" alt="" class="avatar">
-											</div>
-											<el-button type='text' class="textbtn" @click="getImgCode">看不清，换一张</el-button>
+									</el-tab-pane>
+									<el-tab-pane label="找回密码" name="second">
+										<div v-show='switchTab!=3'>
+											<!-- <el-button :class="active === 1?'activeThis':''" size='small' @click="useEmail">通过邮箱找回</el-button> -->
+											<el-button size='small' class="activeThis">通过手机找回</el-button>
 										</div>
-									</el-col>
-								</el-row> -->
-								<el-form-item class="loginItem" prop='VerificationCode' :error='phoneMsg'>
-									<el-input placeholder="请输入验证码" v-model="forgetPhone.VerificationCode"  @blur="phoneCodeVali(forgetPhone.PhoneNumber,forgetPhone.VerificationCode)">
-										<template slot="prepend">验证码</template>
-									</el-input>
-									<el-button type='primary' size='medium' :disabled="getPhonePwd" @click='forgetPhoneCode'>
-										<span v-show="show">获取验证码</span>
-										<span v-show='!show'>{{count}}秒</span>
-									</el-button>
-								</el-form-item>
-								<el-form-item>
-									<el-button type='primary' size='medium' @click="RetrievePwdPhone('forgetPhone')">确定</el-button>
-								</el-form-item>
-							</el-form>
-							<el-form :model='resetPwdForm' ref='resetPwdForm' :rules="setPwdRule" status-icon v-show='switchTab==3'>
-								<el-form-item class="loginItem" prop="newPwd">
-									<el-input v-model="resetPwdForm.newPwd" maxlength='16' type="password" autocomplete="off" placeholder='请输入新密码'>
-										<template slot="prepend">新密码</template>
-									</el-input>
-									<span class="tipTxt">6-16位英文字母和数字组成</span>
-								</el-form-item>
-								<el-form-item class="loginItem" prop="comfirPwd">
-									<el-input v-model="resetPwdForm.comfirPwd" maxlength='16' type="password" autocomplete="off" placeholder='请再次输入新密码'>
-										<template slot="prepend">确认密码</template>
-									</el-input>
-								</el-form-item>
-								<el-form-item>
-									<el-button type='primary' @click="comfirPwdBtn('resetPwdForm')">确定</el-button>
-								</el-form-item>
-							</el-form>
-						</el-tab-pane>
-					</el-tabs>
-					<el-tabs v-model="activeName" @tab-click="handleClick" v-show='!typeShow'>
-						<el-tab-pane label="登录" name="first">
-							<el-form :model="formLogin" ref="formLogin" :rules='rules' class="demo-ruleForm" status-icon>
-								<el-form-item prop='PhoneNumber'>
-									<el-row :gutter="20">
-										<el-col class="loginItem mr10" :sm='24' :md='9' :lg='8' :xl="7">
-											<el-input placeholder="请输入手机号" v-model="formLogin.PhoneNumber">
-												<template slot="prepend">手机号</template>
-											</el-input>
+										<el-form :model="forgetPhone" ref="forgetPhone" :rules='rules' class='mt20' status-icon>
+											<el-form-item class="disInline wid100" label='手机号' prop='PhoneNumber'>
+												<el-input placeholder="请输入手机号" v-model="forgetPhone.PhoneNumber">
 
-										</el-col>
-									</el-row>
-								</el-form-item>
-								<el-form-item class="loginItem" prop='passwords'>
-									<el-input v-model="formLogin.passwords" type='password' minlength="6" maxlength='16' placeholder='请输入密码'>
-										<template slot="prepend">密码</template>
-									</el-input>
-								</el-form-item>
-<!-- 								<el-row :gutter="20">
-									<el-col :sm='24' :md='9' :lg='9' :xl="7" class='mb20'>
-										<el-form-item class="loginItem mb0" prop='imgsCode' :error='errorMsg'>
-											<el-input v-model="formLogin.imgsCode" placeholder='请输入图形码' @blur="imgCodeVali(formLogin.imgsCode)">
-												<template slot="prepend">图形码</template>
-											</el-input>
-										</el-form-item>
-									</el-col>
-									<el-col :sm='24' :md='14' :lg='14' :xl="10" class='txtLeft'>
-										<div class="identifybox">
-											<div>
-												<img :src="codeImg" alt="" class="avatar">
-											</div>
-											<el-button type='text' class="textbtn" @click="getImgCode">看不清，换一张</el-button>
+												</el-input>
+											</el-form-item>
+											<el-form-item label='验证码' prop='VerificationCode'>
+												<el-input placeholder="请输入验证码" v-model="forgetPhone.VerificationCode">
+
+												</el-input>
+												<el-button type='primary' class='mt10' size='medium' @click='getPhoneCode' :disabled='getPhonePwd'>
+													<span v-show="show">获取验证码</span>
+													<span v-show='!show'>{{count}}秒</span>
+												</el-button>
+											</el-form-item>
+											<el-form-item>
+												<el-button type='primary' class='confirmLogin' @click="RetrievePwdPhone('forgetPhone')">确定</el-button>
+											</el-form-item>
+										</el-form>
+										<el-form :model='resetPwdForm' ref='resetPwdForm' :rules="rules" status-icon v-show='switchTab==3'>
+											<el-form-item prop="newPwd" label='新密码'>
+												<el-input v-model="resetPwdForm.newPwd" maxlength='16' type="password" autocomplete="off" placeholder='请输入新密码'>
+
+												</el-input>
+												<span class="tipTxt">6-16位英文字母和数字组成</span>
+											</el-form-item>
+											<el-form-item prop="comfirPwd" label='确认密码'>
+												<el-input v-model="resetPwdForm.comfirPwd" maxlength='16' type="password" autocomplete="off" placeholder='请再次输入新密码'>
+
+												</el-input>
+											</el-form-item>
+											<el-form-item>
+												<el-button type='primary' class='confirmLogin' @click="comfirPwdBtn('resetPwdForm')">确定</el-button>
+											</el-form-item>
+										</el-form>
+									</el-tab-pane>
+								</el-tabs>
+								<el-form :model="formLogin" ref="formLogin" :rules='rules' class="demo-ruleForm" status-icon v-show='LoginShow==2'>
+									<div class="txtCenter fz30">登录</div>
+									<el-form-item prop='PhoneNumber' label='手机'>
+										<el-input placeholder="请输入手机号" v-model="formLogin.PhoneNumber">
+										</el-input>
+									</el-form-item>
+									<el-form-item prop='passwords' label='密码'>
+										<el-input type='password' v-model="formLogin.passwords" placeholder='请输入密码'>
+
+										</el-input>
+									</el-form-item>
+						<!-- 			<el-form-item label='图形码' prop='imgsCode'>
+										<el-input v-model="formLogin.imgsCode" placeholder='请输入图形码'>
+										</el-input>
+									</el-form-item>
+									<div class="identifybox">
+										<div class='mb10'>
+											<img :src="codeImg" alt="" class="avatar">
 										</div>
-									</el-col>
-								</el-row> -->
-								<el-form-item class='mt20'>
-									<el-button type="primary" @click="loginIn('formLogin')" size="medium">立即登录</el-button>
-									<span class="ml30 forgetTxt" @click="forgetPwd">忘记密码</span>
-								</el-form-item>
-							</el-form>
-						</el-tab-pane>
-						<el-tab-pane label="注册" name="second">
-							<el-form :model="formReg" ref="formReg" :rules="rules" class="demo-ruleForm" status-icon>
-								<el-form-item prop="PhoneNumber" class="loginItem">
-									<el-input v-model="formReg.PhoneNumber" placeholder='请输入手机号'>
-										<template slot="prepend">手机号</template>
-									</el-input>
-								</el-form-item>
-								<el-form-item class="loginItem" :error='phoneMsg'>
-									<el-input v-model="formReg.VerificationCode" placeholder='请输入验证码' @blur="phoneCodeVali(formReg.PhoneNumber,formReg.VerificationCode)">
-										<template slot="prepend">验证码</template>
-									</el-input>
-									<el-button type="primary" size="medium" @click='getPhoneCode' :disabled="codedisabled">
-										<span v-show="show">获取验证码</span>
-										<span v-show='!show'>{{count}}秒</span>
-									</el-button>
-								</el-form-item>
-								<el-form-item prop="passwords" class="loginItem">
-									<el-input v-model="formReg.passwords" minlength='6' maxlength='16' type='password' placeholder='请输入密码'>
-										<template slot="prepend">密码</template>
-									</el-input>
-									<span class="tipTxt">6-16位英文字母和数字组成</span>
-								</el-form-item>
-								<el-form-item prop="confirmPassWord" class="loginItem">
-									<el-input v-model="formReg.confirmPassWord" minlength='6' maxlength='16' type='password' placeholder='请确认密码'>
-										<template slot="prepend">确认密码</template>
-									</el-input>
-								</el-form-item>
-								<el-form-item class="loginItem">
-									<el-input v-model="formReg.RecommendCode" placeholder='请输入推荐码'>
-										<template slot="prepend">推荐码</template>
-									</el-input>
-								</el-form-item>
-<!-- 								<el-form-item>
-									<el-checkbox-group v-model="formReg.agreeService">
-										<el-checkbox label="同意服务条款" class='col9' name="type"></el-checkbox>
-									</el-checkbox-group>
-								</el-form-item> -->
-								<el-form-item>
-									<el-button type="primary" @click="submitRegister('formReg')">立即注册</el-button>
-								</el-form-item>
-							</el-form>
-						</el-tab-pane>
-					</el-tabs>
+										<el-button type='text' class="textbtn ml20">看不清，换一张</el-button>
+									</div> -->
+									<el-form-item class="mt20">
+										<el-button type="primary" v-loading.fullscreen.lock="fullscreenLoading" @click="loginIn('formLogin')" class='confirmLogin'>立即登录</el-button>
+										<div class="flexBox">
+											<span class="forgetTxt" @click="register">立即注册</span>
+											<span class="forgetTxt2" @click="forgetPwd">忘记密码</span>
+										</div>
+									</el-form-item>
+								</el-form>
+								<el-form :model="formReg" ref="formReg" :rules="rules" class="demo-ruleForm demo-dynamic" status-icon v-show='LoginShow==3'>
+									<div class="txtCenter fz30">注册</div>
+									<el-form-item prop="PhoneNumber" label='手机号'>
+										<el-input v-model="formReg.PhoneNumber" placeholder='请输入手机号'>
+										</el-input>
+									</el-form-item>
+									<el-form-item label='验证码'>
+										<el-input v-model="formReg.VerificationCode" placeholder='请输入验证码'>
+
+										</el-input>
+										<el-button type="primary" size="medium" class='mt10' @click='getPhoneCode' :disabled="codedisabled">
+											<span v-show="show">获取验证码</span>
+											<span v-show='!show'>{{count}}秒</span>
+										</el-button>
+									</el-form-item>
+									<el-form-item prop="passwords" label='密码'>
+										<el-input v-model="formReg.passwords" type='password' placeholder='请输入密码'>
+
+										</el-input>
+										<span class="tipTxt">6-16位英文字母和数字组成</span>
+									</el-form-item>
+									<el-form-item prop="confirmPassWord" label='确认密码'>
+										<el-input v-model="formReg.confirmPassWord" type='password' placeholder='请确认密码'>
+
+										</el-input>
+									</el-form-item>
+									<el-form-item label='推荐码'>
+										<el-input v-model="formReg.RecommendCode" placeholder='请输入推荐码'>
+
+										</el-input>
+									</el-form-item>
+						<!-- 			<el-form-item>
+										<el-checkbox-group v-model="formReg.agreeService">
+											<el-checkbox label="同意服务条款" class='col9' name="type"></el-checkbox>
+										</el-checkbox-group>
+									</el-form-item> -->
+									<el-form-item>
+										<el-button type="primary" @click="submitRegister('formReg')" class='confirmLogin'>立即注册</el-button>
+									</el-form-item>
+									<p>已有账号 <span class="forgetTxt" @click='loginBtn'>登录</span></p>
+								</el-form>
+							</el-col>
+						</el-row>
+					</div>
 				</div>
 				<div class="footer">
-					<div>2019 © 版权所有</div>
+					<div>2020 © 版权所有</div>
 				</div>
 			</div>
 		</div>
 		<div class="index" v-show='indexShow'>
 			<a name='index'></a>
-			<div class="banner">
-				<div class="headNav">
-					<div class="navHeads">
-						<div class="navImg login">
-							<div class="imgBox">
-								<img src="../../assets/image/logo.png" class="img-log" />
+			<div class="bannerBox">
+				<div class="banner" ref='box'>
+					<div class="headNav" :class="{'bgCol':1 == headBg}">
+						<div class="navHeads">
+							<div class="navImg login">
+								<div class="imgBox">
+									<img src="../../assets/image/logo.png" class="img-log" />
+								</div>
 							</div>
-						</div>
-						<div class="navRightBox loginRi">
-							<ul class="navBox">
-								<li>
-									<a href="#index">首页</a>
-								</li>
-								<li>
-									<a href="#Solution">解决方案</a>
-								</li>
-								<li>
-									<a href="#about">关于我们</a>
-								</li>
-								<li>
-									<a class="loginBtn" @click="loginBtn">登录</a><span class="col">|</span>
-									<a class="registerBtn" @click="register">注册</a>
-								</li>
-							</ul>
+							<div class="navRightBox loginRi">
+								<ul class="navBox">
+									<li>
+										<a href="#index" :class="{'bgCol':1 == headBg}">首页</a>
+									</li>
+									<li>
+										<a href="#Solution" :class="{'bgCol':1 == headBg}">解决方案</a>
+									</li>
+									<li>
+										<a href="#about" :class="{'bgCol':1 == headBg}">关于我们</a>
+									</li>
+									<li>
+										<a class="loginBtn" @click="loginBtn" :class="{'bgCol':1 == headBg}">登录</a><span class="col">|</span>
+										<a class="registerBtn" @click="register" :class="{'bgCol':1 == headBg}">注册</a>
+									</li>
+								</ul>
+							</div>
 						</div>
 					</div>
-				</div>
-				<div class="bannerTxt">
-					<p class="col p1">Amzbuy</p>
-					<p class="col p2">用amzBuy，提升亚马逊销量</p>
-				</div>
-			</div>
-			<a name='Solution'></a>
-			<div class="proType">
-				<p class="txtCenter fz30">平台的特点</p>
-				<p class="txtCenter fz16 txtCol mt20">诚信，安全，简单，让电商更有价值</p>
-				<div class="mt50">
-					<el-row>
-						<el-col :span='8' :xs='24' class="txtCenter">
-							<div>
-								<p><i class="el-icon-setting iconFZ"></i></p>
-								<p class="col6 typeItem">诚信</p>
-								<p class="col9 mt20">我们是最棒的</p>
-							</div>
-						</el-col>
-						<el-col :span='8' :xs='24' class="txtCenter">
-							<div>
-								<p><i class="el-icon-upload iconFZ"></i></p>
-								<p class="col6 typeItem">安全</p>
-								<p class="col9 mt20">我们是最可靠的</p>
-							</div>
-						</el-col>
-						<el-col :span='8' :xs='24' class="txtCenter">
-							<div>
-								<p><i class="el-icon-help iconFZ"></i></p>
-								<p class="col6 typeItem">简单</p>
-								<p class="col9 mt20">我们是最厉害的</p>
-							</div>
-						</el-col>
-					</el-row>
+					<div class="bannerTxt">
+						<p class="col p1">用Amzbuy 提升亚马逊销量</p>
+						<p class="col p2">诚信，安全，简单，让电商更有价值</p>
+						<el-button class='mt20 joinBtn' type='primary' @click='register'>立即加入</el-button>
+					</div>
 				</div>
 			</div>
-<!-- 			<div class="taskShow">
-				<p class="txtCenter fz30">平台</p>
-				<p class="txtCenter col6 mt20 mb50">使用我们的产品轻松提高您的服务的性能，安全性和可靠性</p>
-				<div class="widCon">
-					<el-row :gutter="20">
-						<el-col :span='8' :xs='24' class='txtCenter'>
-							<div class="taskBor">
-								<p class="fz20">FBA任务</p>
-								<p class="mt20 mb20"><span class="priceTask">￥100</span><span class="colItem">起</span></p>
-								<p class="br"></p>
-								<div class="itemBom">
-									<p class="mt30 col9 taskDes">很棒的任务，快速简单安werrqeqrretetetetertewtetete全可靠大神的都是速简单安werrqeqrretetetetertewtetete全可靠大神的都是速简单安werrqeqrretetetetertewtetete全可靠大神的都是速简单安werrqeqrretetetetertewtetete全可靠大神的都是</p>
-									<div class="buyBtn">
-										<el-button type='warning' round @click="loginBtn">立即购买</el-button>
+			<div class="itemBg">
+				<a name='Solution'></a>
+				<div class="proType">
+					<p class="txtCenter fz30"><span class="fzTxtCol">解决方案</span></p>
+					<p class="txtCenter fz16 txtCol mt20">诚信，安全，简单，让电商更有价值</p>
+					<div class="mt50">
+						<el-row>
+							<el-col :span='8' :xs='24'>
+								<div class="flexItem">
+									<div class="mr30 ml30">
+										<p><i class="el-icon-trophy iconFZ"></i></p>
+									</div>
+									<div>
+										<p class="typeItem">提升销售流量</p>
+										<p class="col9 mt20">amzBuy助力您的销售更上一层楼</p>
 									</div>
 								</div>
-							</div>
-						</el-col>
-						<el-col :span='8' :xs='24' class='txtCenter'>
-							<div class="taskBor">
-								<p class="fz20">加购任务</p>
-								<p class="mt20 mb20"><span class="priceTask">￥100</span><span class="colItem">起</span></p>
-								<p class="br"></p>
-								<div class="itemBom">
-									<p class="mt30 col9 taskDes">很棒的任务，快速简单安全可靠大神的都是</p>
-									<div class="buyBtn">
-										<el-button type='warning' round @click="loginBtn">立即购买</el-button>
+							</el-col>
+							<el-col :span='8' :xs='24'>
+								<div class="flexItem nthTwo">
+									<div class="mr30 ml30">
+										<p><i class="el-icon-lock iconFZ"></i></p>
+									</div>
+									<div>
+										<p class="typeItem">一对一服务</p>
+										<p class="col9 mt20">尊享一对一专业运营指导服务，包教包会</p>
 									</div>
 								</div>
-							</div>
-						</el-col>
-						<el-col :span='8' :xs='24' class='txtCenter'>
-							<div class="taskBor">
-								<p class="fz20">点赞任务</p>
-								<p class="mt20 mb20"><span class="priceTask">￥100</span><span class="colItem">起</span></p>
-								<p class="br"></p>
-								<div class="itemBom">
-									<p class="mt30 col9 taskDes">很棒的任务，快速简单安全可靠大神的都是</p>
-									<div class="buyBtn">
-										<el-button type='warning' round @click="loginBtn">立即购买</el-button>
+							</el-col>
+							<el-col :span='8' :xs='24'>
+								<div class="flexItem nthThree">
+									<div class="mr30 ml30">
+										<p><i class="el-icon-aim iconFZ"></i></p>
+									</div>
+									<div>
+										<p class="typeItem">云端软件，无需部署</p>
+										<p class="col9 mt20 TypeDes">云端服务，无需复杂的安装和部署过程，注册即用</p>
 									</div>
 								</div>
-							</div>
-						</el-col>
-					</el-row>
+							</el-col>
+						</el-row>
+					</div>
 				</div>
-			</div> -->
-			<!--服务-->
-			<div class="serviceBox">
-				<div>
-					<p class="serviceTitle txtCenter fz30">服务遍布全球</p>
-					<p class="serviceDes txtCenter col9">拥有超过10年的跨境电商实战与传统行业运营经验，充分了解跨境电商卖家的需求和行业发展方向，为您的跨境之路保驾护航</p>
-				</div>
-				<img src="../../assets/image/map.png" alt="" />
 			</div>
 			<!--关于我们-->
 			<div class="aboutUs">
 				<a name='about'></a>
 				<div class="aboutCon">
-					<p class="txtCenter fz30 aboutTit">关于我们</p>
-					<p class="aboutDes col9">amzBuy研发团队，拥有精湛、深厚的技术功底，具有多年电商系统开发经验，专注于数据挖掘和跨境电商云服务开发。 管理团队，是一群资深外贸老炮，拥有超过10年的跨境电商实战与传统行业运营经验，充分了解跨境电商卖家的需求和行业发展方向，为您的跨境之路保驾护航。</p>
-					<img src="../../assets/image/about.jpg" class="aboutImg" alt="" />
+					<p class="txtCenter fz30 aboutTit"><span class="fzTxtCol">关于我们</span></p>
+					<!--<div class="aboutBox">
+						<div class="picLeft">
+							<img src="../../assets/image/about1.jpg" alt="" style="height: 100%;width: 100%;" />
+						</div>
+						<div style="width: 50%;">
+							<div class="aboutUsDes">
+								<p class="aboutDes">amzBuy研发团队，拥有精湛、深厚的技术功底，具有多年电商系统开发经验，专注于数据挖掘和跨境电商云服务开发。 管理团队，是一群资深外贸老炮，拥有超过10年的跨境电商实战与传统行业运营经验，充分了解跨境电商卖家的需求和行业发展方向，为您的跨境之路保驾护航。</p>
+							</div>
+							<div style="height: 50%;">
+								<img src="../../assets/image/about2.jpg" style="height: 100%;width: 100%;" alt="" />
+							</div>
+						</div>
+					</div>-->
+					<el-row class='aboutBox'>
+						<el-col :span='12' :xs='24'>
+							<img src="../../assets/image/about1.jpg" alt="" class="aboutLeftImg" />
+						</el-col>
+						<el-col :span='12' :xs='24' style='height: 100%;'>
+							<div class="aboutUsDes" style='height: 50%;'>
+								<p class="aboutDes">amzBuy研发团队，拥有精湛、深厚的技术功底，具有多年电商系统开发经验，专注于数据挖掘和跨境电商云服务开发。 管理团队，是一群资深外贸老炮，拥有超过10年的跨境电商实战与传统行业运营经验，充分了解跨境电商卖家的需求和行业发展方向，为您的跨境之路保驾护航。</p>
+							</div>
+							<div style="height: 50%;">
+								<img src="../../assets/image/about2.jpg" style="height: 100%;width: 100%;" alt="" />
+							</div>
+						</el-col>
+					</el-row>
 				</div>
 			</div>
 			<!--联系我们-->
-			<!--<div class="contactMe">
-				<p class="txtCenter col fz30 contactTitle">加入我们，为您节省99%的研发投入</p>
-				<div class="txtCenter mt50">
-					<el-button type='warning' class='contactBtn'>立即加入</el-button>
-				</div>
-			</div>-->
-			<footer>
-				<div class='footerTit center'>
+			<footer class="mt30">
+				<div class='footerTit txtCenter '>
 					<p class="fz20 col mb20">加入我们，为您节省99%的研发投入</p>
-					<el-button type='warning' class='contactBtn' @click="loginBtn">立即加入</el-button>
+					<el-button type='warning' class='contactBtn' @click='register'>立即加入</el-button>
 				</div>
 				<!--<p class="footerTit fz20 col">加入我们，为您节省99%的研发投入</p>-->
-				<p class="txtCenter footerTxt">Copyright ©2019 Buy System</p>
+				<p class="txtCenter footerTxt">Copyright ©2020 Buy System</p>
 			</footer>
 		</div>
-
 		<el-dialog title='验证码' :visible.sync='codeModal' :close-on-click-modal="false" width="30%">
 			<el-form :model="formReg" ref='formReg' :rules='rules' status-icon>
-				<el-form-item prop='imgsCode' :error='errorMsg'>
+				<el-form-item prop='imgsCode'>
 					<el-input v-model="formReg.imgsCode" placeholder='请输入图形码'>
 
 					</el-input>
@@ -330,7 +281,7 @@
 				<div>
 					<img :src="codeImg" alt="" class="avatar" @click="getImgCode">
 				</div>
-				<el-button @click="getImgCode" type='text' class="textbtn">看不清，换一张</el-button>
+				<el-button @click="getImgCode" type='text' class="textbtn ml20">看不清，换一张</el-button>
 			</div>
 			<div slot='footer' class="dialog-footer">
 				<el-button type='primary' @click="regSendCode('formReg')">确定</el-button>
@@ -424,6 +375,7 @@
 				}
 			};
 			return {
+        fullscreenLoading:false,//登录加载
 				errorMsg:'',//图形码是否正确
 				phoneMsg:'',//手机验证码是否正确
 				getEmailPwd: true, // 通过邮箱找回密码验证
@@ -549,7 +501,9 @@
 				timer: null,
 				count: '',
 				show: true,
-				imgCode: 0
+				imgCode: 0,
+        headBg: -1,
+        LoginShow: 2
 			}
 		},
 		created() {
@@ -562,7 +516,21 @@
 				_this.indexShow = false
 			}
 		},
+    mounted() {
+    	window.addEventListener("scroll", this.showIcon, true);
+    },
 		methods: {
+      showIcon(e) {
+      	let _this = this
+      	let scrollTop = e.target.scrollTop
+      	if(
+      		scrollTop > 200
+      	) {
+      		_this.headBg = 1
+      	} else {
+      		_this.headBg = -1
+      	}
+      },
 			//手机验证码验证
 			phoneCodeVali(phonenumber,phoneCode){
 				let _this = this
@@ -575,7 +543,7 @@
 				}
 				_this.axios.post(this.GLOBAL.BASE_URL + '/api/phoneCodeValidation', param).then((res) => {
 					if(res.data.status == 500) {
-						_this.getImgCode()
+						// _this.getImgCode()
 						_this.phoneMsg = res.data.message
 					}
 				})
@@ -591,7 +559,7 @@
 				}
 				_this.axios.post(this.GLOBAL.BASE_URL + '/api/imageCodeValidation', param).then((res) => {
 					if(res.data.status == 500) {
-						_this.getImgCode()
+						// _this.getImgCode()
 						_this.errorMsg = res.data.message
 					}
 				})
@@ -658,7 +626,7 @@
 				let _this = this
 				_this.$refs[formName].validate((valid) => {
 					if(valid) {
-						this.getPhoneCodeApi()
+						_this.getPhoneCodeApi()
 					} else {
 						return false
 					}
@@ -667,7 +635,7 @@
 			//获取手机验证码
 			getPhoneCode() {
 				let _this = this
-				_this.getImgCode()
+				// _this.getImgCode()
 				_this.codeModal = true
 			},
 			//手机找回密码获取验证码
@@ -755,32 +723,25 @@
 			loginBtn() {
 				let _this = this
 				_this.indexShow = false
-				_this.activeName = 'first'
+				_this.LoginShow = 2
 			},
 			//注册
 			register() {
 				let _this = this
 				_this.indexShow = false
-				_this.activeName = 'second'
+				// _this.activeName = 'second'
+        _this.LoginShow = 3
 			},
 			//登录
 			loginShow() {
 				let _this = this
 				_this.typeShow = true
-				console.log(12)
 			},
 			//使用邮箱找回密码
 			useEmail() {
 				let _this = this
-				_this.getImgCode()
+				// _this.getImgCode()
 				_this.active = 1
-				_this.errorMsg = ''
-			},
-			//使用手机找回密码
-			usePhone() {
-				let _this = this
-				_this.getImgCode()
-				_this.active = 2
 				_this.errorMsg = ''
 			},
 			//忘记密码
@@ -788,7 +749,8 @@
 				let _this = this
 				_this.typeShow = true
 				_this.forgetType = 'second'
-				_this.getImgCode()
+        _this.LoginShow = 1
+				// _this.getImgCode()
 			},
 			//重新设置密码确定
 			comfirPwdBtn(formName) {
@@ -826,31 +788,19 @@
 					}
 				})
 			},
-			//登陆后加载数据
-			getHome(){
-				let _this = this
-				let param = {
-					SessionId:sessionStorage.getItem('sessionid')
-				}
-				_this.axios.post(this.GLOBAL.BASE_URL + '/api/frontConsoleHome', param).then((res) => {
-					if(res.data.status == 200) {
-						sessionStorage.setItem('userName',res.data.data.userName)
-					}
-				})
-			},
 			// 登录
 			loginIn(formName) {
 				let _this = this
+        _this.fullscreenLoading = true
 				let param = {
 					Phone: _this.formLogin.PhoneNumber,
 					Password: _this.formLogin.passwords,
 				}
-								// sessionStorage.setItem('token','23425252')
-								// _this.$router.push('/loginHome')
 				_this.$refs[formName].validate((valid) => {
 					if(valid) {
             login(param).then((res)=>{
-              if(res.data.Code === 'ok') {
+              if(res.data.Code == 'ok') {
+                _this.fullscreenLoading = false
               	_this.$message({
               		message: res.data.Msg,
               		type: 'success'
@@ -879,7 +829,7 @@
 				})
 			},
 			//注册
-			submitRegister(formName) {
+			submitRegister() {
 				let _this = this
 				let param = {
 					Phone: _this.formReg.PhoneNumber,
@@ -895,7 +845,8 @@
               		message: res.data.Msg,
               		type: 'success'
               	})
-              	_this.activeName = 'first'
+              	_this.indexShow = false
+              	_this.LoginShow = 2
               	// _this.getImgCode()
 
               } else {
@@ -908,7 +859,6 @@
 							console.log(error)
 						})
 					} else {
-						// _this.getImgCode()
 						return false
 					}
 				})
@@ -919,28 +869,142 @@
 				_this.indexShow = data
 				_this.tabCheck = 'second'
 			},
-			handleClick(tab, event) {
-				this.getImgCode()
-			},
+			// handleClick(tab, event) {
+			// 	this.getImgCode()
+			// },
 			//忘记密码tab切换
 			forgetClick(tab, event) {
-				let _this = this
-				_this.getImgCode()
-				if(tab.index == '0') {
-					_this.typeShow = false
-				} else {
-					_this.typeShow = true
-				}
+			let _this = this
+			// _this.getImgCode()
+			if(tab.index == '0') {
+				_this.typeShow = false
+				_this.LoginShow = 2
+			} else {
+				_this.typeShow = true
+			}
 			}
 		}
 	}
 </script>
 
 <style scoped>
+	body {
+		min-width: 1200px;
+	}
+
+	.confirmLogin {
+		width: 100%;
+		padding: 17px 20px;
+		background: #26d9b3;
+		border-color: #26d9b3;
+	}
+
+	.aboutUsDes {
+		height: 50%;
+		background: #4f4e4c;
+		color: #fff;
+	}
+
+	.joinBtn {
+		padding: 15px 50px;
+		font-size: 16px;
+	}
+
+	.bannerLeft {
+		position: relative;
+		top: 0;
+		left: 0;
+		transform: rotate(-30deg) skew(25deg) scale(.8);
+	}
+
+	.bannerItem {
+		position: absolute;
+		display: inline-block;
+		width: 360px;
+		height: 640px;
+		background-color: rgba(255, 255, 255, .8);
+		/*transform: rotate(-160deg);*/
+		transform: translate(120px, -120px)
+	}
+
+	.bannerLeft .item2 {
+		top: 15px;
+		left: 15px;
+		background-color: rgba(255, 255, 255, .7);
+	}
+
+	.bannerLeft .item3 {
+		top: 30px;
+		left: 30px;
+		background-color: rgba(255, 255, 255, .6);
+	}
+
+	.bannerLeft .item4 {
+		top: 45px;
+		left: 45px;
+		background-color: rgba(255, 255, 255, .5);
+	}
+
+	.bannerLeft .item5 {
+		top: 60px;
+		left: 60px;
+		background-color: rgba(255, 255, 255, .4);
+	}
+
+	.flexItem {
+		display: flex;
+		align-items: center;
+		/*justify-content: center;*/
+		background: #f2f2f2;
+		/*padding: 50px 0;*/
+		height: 192px;
+		padding: 0 15px
+	}
+
+	.nthTwo {
+		background: #ededed;
+	}
+
+	.nthThree {
+		background: #e8e8e8;
+	}
+
+	.itemBg {
+		width: 100%;
+		background: #f8f9fa;
+	}
+
+	.fzTxtCol {
+		color: #4f4e4c;
+		position: relative;
+		display: inline-block;
+	}
+
+	.fzTxtCol:before {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: -110px;
+		width: 90px;
+		height: 1px;
+		background: #4f4e4c;
+	}
+
+	.fzTxtCol:after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		right: -110px;
+		width: 90px;
+		height: 1px;
+		background: #4f4e4c;
+	}
+
 	.identifybox {
 		display: flex;
 		justify-content: space-between;
 		width: 120px;
+		margin-top: 30px;
 	}
 
 	.iconstyle {
@@ -950,12 +1014,12 @@
 	.headNav {
 		width: 100%;
 		height: 60px;
-		background: #0099F0;
+		background: transparent;
 		position: fixed;
 		top: 0;
-		left: 0;
-		right: 0;
+		left: -17px;
 		z-index: 9999;
+		min-width: 1200px;
 	}
 
 	.nav li {
@@ -963,21 +1027,6 @@
 		width: 100px;
 		height: 60px;
 		line-height: 60px;
-	}
-
-	.navHeads {
-		/*width: 80%;*/
-		display: flex;
-		align-items: center;
-		background: transparent;
-		justify-content: space-between;
-		/*padding-top: 20px;*/
-		width: 65%;
-		margin: 0 auto;
-	}
-
-	.navHeads .navBox {
-		text-align: right;
 	}
 
 	.navHeads .navBox li {
@@ -1028,17 +1077,32 @@
 		text-align: center;
 	}
 
-	.forgetTxt {
+	.forgetTxt,
+	.forgetTxt2 {
 		cursor: pointer;
+		color: #26D9B3;
 	}
 
-	.forgetTxt:hover {
+	.forgetTxt2 {
+		color: #666;
+	}
+
+	.forgetTxt:hover,
+	.forgetTxt2:hover {
 		color: #0099F0;
 	}
 
 	.activeThis {
 		color: #FFF;
-		background-color: #409EFF;
-		border-color: #409EFF;
+		background-color: #26d9b3;
+		border-color: #26d9b3;
+	}
+
+	.bgCol {
+		background: #4f4e4c;
+	}
+
+	footer {
+		width: 100%;
 	}
 </style>

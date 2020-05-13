@@ -7,45 +7,45 @@
 			<ul class="detailbox detailbox1">
 				<li>
 					<span>订单编号：</span>
-					<p>{{viewTaskData.OrderNumber}}</p>
+					<p>{{viewOrderData.OrderNumber}}</p>
 				</li>
 				<li>
 					<span>下单类型：</span>
-					<p>{{viewTaskData.ServiceType}}</p>
+					<p>{{viewOrderData.ServiceType}}</p>
 				</li>
         <li>
 					<span>国家：</span>
-					<p>{{viewTaskData.CountryName}}</p>
+					<p>{{viewOrderData.CountryName}}</p>
 				</li>
 				<li>
 					<span>订单状态：</span>
-					<p>{{viewTaskData.OrderState}}</p>
+					<p>{{viewOrderData.OrderState}}</p>
 				</li>
 				<li>
 					<span>产品ASIN：</span>
-					<p>{{viewTaskData.Asin}}</p>
+					<p>{{viewOrderData.Asin}}</p>
 				</li>
 				<li>
 					<span>产品名称：</span>
-					<p>{{viewTaskData.ProductName}}</p>
+					<p>{{viewOrderData.ProductName}}</p>
 				</li>
 				<li>
 					<span>产品价格：</span>
-					<p>{{viewTaskData.Currency}}{{viewTaskData.ProductPrice}}</p>
+					<p>{{viewOrderData.Currency}}{{viewOrderData.ProductPrice}}</p>
 				</li>
 				<li>
 					<span>产品评分：</span>
 					<!-- <p>{{viewTaskData.ProductScore}}</p> -->
-          <el-rate v-model="viewTaskData.ProductScore"></el-rate>
+          <el-rate v-model="viewOrderData.ProductScore"></el-rate>
 				</li>
 				<li>
 					<span>产品链接：</span>
-					<a :href="viewTaskData.ProductLink">{{viewTaskData.ProductLink}}</a>
+					<a :href="viewOrderData.ProductLink">{{viewOrderData.ProductLink}}</a>
 				</li>
         <li>
         	<span>产品图片：</span>
         	<p>
-        		<img :src="viewTaskData.ProductPictures" alt="" class="eval_img">
+        		<img :src="viewOrderData.ProductPictures" alt="" class="eval_img">
         	</p>
         </li>
 			</ul>
@@ -53,36 +53,35 @@
 		<el-card class="box-card mt20">
 			<div slot="header" class="clearfix">
 				<span>购买信息</span>
-				<!--          <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>-->
 			</div>
 			<ul class="detailbox detailbox1">
 				<li>
 					<span>关键字类型：</span>
-					<p>{{viewTaskData.KeywordType}}</p>
+					<p>{{viewOrderData.KeywordType}}</p>
 				</li>
-				<li v-show="viewTaskData.KeywordType=='产品关键字'">
+				<li v-show="viewOrderData.KeywordType=='产品关键字'">
 					<span>产品关键词：</span>
-					<p>{{viewTaskData.ProductKeyword}}</p>
+					<p>{{viewOrderData.ProductKeyword}}</p>
 				</li>
-        <li  v-show="viewTaskData.KeywordType=='CPC关键字'">
+        <li  v-show="viewOrderData.KeywordType=='CPC关键字'">
 					<span>CPC关键词：</span>
-					<p>{{viewTaskData.CpcKeyword}}</p>
+					<p>{{viewOrderData.CpcKeyword}}</p>
 				</li>
 				<li>
 					<span>订单数量：</span>
-					<p>{{viewTaskData.OrderNumber}}</p>
+					<p>{{viewOrderData.OrderNumber}}</p>
 				</li>
         <li>
 					<span>留评比例：</span>
-					<p>{{viewTaskData.ProductPosition}}</p>
+					<p>{{viewOrderData.ProductPosition}}</p>
 				</li>
         <li>
 					<span>任务开始时间：</span>
-					<p>{{viewTaskData.StartTimes}}</p>
+					<p>{{viewOrderData.StartTimes}}</p>
 				</li>
         <li>
 					<span>任务结束时间：</span>
-					<p>{{viewTaskData.EndTimes}}</p>
+					<p>{{viewOrderData.EndTimes}}</p>
 				</li>
 	<!-- 			<li>
 					<span>feedback数量：</span>
@@ -106,19 +105,19 @@
 				</li> -->
 				<li>
 					<span>产品总价：</span>
-					<p>${{viewTaskData.TotalProductPrice}}</p>
+					<p>{{viewOrderData.TotalProductPrice}}</p>
 				</li>
 				<li>
 					<span>服务费：</span>
-					<p>${{viewTaskData.ServiceFee}}</p>
+					<p>{{viewOrderData.ServiceCharge}}</p>
 				</li>
 				<li>
 					<span>合计：</span>
-					<p>{{viewTaskData.Total}}</p>
+					<p>{{viewOrderData.Total}}</p>
 				</li>
 				<li>
 					<span>备注：</span>
-					<p>{{viewTaskData.Remarks}}</p>
+					<p>{{viewOrderData.Remarks}}</p>
 				</li>
 			</ul>
 		</el-card>
@@ -128,18 +127,16 @@
 
 <script>
 	export default {
-		name: 'viewTaskDetails',
-		props: ["viewTaskData"],
+		name: 'viewOrderDetails',
+		props: ["viewOrderData"],
 		data() {
 			return {
 				form: {}
 			}
 		},
-		mounted() {
-			this.txtOrderType()
-			this.txtKeywords()
-      this.orderStatus()
-		},
+    mounted(){
+      this.txtKeywords()
+    },
 
 		methods: {
 			//获取类型
@@ -154,42 +151,16 @@
 			backBtn() {
 				this.$router.push('/taskManage')
 			},
-			//下单类型
-			txtOrderType() {
-				let _this = this
-				let types = _this.viewTaskData.ServiceType
-				if(types == 0) {
-					_this.viewTaskData.ServiceType = '见单返本'
-				} else if(types == 1) {
-					_this.viewTaskData.ServiceType = '评后返'
-				}
-			},
-			//关键字类型
-			txtKeywords() {
-				let _this = this
-				let keys = _this.viewTaskData.KeywordType
-				if(keys == 1) {
-					_this.viewTaskData.KeywordType = '产品关键字'
-				} else if(keys == 2) {
-					_this.viewTaskData.KeywordType = 'CPC关键字'
-				}
-			},
-      // 订单状态
-      orderStatus(){
+      //关键字类型
+      txtKeywords() {
         let _this = this
-        let status = _this.viewTaskData.OrderState
-        if(status == 1){
-          _this.viewTaskData.OrderState = '待确认'
-        } else if(status == 2){
-           _this.viewTaskData.OrderState = '待分配'
-        } else if(status == 3){
-           _this.viewTaskData.OrderState = '已分配'
-        }else if(status == 4){
-           _this.viewTaskData.OrderState = '已完成'
-        }else if(status == 5){
-           _this.viewTaskData.OrderState = '已取消'
+        let keys = _this.viewOrderData.KeywordType
+        if (keys == 1) {
+          _this.viewOrderData.KeywordType = '产品关键字'
+        } else if (keys == 2) {
+          _this.viewOrderData.KeywordType = 'CPC关键字'
         }
-      }
+      },
 		}
 	}
 </script>

@@ -38,30 +38,14 @@ export default new Router({
 						title: '任务管理'
 					}
 				},
-				{
-					path: '/accountManage',
-					name: 'accountManage',
-					component: resolve => require(['../components/page/accountManage.vue'], resolve),
-					meta: {
-						title: '资金管理'
-					}
-				},
-				{
-					path: '/help',
-					name: 'help',
-					component: resolve => require(['../components/page/help.vue'], resolve),
-					meta: {
-						title: '帮助中心'
-					}
-				},
-				{
-					path: '/helpDetails',
-					name: 'helpDetails',
-					component: resolve => require(['../components/page/helpDetails.vue'], resolve),
-					meta: {
-						title: '帮助中心详情'
-					}
-				},
+        {
+        	path: '/accountManage',
+        	name: 'accountManage',
+        	component: resolve => require(['../components/page/accountManage.vue'], resolve),
+        	meta: {
+        		title: '资金管理'
+        	}
+        },
 				{
 					path: '/userInfo',
 					name: 'userInfo',
@@ -92,46 +76,6 @@ export default new Router({
 					component: resolve => require(['../components/page/CashWithdrawal.vue'], resolve),
 					meta: {
 						title: '提现'
-					}
-				},
-				{
-					path: '/FbaTask',
-					name: 'FbaTask',
-					component: resolve => require(['../components/page/FbaTask.vue'], resolve),
-					meta: {
-						title: 'FBA任务'
-					}
-				},
-				{
-					path: '/wishTask',
-					name: 'wishTask',
-					component: resolve => require(['../components/page/wishTask.vue'], resolve),
-					meta: {
-						title: '心愿任务'
-					}
-				},
-				{
-					path: '/QaTask',
-					name: 'QaTask',
-					component: resolve => require(['../components/page/QaTask.vue'], resolve),
-					meta: {
-						title: 'QA任务'
-					}
-				},
-				{
-					path: '/buyCarTask',
-					name: 'buyCarTask',
-					component: resolve => require(['../components/page/buyCarTask.vue'], resolve),
-					meta: {
-						title: '购物车任务'
-					}
-				},
-				{
-					path: '/likesTask',
-					name: 'likesTask',
-					component: resolve => require(['../components/page/likesTask.vue'], resolve),
-					meta: {
-						title: '点赞任务'
 					}
 				}
 			]

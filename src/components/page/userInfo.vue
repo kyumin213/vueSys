@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="mt20 mb20 tabsTxt">
+    <div class="mt20 mb20">
         <span>首页</span>
         <span class="fg">/</span>
         <a>账户设置</a>
@@ -29,8 +29,8 @@
       </el-form-item>
     </el-form>
 <!--  修改QQ-->
-    <el-dialog title="修改信息" :visible.sync="editQqModel" width="30%" center :close-on-click-modal="false">
-      <el-form :model="formQq" ref="formQq" label-width='50px' :rules='rules' class="demo-ruleForm">
+    <el-dialog title="修改信息" :visible.sync="editQqModel" width="40%" center :close-on-click-modal="false">
+      <el-form :model="formQq" ref="formQq" label-width='80px' :rules='rules' class="demo-ruleForm">
         <el-form-item label="QQ" prop="qq">
           <el-input v-model="formQq.qq" placeholder='请输入新QQ'></el-input>
         </el-form-item>
@@ -41,8 +41,8 @@
         </span>
     </el-dialog>
     <!--修改微信-->
-    <el-dialog title="修改信息" :visible.sync="editWeChatModel" width="30%" center :close-on-click-modal="false">
-      <el-form :model="formWeChat" ref="formWeChat" :rules='rules' class="demo-ruleForm" label-width='50px'>
+    <el-dialog title="修改信息" :visible.sync="editWeChatModel" width="40%" center :close-on-click-modal="false">
+      <el-form :model="formWeChat" ref="formWeChat" :rules='rules' class="demo-ruleForm" label-width='80px'>
         <el-form-item prop="WeChat" label='微信'>
           <el-input v-model="formWeChat.WeChat" placeholder='请输入新微信'></el-input>
         </el-form-item>
@@ -53,8 +53,8 @@
         </span>
     </el-dialog>
     <!-- 修改名称 -->
-    <el-dialog title="修改信息" :visible.sync="editNameModel" width="30%" center :close-on-click-modal="false">
-      <el-form :model="formName" ref="formName" :rules='rules' class="demo-ruleForm" label-width='50px'>
+    <el-dialog title="修改信息" :visible.sync="editNameModel" width="40%" center :close-on-click-modal="false">
+      <el-form :model="formName" ref="formName" :rules='rules' class="demo-ruleForm" label-width='80px'>
         <el-form-item prop="userName" label='姓名'>
           <el-input v-model="formName.userName" placeholder='请输入姓名'></el-input>
         </el-form-item>
@@ -89,6 +89,7 @@ export default {
       formName:{
         userName:''
       },
+      userInfo:[],
       rules:{
       	qq:[{
       		required: true,
@@ -120,6 +121,9 @@ created() {
         _this.userNames = res.data[0].name
         _this.userQQ = res.data[0].qq
         _this.WeChat = res.data[0].wecate
+        _this.formWeChat.WeChat = res.data[0].wecate
+        _this.formQq.qq = res.data[0].qq
+        _this.formName.userName = res.data[0].name
       })
 
 		},//  修改QQ弹窗

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="mt20 mb20 tabsTxt">
+		<div class="mt20 mb20">
 			<span>首页</span>
 			<span class="fg">/</span>
 			<a>账户设置</a>
@@ -74,7 +74,7 @@
         </span>
 		</el-dialog>
 		<!--修改手机号-->
-		<el-dialog title="修改手机号" :visible.sync="editPhoneModel" width="30%" center :close-on-click-modal="false">
+		<el-dialog title="修改手机号" :visible.sync="editPhoneModel" width="40%" center :close-on-click-modal="false">
 			<el-form :model="formPhone" ref="formPhone" class="demo-ruleForm">
 				<el-form-item>
 					<span class="col9">为了保障您的帐号安全，变更信息前需验证身份</span>
@@ -199,34 +199,10 @@
 			}
 		},
 		created() {
-			this.getHome()
 		},
 		methods: {
 			//初次加载
-			getHome() {
-				let _this = this
-				let param = {
-					SessionId: sessionStorage.getItem('sessionid')
-				}
-				_this.axios.post(this.GLOBAL.BASE_URL + '/api/frontConsoleHome', param).then((res) => {
-					if(res.data.status == 200) {
-						if(res.data.data.phonenumber != null) {
-							_this.userPhone = res.data.data.phonenumber
-						}
-						if(res.data.data.Email != null) {
-							_this.userEmail = res.data.data.Email
-						}
-					}
-					if(res.data.status == 400) {
-						_this.$message({
-							type: 'error',
-							message: '登录过期，请重新登录'
-						})
-						sessionStorage.clear()
-						_this.$router.push({name:'index',params:{indexShow: false}})
-					}
-				})
-			},
+			
 			//手机验证码验证
 			phoneCodeVali(phone, code) {
 				let _this = this

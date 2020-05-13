@@ -2,7 +2,7 @@
   <div>
     <div>
       <div class="mb20 mt20">
-        <span class="tabsTxt">
+        <span>
           <span>首页</span>
           <span class="fg">/</span>
           <a>任务管理</a>
@@ -22,21 +22,13 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <div class="form-item">
-          <el-form-item label="下单时间">
-            <el-date-picker v-model="searchForm.orderStartTime" type="date" placeholder="选择开始时间" :picker-options="pickerStartDate"
-              value-format="yyyy-MM-dd" class="mb10"></el-date-picker>
-            <el-date-picker v-model="searchForm.orderEndTime" type="date" placeholder="选择结束时间" :picker-options="pickerEndDate"
-              value-format="yyyy-MM-dd"></el-date-picker>
-          </el-form-item>
-        </div>
         <div>
           <el-form-item label="关键字" class="labelNum">
             <el-input v-model="searchForm.Keyword" style="width: 220px" placeholder="任务编码,产品名称"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" size="medium" @click='searchOrder'>搜索</el-button>
-            <el-button size="medium" @click="resetTask">重置</el-button>
+            <el-button type="primary" @click='searchOrder'>搜索</el-button>
+            <el-button  @click="resetTask">重置</el-button>
             <!-- <el-button type="warning" size="medium" @click="exportExcel">导出</el-button> -->
           </el-form-item>
         </div>
@@ -58,31 +50,25 @@
       </div>
     </div>
     <div class="mt10 tableBg" style="overflow-x: auto">
-      <el-table :data="allOrderData" border style="width: 100%;overflow-x: auto" :header-cell-style="{background:'#eef1f6'}">
+      <el-table :data="allOrderData" v-loading="loading" element-loading-text="拼命加载中" border style="width: 100%;font-size: 15px;" :header-cell-style="{background:'#eef1f6'}">
         <el-table-column prop="OrderNumbers" label="任务编码" align="center" width="170">
           <template slot-scope="scope">
             <el-button type="text" @click="viewDetails(scope.$index,scope.row)">{{scope.row.OrderNumbers}}</el-button>
           </template>
         </el-table-column>
         <el-table-column prop="countryName" label="国家" align="center"></el-table-column>
-        <el-table-column prop="Asin" label="产品ASIN" align="center" width="120"></el-table-column>
+        <el-table-column prop="Asin" label="产品ASIN" align="center"></el-table-column>
         <el-table-column prop="AmazonProductPrice" label="产品价格" align="center"></el-table-column>
         <el-table-column prop="ServiceType" label="服务类型" align="center"></el-table-column>
-        <el-table-column prop="TaskState" label="状态" align="center" width="100" :formatter="txtOrderStatus"></el-table-column>
-        <el-table-column prop="AmazonNumber" label="订单号" align="center" width="100"></el-table-column>
-        <el-table-column prop="ProductName" label="产品名称" align="center" width="100"></el-table-column>
-        <el-table-column prop="BuyTime" label="下单时间" align="center" width="200"></el-table-column>
+        <el-table-column prop="TaskState" label="状态" align="center" :formatter="txtOrderStatus"></el-table-column>
+        <el-table-column prop="AmazonNumber" label="订单号" align="center"></el-table-column>
+        <el-table-column prop="ProductName" label="产品名称" align="center"></el-table-column>
+        <el-table-column prop="BuyTime" label="下单时间" align="center" width="180"></el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <!-- <el-button size="small" type="primary" v-if="scope.row.Status=='待付款'" @click="payMent(scope.$index,scope.row)">付款</el-button> -->
-            <el-button size="small" v-if="scope.row.TaskState==1" type="danger" @click="cancelHandel(scope.$index,scope.row)">取消</el-button>
-            <el-button size="small" v-if="scope.row.TaskState==5" type="success" @click="evalEdit(scope.$index,scope.row)">填写评价</el-button>
-            <!-- <el-button size="small" type="warning" @click="viewDaily(scope.$index,scope.row)">日志</el-button> -->
-            <!-- <el-button size="small" v-if="scope.row.Status=='取消'" type="danger" @click="delhandel(scope.$index,scope.row)">删除</el-button> -->
-            <el-button size="small" type="primary" v-if="scope.row.TaskState==3" @click="confirmBtn(scope.$index,scope.row)">订单确认</el-button>
-            <!-- 						<el-button size="small" v-if="scope.row.Status=='待收货'" type="danger" @click="refundBtn(scope.$index,scope.row)">申请退款</el-button>
-						<el-button size="small" v-if="scope.row.Status=='退款'" @click="cancelRefundBtn(scope.$index,scope.row)">取消退款</el-button>
-						<el-button size="small" v-if="scope.row.Status=='取消'" @click="cancelReasonBtn(scope.$index,scope.row)">取消原因</el-button> -->
+            <el-button v-if="scope.row.TaskState==1" type="danger" @click="cancelHandel(scope.$index,scope.row)">取消</el-button>
+            <el-button  v-if="scope.row.TaskState==5" type="success" @click="evalEdit(scope.$index,scope.row)">填写评价</el-button>
+            <el-button type="primary" v-if="scope.row.TaskState==3" @click="confirmBtn(scope.$index,scope.row)">订单确认</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -117,26 +103,6 @@
         <el-button @click="assessModel=false" size="medium">取消</el-button>
       </span>
     </el-dialog>
-    <!-- 日志-->
-<!--    <el-dialog title="日志" :visible.sync="dailyModel" :close-on-click-modal="false">
-      <el-timeline>
-        <el-timeline-item v-for="(item, index) in activities" :key="index" :timestamp="item.ActDate" placement="top">
-          <el-card>
-            <h4>{{item.ActionName}}</h4>
-            <p>{{item.ActDate}}</p>
-          </el-card>
-        </el-timeline-item>
-      </el-timeline>
-    </el-dialog> -->
-    <!-- 删除-->
-<!--    <el-dialog title="温馨提示" :visible.sync="delModel" :close-on-click-modal="false" center="" width="30%">
-      <div class="del-dialog-cnt">是否删除此数据?</div>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" size="medium" @click='delSubmit'>确定</el-button>
-        <el-button @click="delModel=false" size="medium">取消</el-button>
-      </span>
-    </el-dialog> -->
-    <!--确认完成-->
     <el-dialog title="订单确认" :visible.sync="submitModal" :close-on-click-modal="false" center="" width="40%">
       <div>
         <el-form :model="orderForm" label-width="80px">
@@ -156,22 +122,6 @@
         <el-button @click="submitModal=false" size="medium">取消</el-button>
       </span>
     </el-dialog>
-    <!--申请退款-->
-<!--    <el-dialog title="温馨提示" :visible.sync="refundModal" :close-on-click-modal="false" center="" width="30%">
-      <div class="del-dialog-cnt">是否确定申请退款?</div>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" size="medium" @click='retuenSubmit'>确定</el-button>
-        <el-button @click="refundModal=false" size="medium">取消</el-button>
-      </span>
-    </el-dialog> -->
-    <!--取消退款-->
-<!--    <el-dialog title="温馨提示" :visible.sync="cancelRefundModal" :close-on-click-modal="false" center="" width="30%">
-      <div class="del-dialog-cnt">是否确定取消退款申请?</div>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" size="medium" @click='cancelRefund'>确定</el-button>
-        <el-button @click="cancelRefundModal=false" size="medium">取消</el-button>
-      </span>
-    </el-dialog> -->
     <!--取消-->
     <el-dialog title="取消订单" :visible.sync="cancelModal" :close-on-click-modal="false" center="" width="30%">
       <div class="del-dialog-cnt">是否确定取消该任务?</div>
@@ -180,52 +130,19 @@
         <el-button @click="cancelModal=false" size="medium">取消</el-button>
       </span>
     </el-dialog>
-    <!-- 付款-->
-<!--    <el-dialog title="付款" :visible.sync="paymentModel" :close-on-click-modal="false" width="40%" :before-close="paymentClose"
-      top='5vh'>
-      <el-form :model="paymentForm" class="demo-ruleForm">
-        <el-row>
-          <el-col :span="12" :xs="24">
-            <el-form-item label="当前余额">
-              <span class="tipRed">￥{{paymentForm.balance}}</span>
-            </el-form-item>
-            <div>
-              <el-form-item label="待付款金额">
-                <span class="tipRed">￥{{paymentForm.payMoney}}</span>
-              </el-form-item>
-            </div>
-            <el-button type='warning' v-if='parseInt(this.paymentForm.payMoney)>parseInt(this.paymentForm.balance) || parseInt(this.paymentForm.balance)==0'
-              @click='toRecharge'>去充值</el-button>
-          </el-col>
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click='paymentOrder' v-if='parseInt(this.paymentForm.payMoney)<parseInt(this.paymentForm.balance) && parseInt(this.paymentForm.balance)!=0 && !payList'>确定</el-button>
-        <el-button type="primary" @click='paymentOrderList' v-if="payList">确定</el-button>
-        <el-button @click="paymentClose">取消</el-button>
-      </div>
-    </el-dialog> -->
     <!--FBA查看详情-->
-    <el-dialog title='详情' :visible.sync="viewDetailModal" width='80%'>
+    <el-dialog title='任务详情' :visible.sync="viewDetailModal" width='80%'>
       <view-task :viewTaskData="viewTaskData"></view-task>
-      <span slot='footer' class="dialog-footer">
+      <span slot='footer' class="dialog-footer txtCenter">
         <el-button type='primary' @click='viewDetailModal=false'>返回</el-button>
       </span>
     </el-dialog>
-    <!--取消原因-->
-<!--    <el-dialog title='取消原因' :visible.sync='reasonModal' width='40%'>
-      <span>{{reasonCon}}</span>
-      <span slot='footer' class="dialog-footer">
-        <el-button type='primary' @click='reasonModal=false'>返回</el-button>
-      </span>
-    </el-dialog> -->
   </div>
 </template>
 <script>
-  import vali from '../common/validate'
   import viewTask from '../common/viewTaskDetails'
-  import FileSaver from 'file-saver'
-  import XLSX from 'xlsx'
+  // import FileSaver from 'file-saver'
+  // import XLSX from 'xlsx'
   import {
     getCountry,
     taskList,
@@ -233,11 +150,12 @@
     taskConfirm,
     taskCancel
   } from '@/request/api'
-  const cityOptions = ['美国', '日本', '韩国', '加拿大'];
+  // const cityOptions = ['美国', '日本', '韩国', '加拿大'];
   export default {
     name: 'taskManage',
     data() {
       return {
+        loading: true, //列表加载
         serviceType:0,
         hideUpload: false, //评论上传图片继续添加按钮
         limitCount:1, //图片数量
@@ -248,51 +166,19 @@
         checkAll: false,
         cities: [],
         isIndeterminate: true,
-        activeTask: 2, //除FBA任务外的其它任务状态
-        imgIng: false, //评论图片上传中
-        videoTip: true, //评论视频上传错误提示
-        videlIng: false, //视频上传中
-        payList: false, //列表付款按钮显示
-        reasonModal: false, //取消原因
-        reasonCon: '',
-        imgTip: false, //上传图片失败提示
-        videoSuccess: false, //视频上传成功
-        imgsData: [], //评论上传图片
-        fileId: '',
         OrderId: '', //任务ID
-        Amount: 0,
         uploadUrl: this.axios.defaults.baseURL+'/api/Order/GetProductPictures',
-        BaseTaskType: 1, //任务列表类型
         viewTaskData: [],
-        OrderSchedule: {}, //查看任务开始时间
         allOrderData: [],
         hasBalance: 0,
-        taskTypeData: [], //任务类型
-        commentTypeData: [], //留评类型
-        dialogImageUrl: '',
-        dialogVisible: false,
-        loading: true,
-        // status: this.$route.params.taskTypeModel,
-        errorStatus: this.$route.params.active,
         pageSize: 10, //每页条数
         total: 0, //总条数
-        btnTask: true,
         currentPage: 1, //页数
         cancelModal: false,
-        delModel: false, // 删除
-        reverse: true,
-        paymentModel: false,
         submitModal: false, //确认
-        refundModal: false, //申请退款
-        cancelRefundModal: false, //取消退款
-        viewDetailModal: false, //FBA查看详情
-        activities: [],
+        viewDetailModal: false, //查看详情
         active: 0,
-        dailyModel: false,
-        disabled: true,
         assessModel: false,
-        errorMes: false,
-        nolp: true,
         startTime: '',
         pickerEndDate: this.pickerOptionsEnd(),
         pickerStartDate: this.searchStartDate(),
@@ -300,45 +186,21 @@
           balance: 0,
           payMoney: 0,
         },
-        countryData: [],
         searchForm: {
           Keyword: '',
           orderStartTime: '',
           orderEndTime: '',
           checkedCities: []
         },
+        // 评价
         assessForm: {
           productLink:'', //产品链接
           ProductPictures: '',//评论图片
           ProductImage:'' //产品图片
         },
 
-        // taskType: 'all',
-
-        taskRule: {
-          VideoNum: [{
-            validator: vali.checkNum,
-            trigger: 'change'
-          }],
-          PicNum: [{
-            validator: vali.checkNum,
-            trigger: 'change'
-          }],
-          tradingFlow: [{
-            required: true,
-            message: '请输入交易流水',
-            trigger: 'change'
-          }],
-          PayAccount: [{
-            required: true,
-            message: '请输入付款账号',
-            trigger: 'change'
-          }]
-        },
-
         obj: [],
         StatusSum: [], //任务状态数量
-        selected: [], //选中的值
         statusList: [] //全部状态
       }
     },
@@ -346,8 +208,6 @@
       viewTask
     },
     created() {
-      // this.getError()
-      // this.getObj()
       this.getAllCountry()
       this.getAllData()
       this.getAllStatus()
@@ -438,6 +298,7 @@
           state: parseInt(_this.active) //任务状态
         }
         taskList(param).then(res => {
+          _this.loading = false
           _this.allOrderData = res.data.list
           _this.total = parseInt(res.data.total)
           let lists = res.data.list
@@ -467,8 +328,10 @@
       },
       // 国家全选
       handleCheckAllChange(val) {
-        this.searchForm.checkedCities = val ? cityOptions : [];
-        this.isIndeterminate = false;
+        let _this = this
+        let citys = _this.cities
+        _this.searchForm.checkedCities = val ? citys : [];
+        _this.isIndeterminate = false;
       },
       // 国家选择
       handleCheckedCitiesChange(value) {
@@ -504,47 +367,8 @@
           }
         })
       },
-      getObj() {
-        let _this = this
-        let types = sessionStorage.getItem('typeData')
-        let obj = JSON.parse(types)
-        _this.obj = obj
-      },
-      //获取类型
-      getInfo(obj, param1, param2) {
-        for (let i = 0; i < obj.length; i++) {
-          if ((obj[i].TypeName == param1 && obj[i].Value == param2) ||
-            (obj[i].Value == param1 && obj[i].TypeName == param2)) {
-            return obj[i].Display;
-          }
-        }
-      },
-
-      //任务类型搜索
-      checkTask(value) {
-        let _this = this
-        _this.BaseTaskType = value
-        _this.currentPage = 1
-        _this.getAllData(value)
-      },
       handleRemove(file, fileList) {
         console.log(file, fileList);
-      },
-      handlePictureCardPreview(file) {
-        console.log(file)
-        this.dialogImageUrl = file.url;
-        this.dialogVisible = true;
-      },
-      //列表确认付款弹窗
-      payMent() {
-        let _this = this
-        _this.paymentModel = true
-        _this.payList = true
-        _this.hasBalance = 1
-        _this.OrderId = _this.selected.Id
-        _this.Amount = _this.selected.TotalPrice
-        _this.paymentForm.payMoney = _this.selected.TotalPrice
-        _this.paymentForm.balance = sessionStorage.getItem('balance')
       },
       //订单确认完成弹窗
       confirmBtn(index) {
@@ -585,15 +409,6 @@
           console.log(error)
         })
       },
-      // 获取异常
-      getError() {
-        let _this = this
-        let errors = _this.errorStatus
-        if (errors != undefined) {
-          this.errData()
-        }
-      },
-
       // 重置
       resetTask() {
         let _this = this
@@ -605,14 +420,6 @@
         }
         _this.getAllData()
       },
-      // 付款关闭页面
-      paymentClose() {
-        let _this = this
-        _this.paymentModel = false
-        _this.payList = false
-        _this.hasBalance = 0
-      },
-
 
       // 取消
       cancelHandel(index) {
@@ -715,6 +522,26 @@
         let obj = _this.obj
         _this.viewDetailModal = true
         _this.viewTaskData = _this.allOrderData[index]
+        // let val = _this.allOrderData[index]
+        // if (val.TaskState == 1) {
+        //  _this.viewTaskData.TaskState = '任务待分配'
+        // } else if (val.TaskState == 2) {
+        //    _this.viewTaskData.TaskState = '待购买'
+        // } else if (val.TaskState == 3) {
+        //    _this.viewTaskData.TaskState = '订单待确认'
+        // } else if (val.TaskState == 4) {
+        //    _this.viewTaskData.TaskState = '待评价'
+        // } else if (val.TaskState == 5) {
+        //    _this.viewTaskData.TaskState = '评价待确认'
+        // }else if(val.TaskState == 6){
+        //   _this.viewTaskData.TaskState = '完成'
+        // }else if(val.TaskState == 7){
+        //   _this.viewTaskData.TaskState = '取消'
+        // }else if(val.TaskState == 8){
+        //   _this.viewTaskData.TaskState = '异常'
+        // }else{
+        //   return
+        // }
       },
 
       startDate() {

@@ -1,8 +1,9 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
-import App from './App'
 import router from './router'
+import 'element-ui/lib/theme-chalk/index.css'
+import App from './App'
 import axios from 'axios'
 import vuex from 'vuex'
 import 'babel-polyfill'
@@ -10,12 +11,11 @@ import ElementUI from 'element-ui'
 import VueResource from 'vue-resource'
 import 'default-passive-events'
 import global_ from '@/components/global'
-import 'element-ui/lib/theme-chalk/index.css'
 import './assets/css/mystyle.css'
 import vali from '@/components/common/validate'
 // import request from '@/request/https'
 Vue.config.productionTip = false
-Vue.use(ElementUI,{size: 'medium'}, VueResource, vuex, vali)
+Vue.use(ElementUI, VueResource, vuex, vali)
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 //axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 // axios.defaults.headers.common['SID'] = sessionStorage.getItem('sessionid')

@@ -4,7 +4,7 @@ export const login = (params) => post('/api/Login/UserLogin', params) //登录
 export const register = (params) => post('/api/CustomerUser/AddUser', params) //注册
 export const getIndex = (params) => post('/api/HomePage/GetUserInformation', params) //首页获取用户信息、余额
 export const getNotice = (params) => get('/api/HomePage/GetHomePage') //首页公告
-export const OrderSum = (params) => getAction('/api/Task/GetAllTaskState') //首页任务数量
+export const orderSum = (params) => getAction('/api/Task/GetAllTaskState', params) //首页任务数量
 export const updatePwd = (params) => post('/api/CustomerUser/ChangePassWord', params) //修改密码
 export const updateQQ = (params) => post('/api/CustomerUser/ChangeQQ', params) //修改QQ
 export const updateName = (params) => post('/api/CustomerUser/ChangeName', params) //修改姓名

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="mt20 mb20 tabsTxt">
+		<div class="mt20 mb20">
 			<span>首页</span>
 			<span class="fg">/</span>
 			<a>账户设置</a>
@@ -8,7 +8,7 @@
 			<span>修改密码</span>
 		</div>
 		<div class="pwdBox">
-			<el-form :model="updatePwdForm" ref='updatePwdForm' label-width="80px" :rules='rules' status-icon>
+			<el-form :model="updatePwdForm" ref='updatePwdForm' label-width="100px" :rules='rules' status-icon>
 				<el-row>
 					<el-col :xs="24">
 						<el-form-item label="旧密码" prop='oldPwd'>

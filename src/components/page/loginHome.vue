@@ -1,76 +1,57 @@
 <template>
 	<div>
-		<div class="mt20 mb20"><span class="tabsTxt">首页</span></div>
-		<div class="userBox">
+		<div class="userBox mb20">
 			<div class="panLeft">
 				<img src="../../assets/image/headImg.jpg" alt="" class="headImg" />
 			</div>
 			<div class="bg-purple panRight">
 				<div class="userMsg">
 					<span>您好，</span>
-					<span>{{name}}</span>
+					<span class="fz18">{{name}}</span>
 				</div>
 				<div>
 					<span>账户余额:￥<span class="money">{{balance}}</span></span>
-					<el-button class="el-button ml30" type="primary" size="medium" @click='viewAccount'>查看明细</el-button>
-					<el-button class="el-button cashWish" type="success" @click="cashMoney" size="medium">提现</el-button>
+					<el-button class="el-button ml30" type="primary" @click='viewAccount'>查看明细</el-button>
+					<el-button class="el-button cashWish" type="success" @click="cashMoney">提现</el-button>
 				</div>
 			</div>
 		</div>
-		<el-row :gutter="20">
-			<el-col :span="6" :xs="24">
-				<div class="grid-content bg-purple taskBox">
-					<div class="items items1" style="width: 100%">
-						<div style="width: 40%;">
-							<i class="el-icon-goods icons" style="color: #fff;"></i>
-						</div>
-						<div style="width: 60%;">
-							<div class="count">{{TotalCount}}</div>
-							<div class="col fz">总任务</div>
-						</div>
-					</div>
-				</div>
-			</el-col>
-			<el-col :span="6" :xs="24">
-				<div class="grid-content bg-purple taskBox">
-					<div class="items items2" style="width: 100%">
-						<div style="width: 40%;">
-							<i class="el-icon-pie-chart icons" style="color: #fff;"></i>
-						</div>
-						<div style="width: 60%;">
-							<div class="count">{{HaveInHandByTask}}</div>
-							<div class="col fz">进行中的任务</div>
-						</div>
-					</div>
-				</div>
-			</el-col>
-			<el-col :span="6" :xs="24">
-				<div class="grid-content bg-purple taskBox">
-					<div class="items items3" style="width: 100%">
-						<div style="width: 40%;">
-							<i class="el-icon-time icons" style="color: #fff;"></i>
-						</div>
-						<div style="width: 60%;">
-							<div class="count">{{CompleteTask}}</div>
-							<div class="col fz">已完成的任务</div>
-						</div>
-					</div>
-				</div>
-			</el-col>
-			<el-col :span="6" :xs="24">
-				<div class="grid-content bg-purple taskBox">
-					<div class="items items4" style="width: 100%">
-						<div style="width: 40%;">
-							<i class="el-icon-warning-outline icons" style="color: #fff;"></i>
-						</div>
-						<div style="width: 60%;">
-							<div class="count">{{CancelTask}}</div>
-							<div class="col fz">已取消任务</div>
-						</div>
-					</div>
-				</div>
-			</el-col>
-		</el-row>
+    <div class="boxBorder mb20">
+    	<el-row class='bgTask' v-for="(item,index) in taskNum" :key='index'>
+    		<el-col :span="6" :xs="24" class='txtCenter'>
+    			<div class="grid-content bg-purple taskBox">
+    				<div class="items items1">
+    					<span class="count">{{item.TotalCount}}</span>
+    				</div>
+    				<div class="txtCenter col fz20 mt20">总任务</div>
+    			</div>
+    		</el-col>
+    		<el-col :span="6" :xs="24">
+    			<div class="grid-content bg-purple taskBox">
+    				<div class="items items2">
+    					<span class="count">{{item.HaveInHandByTask}}</span>
+    				</div>
+    				<div class="txtCenter col fz20 mt20">进行中的任务</div>
+    			</div>
+    		</el-col>
+    		<el-col :span="6" :xs="24">
+    			<div class="grid-content bg-purple taskBox">
+    				<div class="items items3">
+    					<span class="count">{{item.CompleteTask}}</span>
+    				</div>
+    				<div class="txtCenter col fz20 mt20">已完成的任务</div>
+    			</div>
+    		</el-col>
+    		<el-col :span="6" :xs="24">
+    			<div class="grid-content bg-purple taskBox">
+    				<div class="items items4">
+    					<span class="count">{{item.CancelTask}}</span>
+    				</div>
+    				<div class="txtCenter col fz20 mt20">已取消任务</div>
+    			</div>
+    		</el-col>
+    	</el-row>
+    </div>
     <el-card class="box-card">
       <div slot="header" class="clearfix">
         <span>公告</span>
@@ -128,7 +109,7 @@
 <script>
 	import bus from '../common/bus'
 	import vali from '../common/validate'
-  import {getIndex,OrderSum} from '@/request/api'
+  import {getIndex,orderSum,getNotice} from '@/request/api'
 	export default {
 		name: 'loginHome',
 		data() {
@@ -144,14 +125,10 @@
 				// hashBd: false,
 				name: sessionStorage.getItem('userName'),
 				times: sessionStorage.getItem('times'),
-				balance: sessionStorage.getItem('balance'),
+				balance: 0,
 				homeData: [],
 				userSmmary: [],
 				tasksItems: [],
-        TotalCount:0, //总任务
-        HaveInHandByTask:0, //进行中的任务
-        CompleteTask:0, //已完成任务
-        CancelTask:0, //已取消任务
 				//银行卡信息
 				bankPayForm: {
 					accountName: '',
@@ -159,7 +136,8 @@
 					accountNumber: '',
 					IdentificationCode: ''
 				},
-				postJson: {}
+				postJson: {},
+        taskNum:[]
 			}
 		},
 		created() {
@@ -170,6 +148,7 @@
 			this.isError()
       this.getNoticeData()
 			this.getHome()
+      this.getAllTaskNum()
 		},
 		computed: {
 			role() {
@@ -181,8 +160,10 @@
       // 公告内容
       getNoticeData(){
         let _this = this
-        _this.axios.get(_this.GLOBAL.BASE_URL +'/api/HomePage/GetHomePage').then((res)=>{
-            _this.Notice = res.data[0].Notice
+        getNotice().then(res=>{
+          _this.Notice = res.data[0].Notice
+        }).catch(error=>{
+          console.log(error)
         })
       },
 			//首页数据加载
@@ -193,8 +174,10 @@
 				}
          getIndex(param).then((res=>{
            _this.homeData = res.data
-           if(_this.homeData[0].accountbalance == null){
-             _this.homeData[0].accountbalance = 0
+           if(res.data[0].accountbalance == null){
+             res.data[0].accountbalance = 0
+           }else{
+             _this.balance = res.data[0].accountbalance
            }
            sessionStorage.setItem('userName', _this.homeData[0].name)
            sessionStorage.setItem('balance', _this.homeData[0].accountbalance)
@@ -206,11 +189,10 @@
         let param = {
         	uid: sessionStorage.getItem('userId')
         }
-        OrderSum(param).then((res)=>{
-          _this.TotalCount = TotalCount
-          _this.HaveInHandByTask = HaveInHandByTask
-          _this.CompleteTask = CompleteTask
-          _this.CancelTask = CancelTask
+        orderSum(param).then(res=>{
+          _this.taskNum = res.data.list
+        }).catch(error=>{
+          console.log(error)
         })
       },
 			//充值
@@ -250,44 +232,6 @@
 						taskTypeModel: true
 					}
 				})
-			},
-			// FBA任务
-			fbaTask(index) {
-				let _this = this
-				_this.$router.push('/FbaTask')
-				sessionStorage.setItem('platformId',_this.tasksItems[index].platformId)
-				sessionStorage.setItem('Platform',_this.tasksItems[index].platform)
-				sessionStorage.setItem('baseTaskId',_this.tasksItems[index].taskId)
-				sessionStorage.setItem('baseTaskType',_this.tasksItems[index].tasktype)
-			},
-			// 心愿任务
-			wishTask(index) {
-				let _this = this
-				_this.$router.push({
-					name: 'wishTask'
-				})
-				sessionStorage.setItem('platformId',_this.tasksItems[index].platformId)
-				sessionStorage.setItem('Platform',_this.tasksItems[index].platform)
-				sessionStorage.setItem('baseTaskId',_this.tasksItems[index].taskId)
-				sessionStorage.setItem('baseTaskType',_this.tasksItems[index].tasktype)
-			},
-			//购物车任务
-			buyCarTask(index) {
-				let _this = this
-				_this.$router.push('/buyCarTask')
-				sessionStorage.setItem('platformId',_this.tasksItems[index].platformId)
-				sessionStorage.setItem('Platform',_this.tasksItems[index].platform)
-				sessionStorage.setItem('baseTaskId',_this.tasksItems[index].taskId)
-				sessionStorage.setItem('baseTaskType',_this.tasksItems[index].tasktype)
-			},
-			//点赞任务
-			likesTask(index) {
-				let _this = this
-				_this.$router.push('/likesTask')
-				sessionStorage.setItem('platformId',_this.tasksItems[index].platformId)
-				sessionStorage.setItem('Platform',_this.tasksItems[index].platform)
-				sessionStorage.setItem('baseTaskId',_this.tasksItems[index].taskId)
-				sessionStorage.setItem('baseTaskType',_this.tasksItems[index].tasktype)
 			},
 			// 提现
 			cashMoney() {
